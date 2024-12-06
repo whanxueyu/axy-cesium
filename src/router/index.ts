@@ -16,8 +16,9 @@ const routes: Array<RouteRecordRaw> = [
         component: Home
       },
       {
-        path: 'basicCase',
+        path: '/basicCase/:type',
         name: 'basicCase',
+        props: true,
         component: basicCase
       },
       {

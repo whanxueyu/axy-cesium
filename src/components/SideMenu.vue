@@ -23,7 +23,10 @@ export default defineComponent({
 
         const menuItems: MenuItem[] = [
             { name: 'Home', path: '/' },
-            { name: '基础案例', path: '/basicCase' },
+            { name: 'ImagerLayer案例', path: '/basicCase/layers' },
+            { name: '标牌案例', path: '/basicCase/billboard' },
+            { name: '模型案例', path: '/basicCase/model' },
+            { name: '自定义材质案例', path: '/basicCase/material' },
             { name: '综合案例', path: '/ComprehensiveCase' },
         ];
 

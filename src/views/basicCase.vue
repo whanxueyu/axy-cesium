@@ -1,9 +1,5 @@
 <!-- src/views/Case2.vue -->
 <template>
-  <div>
-    <h1>Cesium 案例集合</h1>
-    <p>这是案例集合的内容。</p>
-  </div>
   <div class="case_list">
     <div class="case_item" v-for="(item, index) in caselist" :key="item.title" @click="showDetails(index)">
       <img :src="item.imgurl" :alt="item.title">
@@ -38,12 +34,16 @@
 </template>
 
 <script setup lang="ts" name="Case2">
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
 import { caseList } from '@/data/caseList';
 import router from '@/router';
+interface Props {
+  type: 'layers' | 'billboard'; // 只允许 'layer' 或 'billboard'
+}
+const props = defineProps<Props>();
 const selectedIndex = ref<number | null>(null)
-const caselist = ref(caseList)
+const caselist = ref<any>([])
 const showCase = ref(false)
 const selectedCase = ref<{
   imgurl: string;
@@ -85,6 +85,22 @@ function showDetails(index: number) {
   showCase.value = true;
   selectedCase.value = caselist.value[index];
 }
+// 监听 props.type 的变化
+watch(
+  () => props.type,
+  (newType) => {
+    updateCaselist(newType);
+  }
+);
+
+function updateCaselist(type: 'layers' | 'billboard' = props.type) {
+  console.log(type, caseList);
+  caselist.value = caseList[type];
+  console.log(caseList[type]);
+}
+onMounted(() => {
+  updateCaselist();
+})
 </script>
 
 <style scoped>
