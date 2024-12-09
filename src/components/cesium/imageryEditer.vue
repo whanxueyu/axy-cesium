@@ -3,6 +3,12 @@
         <el-button @click="setBlackMap()">暗色地图</el-button>
         <el-color-picker v-model="filterColor" color-format="hex"></el-color-picker>
         <div class="flex">
+            <div class="flex-label">反色</div>
+            <div class="flex-content">
+                <el-checkbox v-model="viewModel.invertColor" label="反色" @change="setBlackMap()"></el-checkbox>
+            </div>
+        </div>
+        <div class="flex">
             <div class="flex-label">Brightness</div>
             <div class="flex-content">
                 <el-slider @change="setParmas('brightness')" type="range" :min="0" :max="3" :step="0.02"
@@ -61,6 +67,7 @@ const viewModel = reactive({
     hue: 0,
     saturation: 0,
     gamma: 0,
+    invertColor: false,
 })
 // 获取 Cesium 视图对象
 let viewer: Cesium.Viewer;
@@ -70,32 +77,32 @@ const setBlackMap = () => {
     let { red, blue, green } = hexColorToRgba(filterColor.value)
     console.log(red, blue, green)
     modifyMap(viewer, {
-        //反色?
-        invertColor: true,
-        brightness: 0.8,
         filterRGB: [red, green, blue],
-        hue: 0.5,
-        gamma: 0.2,
-        contrast: 3,
-        saturation: 1.5,
-        // color: 'rgb('+red+','+green+','+blue+')',
+        ...viewModel,
     });
 }
 
 
-const modifyMap = (viewer: Cesium.Viewer, options:any) => {
+const modifyMap = (viewer: Cesium.Viewer, options: any) => {
+    console.log(options)
     const baseLayer = viewer.imageryLayers.get(0)
     baseLayer.brightness = options.brightness || 0.6
     baseLayer.contrast = options.contrast || 1.8
     baseLayer.gamma = options.gamma || 0.3
     baseLayer.hue = options.hue || 1
     baseLayer.saturation = options.saturation || 0
-    const baseFragShader = (viewer.scene.globe)._surfaceShaderSet
-        .baseFragmentShaderSource.sources
-    for (let i = 0; i < baseFragShader.length; i++) {
+    // const baseFragShader = (viewer.scene.globe)._surfaceShaderSet
+    //     .baseFragmentShaderSource.sources
+    for (let i = 0; i < baseFragShader.value.length; i++) {
         const strS = 'color = czm_saturation(color, textureSaturation);\n#endif\n'
         let strT = 'color = czm_saturation(color, textureSaturation);\n#endif\n'
         if (options.invertColor) {
+            strT += `
+                color.r = 1.0 - color.r;
+                color.g = 1.0 - color.g;
+                color.b = 1.0 - color.b;
+                `
+        } else {
             strT += `
                 color.r = 1.0 - color.r;
                 color.g = 1.0 - color.g;
@@ -109,12 +116,13 @@ const modifyMap = (viewer: Cesium.Viewer, options:any) => {
                 color.b = color.b * ${options.filterRGB[2]}.0/255.0;
                 `
         }
-        baseFragShader[i] = baseFragShader[i].replace(strS, strT)
+        baseFragShader.value[i] = baseFragShader.value[i].replace(strS, strT)
     }
     nextTick(() => {
         updateViewModel()
     })
 }
+const baseFragShader = ref()
 const updateViewModel = () => {
     if (imageryLayers.value.length > 0) {
         const layer = imageryLayers.value.get(0);
@@ -125,12 +133,21 @@ const updateViewModel = () => {
         viewModel.gamma = layer.gamma;
     }
 }
+const setviewModel = () => {
+    const baseLayer = viewer.imageryLayers.get(0)
+    baseLayer.brightness = viewModel.brightness || 0.6
+    baseLayer.contrast = viewModel.contrast || 1.8
+    baseLayer.gamma = viewModel.gamma || 0.3
+    baseLayer.hue = viewModel.hue || 1
+    baseLayer.saturation = viewModel.saturation || 0
+}
 
 const setParmas = (name: string) => {
     const layer = imageryLayers.value.get(0);
     if (layer) {
         layer[name] = viewModel[name]
     }
+    setviewModel()
 }
 const hexColorToRgba = (color: string) => {
     // 检查输入颜色是否以 "#" 开头
@@ -180,8 +197,11 @@ onMounted(() => {
     if (viewer) {
         imageryLayers.value = viewer.imageryLayers;
         nextTick(() => {
+            // setBlackMap(true)
             updateViewModel()
         })
+        baseFragShader.value = (viewer.scene.globe)._surfaceShaderSet
+            .baseFragmentShaderSource.sources
     }
 });
 

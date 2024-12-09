@@ -26,6 +26,8 @@ onMounted(async () => {
         fullscreenButton: false,
         terrain: Cesium.Terrain.fromWorldTerrain(),
     });
+    if (viewer.imageryLayers.length > 0)
+        viewer.imageryLayers.removeAll();
     (viewer.cesiumWidget.creditContainer as HTMLElement).style.display = "none";
     viewer.imageryLayers.addImageryProvider(
         await Cesium.IonImageryProvider.fromAssetId(4),
