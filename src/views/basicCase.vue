@@ -107,8 +107,8 @@ onMounted(() => {
 .case_list {
   display: flex;
   flex-wrap: wrap;
-  gap: 30px;
-  justify-content: space-between;
+  gap: 40px;
+  /* justify-content: space-between; */
 }
 
 .dialog_content {

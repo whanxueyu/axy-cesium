@@ -10,6 +10,7 @@ import tilegrid from '@/assets/images/example/tilegrid.png';
 import darkmap from '@/assets/images/example/darkmap.png';
 import baselayer from '@/assets/images/example/baselayer.png';
 import editlayer from '@/assets/images/example/editlayer.png';
+import basicBillboard from '@/assets/images/example/basicBillboard.png';
 
 export const caseList = {
   layers: [
@@ -86,5 +87,18 @@ export const caseList = {
       path: '/example/editMapColor'
     },
   ],
-  billboard:[]
+  billboard:[
+    {
+      imgurl: basicBillboard,
+      title: '基础标牌',
+      description: '基础标牌的各个参数效果对比展示',
+      path: '/example/basicBillboard'
+    },
+    {
+      imgurl: img1,
+      title: '标牌聚合效果',
+      description: '标牌聚合效果',
+      path: '/example/billboardCluster'
+    },
+  ]
 }

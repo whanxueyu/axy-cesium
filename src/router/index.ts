@@ -93,6 +93,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'editMapColor',
         component: () => import('@/views/example/imageLayer/editMapColor.vue')
       },
+      {
+        path: '/example/basicBillboard',
+        name: 'basicBillboard',
+        component: () => import('@/views/example/billboard/basicBillboard.vue')
+      },
+      {
+        path: '/example/billboardCluster',
+        name: 'billboardCluster',
+        component: () => import('@/views/example/billboard/billboardCluster.vue')
+      },
     ]
   }
 ];
