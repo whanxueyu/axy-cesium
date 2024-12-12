@@ -1,52 +1,104 @@
-
 <template>
-    <div id="cesiumContainer" class="fullSize"></div>
-  </template>
-  
-  <script setup lang="ts">
-  import { onMounted } from 'vue';
-  import * as Cesium from "cesium";
-  import 'cesium/Source/Widgets/widgets.css';
-  var viewer:Cesium.Viewer
-  Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
-  const addBillboard = () => {
-    const data = [
-      {
-        id: 1,
-        name: "1",
-        position: [116.4, 39.9],
-        color: "#ff0000",
-        scale: 1,
-        image: "https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg"
+  <div id="cesiumContainer" class="fullSize"></div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from 'vue';
+import * as Cesium from "cesium";
+import markList from '@/assets/images/marker/index'
+import 'cesium/Source/Widgets/widgets.css';
+var viewer: Cesium.Viewer
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
+const dataSource = ref()
+const addEntityCluster = () => {
+  dataSource.value = new Cesium.CustomDataSource("poi")
+  const entities = [];
+  for (let i = 0; i < 500; i++) {
+    const longitude = Math.random() * (110 - 90) + 90;
+    const latitude = Math.random() * (40 - 30) + 30;
+    const entity = new Cesium.Entity({
+      position: Cesium.Cartesian3.fromDegrees(longitude, latitude),
+      billboard: {
+        image: markList.LaceRed,
+        scale: 0.5,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        // disableDepthTestDistance: Number.MAX_SAFE_INTEGER, // 禁用深度测试
+        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND // 使 billboard 始终显示在地形上方
       }
-    ]
-    data.forEach(item => {
-      const billboard = viewer.entities.add({
-        position: Cesium.Cartesian3.fromDegrees(item.position[0], item.position[1]),
-        billboard: {
-          image: item.image,
-          scale: item.scale,
-          color: Cesium.Color.fromCssColorString(item.color),
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        }
-      })
-      viewer.zoomTo(billboard)
-    })
-  }
-  onMounted(() => {
-    viewer = new Cesium.Viewer("cesiumContainer", {
-      terrain: Cesium.Terrain.fromWorldTerrain(),     
     });
-    addBillboard()
-  });
-  </script>
-  
-  <style scoped>
-  .fullSize {
-    width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
+    entities.push(entity);
+    dataSource.value.entities.add(entity);
   }
-  </style>
+  viewer.dataSources.add(dataSource.value)
+  combineListener()
+  nextTick(() => {
+    viewer.zoomTo(dataSource.value)
+  })
+}
+const combineListener = () => {
+  dataSource.value.clustering.enabled = true;
+  dataSource.value.clustering.pixelRange = 40;
+  dataSource.value.clustering.minimumClusterSize = 2;
+
+  dataSource.value.clustering.clusterEvent.addEventListener(function (
+    clusteredEntities: Cesium.Entity[],
+    cluster: Cesium.Entity | any
+  ) {
+    // 关闭自带的显示聚合数量的标签
+    cluster.label.show = true;
+    cluster.label.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
+    cluster.label.pixelOffset = new Cesium.Cartesian2(0, 8);
+    cluster.label.font = '20px sans-serif'
+    cluster.label.style = Cesium.LabelStyle.FILL_AND_OUTLINE;
+    // cluster.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
+    cluster.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+    cluster.label.zIndex = 2;
+    cluster.billboard.show = true;
+    cluster.billboard.id = cluster.label.id;
+    cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.CENTER;
+    cluster.billboard.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
+    // cluster.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
+    cluster.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+    cluster.billboard.zIndex = 1;
+
+    // 根据聚合数量的多少设置不同层级的图片以及大小
+    if (clusteredEntities.length >= 100) {
+      cluster.billboard.image = markList.M5;
+      cluster.billboard.width = 60;
+      cluster.billboard.height = 60;
+    } else if (clusteredEntities.length >= 50) {
+      cluster.billboard.image = markList.M4;
+      cluster.billboard.width = 55;
+      cluster.billboard.height = 55;
+    } else if (clusteredEntities.length >= 20) {
+      cluster.billboard.image = markList.M3
+      cluster.billboard.width = 50;
+      cluster.billboard.height = 50;
+    } else if (clusteredEntities.length >= 10) {
+      cluster.billboard.image = markList.M2
+      cluster.billboard.width = 45;
+      cluster.billboard.height = 45;
+    } else {
+      cluster.billboard.image = markList.M1
+      cluster.billboard.width = 45;
+      cluster.billboard.height = 45;
+    }
+  });
+}
+onMounted(() => {
+  viewer = new Cesium.Viewer("cesiumContainer", {
+    terrain: Cesium.Terrain.fromWorldTerrain(),
+  });
+  addEntityCluster()
+});
+</script>
+
+<style scoped>
+.fullSize {
+  width: 100%;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+</style>

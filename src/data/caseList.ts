@@ -11,6 +11,7 @@ import darkmap from '@/assets/images/example/darkmap.png';
 import baselayer from '@/assets/images/example/baselayer.png';
 import editlayer from '@/assets/images/example/editlayer.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
+import cluster from '@/assets/images/example/cluster.png';
 
 export const caseList = {
   layers: [
@@ -95,9 +96,9 @@ export const caseList = {
       path: '/example/basicBillboard'
     },
     {
-      imgurl: img1,
+      imgurl: cluster,
       title: '标牌聚合效果',
-      description: '标牌聚合效果',
+      description: '随机生成500个点，并实现聚合效果',
       path: '/example/billboardCluster'
     },
   ]

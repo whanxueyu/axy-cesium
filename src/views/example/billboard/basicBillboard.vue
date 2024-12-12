@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { Delete, Location, Edit, Plus } from "@element-plus/icons-vue";
+import { Location} from "@element-plus/icons-vue";
 import { onMounted, ref } from 'vue';
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
