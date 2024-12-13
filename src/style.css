@@ -18,6 +18,7 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
+
 a:hover {
   color: #535bf2;
 }
@@ -46,9 +47,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -70,10 +73,128 @@ button:focus-visible {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
   }
+
   button {
     background-color: #f9f9f9;
+  }
+}
+
+
+/* cesium div style */
+.div-billboard {
+  width: 150px;
+  height: 50px;
+  position: absolute;
+  color: #666;
+  background-image: linear-gradient(to bpttom, #00b7ff, #dcf0fc);
+  border-radius: 10px;
+}
+
+.div-billboard .div-billboard-title {
+  font-size: 18px;
+}
+
+.div-billboard .div-billboard-content {
+  font-size: 14px;
+}
+
+.div-billboard1 {
+  text-align: center;
+  padding: 5px 30px;
+  margin: 0;
+  color: #fff;
+  background: linear-gradient(rgb(7 10 203 / 75%), rgb(16 238 220));
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  max-height: 130px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.div-billboard1:after {
+  content: "";
+  position: absolute;
+  bottom: -60px;
+  left: calc(50% - 3px);
+  display: block;
+  width: 3px;
+  height: 60px;
+  border-right: 3px solid #2bcdbb;
+}
+
+.div-billboard2 {
+  border: 1px solid #2bcdbb;
+}
+
+.div-billboard2-boder {
+  width: 162px;
+  height: 30px;
+  margin: auto;
+  color: #15d1f2;
+  box-shadow: inset 0 0 0 1px rgba(21, 209, 242, 0.5);
+}
+
+.div-billboard2-text {
+  color: #ccc;
+  font-size: 15px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  font-weight: bolder;
+  user-select: none;
+  cursor: pointer;
+}
+
+.div-billboard2:hover .div-billboard2-text {
+  color: #fff;
+}
+
+.div-billboard2-boder::before,
+.div-billboard2-boder::after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: "";
+  margin: -5%;
+  box-shadow: inset 0 0 0 2px;
+  animation: mars3d-divBoderLabel-animation 8s linear infinite;
+}
+
+.div-billboard2-boder::before {
+  animation-delay: -4s;
+}
+
+@keyframes mars3d-divBoderLabel-animation {
+
+  0% {
+    clip: rect(0px, 177px, 2px, 0px);
+  }
+
+  25% {
+    clip: rect(0px, 2px, 40px, 0px);
+  }
+
+  50% {
+    clip: rect(38px, 177px, 177px, 0px);
+  }
+
+  75% {
+    clip: rect(0px, 177px, 40px, 175px);
+  }
+
+  100% {
+    clip: rect(0px, 177px, 2px, 0px);
   }
 }

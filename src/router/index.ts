@@ -103,6 +103,21 @@ const routes: Array<RouteRecordRaw> = [
         name: 'billboardCluster',
         component: () => import('@/views/example/billboard/billboardCluster.vue')
       },
+      {
+        path: '/example/gifBillboard',
+        name: 'gifBillboard',
+        component: () => import('@/views/example/billboard/gifBillboard.vue')
+      },
+      {
+        path: '/example/htmlBillboard',
+        name: 'htmlBillboard',
+        component: () => import('@/views/example/billboard/htmlBillboard.vue')
+      },
+      {
+        path: '/example/divBillboard',
+        name: 'divBillboard',
+        component: () => import('@/views/example/billboard/divBillboard.vue')
+      },
     ]
   }
 ];

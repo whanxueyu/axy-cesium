@@ -12,6 +12,8 @@ import baselayer from '@/assets/images/example/baselayer.png';
 import editlayer from '@/assets/images/example/editlayer.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
 import cluster from '@/assets/images/example/cluster.png';
+import gifBillboard from '@/assets/images/example/gifBillboard.png';
+import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 
 export const caseList = {
   layers: [
@@ -98,8 +100,27 @@ export const caseList = {
     {
       imgurl: cluster,
       title: '标牌聚合效果',
-      description: '随机生成500个点，并实现聚合效果',
+      description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
       path: '/example/billboardCluster'
     },
+    {
+      imgurl: gifBillboard,
+      title: '动态标牌',
+      description: '使用gif动图实现动态标牌效果。（目前使用gifler库解析gif，但是效果不理想，无法加载超过1.6M的动图，且加载动图数量稍多就会卡顿，后续寻找更优解）',
+      path: '/example/gifBillboard'
+    },
+    {
+      imgurl: htmlBillboard,
+      title: 'html自定义标牌',
+      description: '使用html作为标牌，有更高的自由度，可以实现自己的交互逻辑',
+      path: '/example/htmlBillboard'
+    },
+    {
+      imgurl: cluster,
+      title: 'div标牌终极方案',
+      description: '封装了divBillboard类，可以加载任意的vue组件',
+      path: '/example/divBillboard'
+    },
+
   ]
 }
