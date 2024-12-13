@@ -2,31 +2,45 @@
   <div class="home">
     <header class="hero">
       <nav class="navbar">
-        <div class="logo">AXY-Cesium</div>
+        <div class="logo">My Blog</div>
         <ul class="nav-links">
-          <li><a href="#about">关于我们</a></li>
-          <li><a href="#services">服务</a></li>
-          <li><a href="#contact">联系我们</a></li>
+          <li><a href="#about">关于我</a></li>
+          <li><a href="#projects">项目案例</a></li>
+          <li><a href="#contact">联系我</a></li>
         </ul>
       </nav>
       <div class="hero-content">
-        <h1 class="title">欢迎来到 AXY-Cesium</h1>
-        <p class="subtitle">探索未来科技，共创美好明天</p>
-        <button class="cta-button">了解更多</button>
+        <h1 class="title">欢迎来到我的博客</h1>
+        <p class="subtitle">分享技术心得，记录成长点滴</p>
+        <button class="cta-button">查看文章</button>
       </div>
       <div class="hero-animation"></div>
     </header>
     <section id="about" class="section">
-      <h2>关于我们</h2>
-      <p>我们是一家专注于前沿科技的公司，致力于提供最优质的解决方案。</p>
+      <h2>关于我</h2>
+      <p>我是一名前端开发者，热爱编程和技术分享。在这里，我会记录我的学习历程和项目经验。</p>
     </section>
-    <section id="services" class="section">
-      <h2>我们的服务</h2>
-      <p>我们提供多种服务，包括但不限于软件开发、数据分析和人工智能。</p>
+    <section id="projects" class="section">
+      <h2>项目案例</h2>
+      <div class="project-list">
+        <div class="project-item">
+          <h3>项目一：AXY-Cesium</h3>
+          <p>一个基于Cesium的三维地球可视化项目。</p>
+        </div>
+        <div class="project-item">
+          <h3>项目二：Vue.js 博客系统</h3>
+          <p>一个使用Vue.js构建的个人博客系统。</p>
+        </div>
+      </div>
     </section>
     <section id="contact" class="section">
-      <h2>联系我们</h2>
-      <p>如果您有任何问题或需求，请随时联系我们。</p>
+      <h2>联系我</h2>
+      <p>如果您有任何问题或建议，欢迎通过以下方式联系我：</p>
+      <ul class="contact-links">
+        <li><a href="mailto:your-email@example.com">Email</a></li>
+        <li><a href="https://github.com/your-github">GitHub</a></li>
+        <li><a href="https://twitter.com/your-twitter">Twitter</a></li>
+      </ul>
     </section>
   </div>
 </template>
@@ -45,7 +59,7 @@
 .hero {
   position: relative;
   height: 100vh;
-  background: linear-gradient(135deg, #ff7e5f, #feb47b);
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -82,7 +96,7 @@
 }
 
 .nav-links a:hover {
-  color: #ff7e5f;
+  color: #6a11cb;
 }
 
 .hero-content {
@@ -101,7 +115,7 @@
 
 .cta-button {
   background-color: #fff;
-  color: #ff7e5f;
+  color: #6a11cb;
   border: none;
   padding: 10px 20px;
   font-size: 18px;
@@ -110,7 +124,7 @@
 }
 
 .cta-button:hover {
-  background-color: #ff7e5f;
+  background-color: #6a11cb;
   color: #fff;
 }
 
@@ -148,5 +162,34 @@
 .section p {
   font-size: 18px;
   line-height: 1.6;
+}
+
+.project-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.project-item {
+  background-color: #2c2c2c;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.contact-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.contact-links a {
+  text-decoration: none;
+  color: #6a11cb;
+  transition: color 0.3s ease;
+}
+
+.contact-links a:hover {
+  color: #fff;
 }
 </style>

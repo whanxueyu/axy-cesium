@@ -50,15 +50,23 @@ export default defineComponent({
 <style scoped lang="scss">
 .side-menu {
     width: 200px;
+    background-color: rgba(106, 17, 203, 0.8); /* 更新背景颜色 */
+    color: #fff; /* 文字颜色改为白色 */
+    padding: 20px;
 }
 
 .menu-item {
     padding: 10px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    &:hover {
+        background-color: rgba(255, 255, 255, 0.1); /* 鼠标悬停时的背景颜色 */
+    }
 
     &.active {
-        background-color: #f0f0f0;
+        background-color: #6a11cb; /* 激活状态下的背景颜色 */
+        color: #fff; /* 激活状态下的文字颜色 */
         font-weight: bold;
     }
 }

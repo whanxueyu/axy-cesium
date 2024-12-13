@@ -107,29 +107,29 @@ onMounted(() => {
 .case_list {
   display: flex;
   flex-wrap: wrap;
-  gap: 40px;
-  /* justify-content: space-between; */
+  gap: 20px;
+  justify-content: space-evenly;
 }
 
 .dialog_content {
   display: flex;
   align-items: center;
+  justify-content: space-between; /* 添加间距 */
+}
 
-  .case_prew {
-    width: 20px;
-  }
-
-  .case_next {
-    width: 40px;
-  }
+.case_prev, .case_next {
+  width: 40px; /* 统一样式 */
+  cursor: pointer;
 }
 
 .case_item {
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 15px; /* 统一样式 */
   width: 360px;
   cursor: pointer;
   transition: transform 0.2s;
+  border-radius: 8px; /* 添加圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
 }
 
 .case_item:hover {
@@ -144,10 +144,12 @@ onMounted(() => {
 .case_item_title {
   font-weight: bold;
   margin-top: 10px;
+  font-size: 18px; /* 统一样式 */
 }
 
 .case_item_description {
   color: #666;
+  margin-top: 5px; /* 添加间距 */
 }
 
 .case_details {
@@ -155,10 +157,23 @@ onMounted(() => {
   border: 1px solid #ccc;
   padding: 20px;
   background-color: #f9f9f9;
+  border-radius: 8px; /* 添加圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
 }
 
 .case_details img {
   max-width: 100%;
   height: auto;
+}
+
+.el-button {
+  font-size: 14px; /* 统一样式 */
+  padding: 10px 20px; /* 统一样式 */
+  border-radius: 4px; /* 添加圆角 */
+}
+
+.el-dialog__header {
+  font-size: 18px; /* 统一样式 */
+  font-weight: bold;
 }
 </style>
