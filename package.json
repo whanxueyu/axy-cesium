@@ -11,6 +11,7 @@
   "dependencies": {
     "cesium": "^1.124.0",
     "element-plus": "^2.9.0",
+    "gifler": "^0.1.0",
     "pinia": "^2.2.8",
     "vue": "^3.5.13",
     "vue-router": "^4.0.13"
