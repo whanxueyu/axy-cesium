@@ -38,6 +38,7 @@ import { ref, onMounted, watch } from 'vue';
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
 import { caseList } from '@/data/caseList';
 import router from '@/router';
+import { ElMessage } from 'element-plus';
 interface Props {
   type: 'layers' | 'billboard'; // 只允许 'layer' 或 'billboard'
 }
@@ -62,10 +63,14 @@ function closeDetails() {
   selectedIndex.value = null
 }
 function openSource() {
-  const url = router.resolve({
-    path: selectedCase.value.path,
-  });
-  window.open(url.href);
+  if (selectedCase.value.path) {
+    const url = router.resolve({
+      path: selectedCase.value.path,
+    });
+    window.open(url.href);
+  }else{
+    ElMessage.warning('该功能暂未完成，待开发')
+  }
 }
 function prevCase() {
   if (selectedIndex.value !== null) {
@@ -114,22 +119,28 @@ onMounted(() => {
 .dialog_content {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 添加间距 */
+  justify-content: space-between;
+  /* 添加间距 */
 }
 
-.case_prev, .case_next {
-  width: 40px; /* 统一样式 */
+.case_prev,
+.case_next {
+  width: 40px;
+  /* 统一样式 */
   cursor: pointer;
 }
 
 .case_item {
   border: 1px solid #ccc;
-  padding: 15px; /* 统一样式 */
+  padding: 15px;
+  /* 统一样式 */
   width: 360px;
   cursor: pointer;
   transition: transform 0.2s;
-  border-radius: 8px; /* 添加圆角 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  border-radius: 8px;
+  /* 添加圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 添加阴影 */
 }
 
 .case_item:hover {
@@ -144,17 +155,23 @@ onMounted(() => {
 .case_item_title {
   font-weight: bold;
   margin-top: 10px;
-  font-size: 18px; /* 统一样式 */
+  font-size: 18px;
+  /* 统一样式 */
 }
 
 .case_item_description {
   text-align: start;
   color: #666;
-  margin-top: 5px; /* 添加间距 */
-  width: 100%; /* 确保容器有宽度 */
-  display: -webkit-box; /* 使用弹性盒模型 */
-  -webkit-box-orient: vertical; /* 设置盒模型的方向为垂直 */
-  -webkit-line-clamp: 1; /* 设置显示的行数 */
+  margin-top: 5px;
+  /* 添加间距 */
+  width: 100%;
+  /* 确保容器有宽度 */
+  display: -webkit-box;
+  /* 使用弹性盒模型 */
+  -webkit-box-orient: vertical;
+  /* 设置盒模型的方向为垂直 */
+  -webkit-line-clamp: 1;
+  /* 设置显示的行数 */
   line-clamp: 1;
   overflow: hidden;
 }
@@ -165,8 +182,10 @@ onMounted(() => {
   border: 1px solid #ccc;
   padding: 20px;
   background-color: #f9f9f9;
-  border-radius: 8px; /* 添加圆角 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+  border-radius: 8px;
+  /* 添加圆角 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  /* 添加阴影 */
 }
 
 .case_details img {
@@ -175,13 +194,17 @@ onMounted(() => {
 }
 
 .el-button {
-  font-size: 14px; /* 统一样式 */
-  padding: 10px 20px; /* 统一样式 */
-  border-radius: 4px; /* 添加圆角 */
+  font-size: 14px;
+  /* 统一样式 */
+  padding: 10px 20px;
+  /* 统一样式 */
+  border-radius: 4px;
+  /* 添加圆角 */
 }
 
 .el-dialog__header {
-  font-size: 18px; /* 统一样式 */
+  font-size: 18px;
+  /* 统一样式 */
   font-weight: bold;
 }
 </style>

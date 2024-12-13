@@ -99,9 +99,21 @@ export const caseList = {
     },
     {
       imgurl: cluster,
-      title: '标牌聚合效果',
+      title: 'entity标牌聚合效果1',
       description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
       path: '/example/billboardCluster'
+    },
+    {
+      imgurl: cluster,
+      title: 'entity标牌聚合效果2',
+      description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
+      path: ''
+    },
+    {
+      imgurl: cluster,
+      title: 'primitive标牌聚合效果(高性能)',
+      description: '随机生成1000个点位，并实现不同层级的自定义聚合效果',
+      path: ''
     },
     {
       imgurl: gifBillboard,
@@ -119,7 +131,7 @@ export const caseList = {
       imgurl: cluster,
       title: 'div标牌终极方案',
       description: '封装了divBillboard类，可以加载任意的vue组件',
-      path: '/example/divBillboard'
+      path: ''
     },
 
   ]
