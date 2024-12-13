@@ -148,12 +148,20 @@ onMounted(() => {
 }
 
 .case_item_description {
+  text-align: start;
   color: #666;
   margin-top: 5px; /* 添加间距 */
+  width: 100%; /* 确保容器有宽度 */
+  display: -webkit-box; /* 使用弹性盒模型 */
+  -webkit-box-orient: vertical; /* 设置盒模型的方向为垂直 */
+  -webkit-line-clamp: 1; /* 设置显示的行数 */
+  line-clamp: 1;
+  overflow: hidden;
 }
 
 .case_details {
   margin-top: 20px;
+  text-align: start;
   border: 1px solid #ccc;
   padding: 20px;
   background-color: #f9f9f9;
