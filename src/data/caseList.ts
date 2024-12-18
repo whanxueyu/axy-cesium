@@ -100,7 +100,7 @@ export const caseList = {
     {
       imgurl: cluster,
       title: 'entity标牌聚合效果1',
-      description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
+      description: '随机生成1000个点位，并实现不同层级的自定义聚合效果',
       path: '/example/billboardCluster'
     },
     {
@@ -112,8 +112,8 @@ export const caseList = {
     {
       imgurl: cluster,
       title: 'primitive标牌聚合效果(高性能)',
-      description: '随机生成1000个点位，并实现不同层级的自定义聚合效果',
-      path: ''
+      description: '随机生成10000个点位，并实现不同层级的自定义聚合效果',
+      path: '/example/primitiveCluster'
     },
     {
       imgurl: gifBillboard,

@@ -1,5 +1,10 @@
 <template>
   <div id="cesiumContainer" class="fullSize"></div>
+  <div class="operation">
+    <span>随机生成点位</span>
+    <el-input-number :min="1" v-model="pointNum" :step="100"></el-input-number>
+    <el-button type="primary" @click="handleAdd">生成</el-button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -10,10 +15,16 @@ import 'cesium/Source/Widgets/widgets.css';
 var viewer: Cesium.Viewer
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 const dataSource = ref()
+const pointNum = ref(500);
+const handleAdd = () => {
+  viewer.entities.removeAll()
+  dataSource.value.entities.removeAll()
+  addEntityCluster()
+}
 const addEntityCluster = () => {
   dataSource.value = new Cesium.CustomDataSource("poi")
   const entities = [];
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < pointNum.value; i++) {
     const longitude = Math.random() * (110 - 90) + 90;
     const latitude = Math.random() * (40 - 30) + 30;
     const entity = new Cesium.Entity({
@@ -22,8 +33,8 @@ const addEntityCluster = () => {
         image: markList.LaceRed,
         scale: 0.5,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-        // disableDepthTestDistance: Number.MAX_SAFE_INTEGER, // 禁用深度测试
-        heightReference: Cesium.HeightReference.CLAMP_TO_GROUND // 使 billboard 始终显示在地形上方
+        disableDepthTestDistance: 500000, // 禁用深度测试
+        // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND // 使 billboard 始终显示在地形上方
       }
     });
     entities.push(entity);
@@ -50,15 +61,15 @@ const combineListener = () => {
     cluster.label.pixelOffset = new Cesium.Cartesian2(0, 8);
     cluster.label.font = '20px sans-serif'
     cluster.label.style = Cesium.LabelStyle.FILL_AND_OUTLINE;
-    // cluster.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
+    // cluster.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
     cluster.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-    cluster.label.zIndex = 2;
+    cluster.label.zIndex = 999;
     cluster.billboard.show = true;
     cluster.billboard.id = cluster.label.id;
     cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.CENTER;
     cluster.billboard.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
-    // cluster.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND;
     cluster.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+    // cluster.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
     cluster.billboard.zIndex = 1;
 
     // 根据聚合数量的多少设置不同层级的图片以及大小
@@ -87,7 +98,7 @@ const combineListener = () => {
 }
 onMounted(() => {
   viewer = new Cesium.Viewer("cesiumContainer", {
-    terrain: Cesium.Terrain.fromWorldTerrain(),
+    // terrain: Cesium.Terrain.fromWorldTerrain(),
   });
   addEntityCluster()
 });
@@ -100,5 +111,12 @@ onMounted(() => {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+.operation{
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background-color: #fff;
+  width: 200px;
 }
 </style>
