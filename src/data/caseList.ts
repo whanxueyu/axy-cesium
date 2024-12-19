@@ -107,7 +107,7 @@ export const caseList = {
       imgurl: cluster,
       title: 'entity标牌聚合效果2',
       description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
-      path: ''
+      path: '/example/billboardCluster2'
     },
     {
       imgurl: cluster,

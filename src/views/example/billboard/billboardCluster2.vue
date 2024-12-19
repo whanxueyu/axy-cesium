@@ -56,13 +56,7 @@ const combineListener = () => {
     cluster: Cesium.Entity | any
   ) {
     // 关闭自带的显示聚合数量的标签
-    cluster.label.show = true;
-    cluster.label.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
-    cluster.label.pixelOffset = new Cesium.Cartesian2(0, 8);
-    cluster.label.font = '20px sans-serif'
-    cluster.label.style = Cesium.LabelStyle.FILL_AND_OUTLINE;
-    // cluster.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
-    cluster.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
+    cluster.label.show = false;
     cluster.billboard.show = true;
     cluster.billboard.id = cluster.label.id;
     cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.CENTER;
@@ -72,27 +66,64 @@ const combineListener = () => {
 
     // 根据聚合数量的多少设置不同层级的图片以及大小
     if (clusteredEntities.length >= 100) {
-      cluster.billboard.image = markList.M5;
-      cluster.billboard.width = 60;
-      cluster.billboard.height = 60;
+      cluster.billboard.image = combineIconAndLabel(
+        markList.M5,
+        clusteredEntities.length,
+        60
+      );
     } else if (clusteredEntities.length >= 50) {
-      cluster.billboard.image = markList.M4;
-      cluster.billboard.width = 55;
-      cluster.billboard.height = 55;
+      cluster.billboard.image = combineIconAndLabel(
+        markList.M4,
+        clusteredEntities.length,
+        55
+      );
     } else if (clusteredEntities.length >= 20) {
-      cluster.billboard.image = markList.M3
-      cluster.billboard.width = 50;
-      cluster.billboard.height = 50;
+      cluster.billboard.image = combineIconAndLabel(
+        markList.M3,
+        clusteredEntities.length,
+        50
+      );
     } else if (clusteredEntities.length >= 10) {
-      cluster.billboard.image = markList.M2
-      cluster.billboard.width = 45;
-      cluster.billboard.height = 45;
+      cluster.billboard.image = combineIconAndLabel(
+        markList.M2,
+        clusteredEntities.length,
+        45
+      );
     } else {
-      cluster.billboard.image = markList.M1
-      cluster.billboard.width = 45;
-      cluster.billboard.height = 45;
+      cluster.billboard.image = combineIconAndLabel(
+        markList.M1,
+        clusteredEntities.length,
+        40
+      );
     }
   });
+}
+async function combineIconAndLabel(url: string, label: number, size: number): Promise<HTMLCanvasElement> {
+  // 创建画布对象
+  const canvas = document.createElement("canvas");
+  canvas.width = 48;
+  canvas.height = 48;
+  const ctx = canvas.getContext("2d");
+
+  try {
+    const image = await Cesium.Resource.fetchImage({ url }) as HTMLImageElement | ImageBitmap;
+
+    if (ctx) {
+      ctx.drawImage(image, 0, 0);
+
+      // 渲染字体
+      ctx.fillStyle = Cesium.Color.WHITE.toCssColorString();
+      ctx.font = "bold 20px Microsoft YaHei";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      // todo根据文字的长度，动态调整位置
+      ctx.fillText(String(label), size / 2, size / 2);
+    }
+  } catch (e) {
+    console.error("Failed to fetch or draw image:", e);
+  }
+
+  return canvas;
 }
 onMounted(() => {
   viewer = new Cesium.Viewer("cesiumContainer", {
@@ -110,7 +141,8 @@ onMounted(() => {
   padding: 0;
   overflow: hidden;
 }
-.operation{
+
+.operation {
   position: fixed;
   top: 20px;
   left: 20px;
