@@ -135,6 +135,11 @@ button:focus-visible {
 }
 
 .div-billboard2-boder {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 162px;
   height: 30px;
   margin: auto;
