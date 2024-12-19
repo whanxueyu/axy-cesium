@@ -104,6 +104,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/billboard/billboardCluster.vue')
       },
       {
+        path: '/example/primitiveCluster',
+        name: 'primitiveCluster',
+        component: () => import('@/views/example/billboard/primitiveCluster.vue')
+      },
+      {
         path: '/example/gifBillboard',
         name: 'gifBillboard',
         component: () => import('@/views/example/billboard/gifBillboard.vue')
