@@ -50,48 +50,37 @@ const combineListener = () => {
   dataSource.value.clustering.enabled = true;
   dataSource.value.clustering.pixelRange = 40;
   dataSource.value.clustering.minimumClusterSize = 2;
+  const pinBuilder = new Cesium.PinBuilder()
 
   dataSource.value.clustering.clusterEvent.addEventListener(function (
     clusteredEntities: Cesium.Entity[],
     cluster: Cesium.Entity | any
   ) {
-    // 关闭自带的显示聚合数量的标签
-    cluster.label.show = true;
-    cluster.label.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
-    cluster.label.pixelOffset = new Cesium.Cartesian2(0, 8);
-    cluster.label.font = '20px sans-serif'
-    cluster.label.style = Cesium.LabelStyle.FILL_AND_OUTLINE;
-    // cluster.label.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
-    cluster.label.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-    cluster.billboard.show = true;
-    cluster.billboard.id = cluster.label.id;
-    cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.CENTER;
-    cluster.billboard.horizontalOrigin = Cesium.HorizontalOrigin.CENTER;
-    cluster.billboard.disableDepthTestDistance = Number.POSITIVE_INFINITY;
-    // cluster.billboard.heightReference = Cesium.HeightReference.CLAMP_TO_GROUND
-
-    // 根据聚合数量的多少设置不同层级的图片以及大小
+    cluster.label.show = false
+    cluster.billboard.show = true
+    cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM
+    
+    let size = clusteredEntities.length;
+    let color = Cesium.Color.RED;
     if (clusteredEntities.length >= 100) {
-      cluster.billboard.image = markList.M5;
-      cluster.billboard.width = 60;
-      cluster.billboard.height = 60;
+      size = 60;
+      color = Cesium.Color.ORANGERED;
     } else if (clusteredEntities.length >= 50) {
-      cluster.billboard.image = markList.M4;
-      cluster.billboard.width = 55;
-      cluster.billboard.height = 55;
+      size = 55;
+      color = Cesium.Color.ORANGE;
     } else if (clusteredEntities.length >= 20) {
-      cluster.billboard.image = markList.M3
-      cluster.billboard.width = 50;
-      cluster.billboard.height = 50;
+      size = 50;
+      color = Cesium.Color.YELLOW;
     } else if (clusteredEntities.length >= 10) {
-      cluster.billboard.image = markList.M2
-      cluster.billboard.width = 45;
-      cluster.billboard.height = 45;
+      size = 45;
+      color = Cesium.Color.GREENYELLOW;
     } else {
-      cluster.billboard.image = markList.M1
-      cluster.billboard.width = 45;
-      cluster.billboard.height = 45;
+      size = 40;
+      color = Cesium.Color.SKYBLUE;
     }
+    let pinImg = pinBuilder.fromText(cluster.label.text, color, size).toDataURL()
+    // 根据聚合数量的多少设置不同层级的图片以及大小
+    cluster.billboard.image = pinImg;
   });
 }
 onMounted(() => {
@@ -110,7 +99,8 @@ onMounted(() => {
   padding: 0;
   overflow: hidden;
 }
-.operation{
+
+.operation {
   position: fixed;
   top: 20px;
   left: 20px;
