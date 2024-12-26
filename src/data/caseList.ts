@@ -13,7 +13,7 @@ import editlayer from '@/assets/images/example/editlayer.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
 import cluster from '@/assets/images/example/cluster.png';
 import cluster2 from '@/assets/images/example/cluster2.png';
-import gifBillboard from '@/assets/images/example/gifBillboard.png';
+import gifBillboard from '@/assets/images/example/gifbillboard.png';
 import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 
 export const caseList = {
