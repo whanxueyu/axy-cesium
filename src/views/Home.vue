@@ -1,195 +1,350 @@
 <template>
-  <div class="home">
-    <header class="hero">
-      <nav class="navbar">
-        <div class="logo">My Blog</div>
-        <ul class="nav-links">
-          <li><a href="#about">关于我</a></li>
-          <li><a href="#projects">项目案例</a></li>
-          <li><a href="#contact">联系我</a></li>
-        </ul>
-      </nav>
+  <div class="homepage">
+    <!-- Navigation Bar -->
+    <el-header class="nav-header">
+      <div class="nav-content">
+        <div class="logo">
+          <img src="@/assets/images/home/fishshell.svg?height=40&width=40" alt="Logo" class="mr-2">
+          <span class="text-xl font-bold">AXY-Cesium</span>
+        </div>
+        <el-menu mode="horizontal" class="nav-menu" :default-active="activeIndex" @select="handleSelect">
+          <el-menu-item index="1">Home</el-menu-item>
+          <el-menu-item index="2">Example</el-menu-item>
+          <el-menu-item index="3">Projects</el-menu-item>
+          <el-menu-item index="4">Documentation</el-menu-item>
+          <el-menu-item index="5">Download</el-menu-item>
+          <el-menu-item index="6">Support</el-menu-item>
+        </el-menu>
+      </div>
+    </el-header>
+
+    <!-- Hero Section -->
+    <div class="hero-section">
       <div class="hero-content">
-        <h1 class="title">欢迎来到我的博客</h1>
-        <p class="subtitle">分享技术心得，记录成长点滴</p>
-        <button class="cta-button">查看文章</button>
-      </div>
-      <div class="hero-animation"></div>
-    </header>
-    <section id="about" class="section">
-      <h2>关于我</h2>
-      <p>我是一名前端开发者，热爱编程和技术分享。在这里，我会记录我的学习历程和项目经验。</p>
-    </section>
-    <section id="projects" class="section">
-      <h2>项目案例</h2>
-      <div class="project-list">
-        <div class="project-item">
-          <h3>项目一：AXY-Cesium</h3>
-          <p>一个基于Cesium的三维地球可视化项目。</p>
-        </div>
-        <div class="project-item">
-          <h3>项目二：Vue.js 博客系统</h3>
-          <p>一个使用Vue.js构建的个人博客系统。</p>
+        <h1 class="hero-title">3D Visualization Case Platform</h1>
+        <h2 class="hero-subtitle">Digital Twin · GIS Development · Learning Improvement</h2>
+        <div class="hero-description">
+          Basic Cesium Demo · Advanced Learning · Comprehensive Case Presentation · Common Communication & Exchange
         </div>
       </div>
-    </section>
-    <section id="contact" class="section">
-      <h2>联系我</h2>
-      <p>如果您有任何问题或建议，欢迎通过以下方式联系我：</p>
-      <ul class="contact-links">
-        <li><a href="mailto:your-email@example.com">Email</a></li>
-        <li><a href="https://github.com/your-github">GitHub</a></li>
-        <li><a href="https://twitter.com/your-twitter">Twitter</a></li>
-      </ul>
-    </section>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="feature-cards">
+      <el-row :gutter="20">
+        <el-col :span="6" v-for="(feature, index) in features" :key="index">
+          <el-card class="feature-card">
+            <div class="feature-icon">
+              <el-icon>
+                <component :is="feature.icon" />
+              </el-icon>
+            </div>
+            <h3>{{ feature.title }}</h3>
+            <p>{{ feature.description }}</p>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- Innovation Section -->
+    <div class="innovation-section">
+      <h2 class="section-title">Continuously Updated Features and Cases</h2>
+      <p class="section-subtitle">Years of technical accumulation, innovative products, forming technical advantages</p>
+
+      <el-row :gutter="20" class="mt-8">
+        <el-col :span="8" v-for="(service, index) in services" :key="index">
+          <el-card class="service-card">
+            <div :class="['service-image',service.image]"></div>
+            <h3>{{ service.title }}</h3>
+            <p>{{ service.description }}</p>
+          </el-card>
+        </el-col>
+      </el-row>
+    </div>
+
+    <!-- Floating Action Buttons -->
+    <div class="floating-buttons">
+      <el-button type="primary" circle :icon="Download">
+      </el-button>
+      <el-button type="primary" circle :icon="Message">
+      </el-button>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts" name="Home">
+<script setup lang="ts">
+import { Download, Message, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
+import { ref } from 'vue'
+import router from '@/router';
+interface Feature {
+  icon: any;
+  title: string;
+  description: string;
+}
+
+interface Service {
+  image: string;
+  title: string;
+  description: string;
+}
+
+const features: Feature[] = [
+  {
+    icon: Monitor,
+    title: 'Easy to Read',
+    description: 'The function of the code is concise and easy to understand'
+  },
+  {
+    icon: Finished,
+    title: 'Friendly Guidance',
+    description: 'From difficult to easy, step by step to guide the progress'
+  },
+  {
+    icon: MagicStick,
+    title: 'Simple Popularization',
+    description: 'Using Vue3 based on element-plus framework'
+  },
+  {
+    icon: ElementPlus,
+    title: 'Innovative Ideas',
+    description: 'Creative ideas and implementation methods'
+  }
+]
+
+const services: Service[] = [
+  {
+    image: 'case',
+    title: 'Lots of cases',
+    description: 'A large number of use cases, combined with practical application scenarios'
+  },
+  {
+    image: 'understand',
+    title: 'In-depth understanding',
+    description: 'Step-by-step difficulty and easy-to-understand code'
+  },
+  {
+    image: 'communicate',
+    title: 'Online Community',
+    description: 'On-line technology exchange group with like-minded friends together exchange'
+  }
+]
+const activeIndex = ref('1')
+const handleSelect = (key: string) => {
+  console.log(key)
+  if (key === '1') {
+    router.push('/');
+  } else if (key === '2') {
+    const url = router.resolve({
+      path: '/basicCase/layers',
+    });
+    window.open(url.href);
+  }
+}
 </script>
 
 <style scoped lang="scss">
-.home {
-  font-family: 'Arial', sans-serif;
-  margin: 0;
-  padding: 0;
-  color: #fff;
-}
-
-.hero {
+.homepage {
+  min-height: 100vh;
+  background-color: #000;
+  color: white;
   position: relative;
-  height: 100vh;
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow: hidden;
 }
 
-.navbar {
-  position: absolute;
-  top: 20px;
-  left: 20px;
+.nav-header {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  position: fixed;
+  width: 100%;
+  z-index: 100;
+}
+
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
+  justify-content: space-between;
   align-items: center;
+  height: 100%;
 }
 
 .logo {
-  font-size: 24px;
-  font-weight: bold;
-  margin-right: 20px;
-}
-
-.nav-links {
-  list-style: none;
   display: flex;
+  align-items: center;
+  color: white;
 }
 
-.nav-links li {
-  margin-right: 20px;
+.logo img {
+  margin-right: 10px;
+  height: 50px;
 }
 
-.nav-links a {
-  text-decoration: none;
-  color: #fff;
-  transition: color 0.3s ease;
+.font-bold {
+  font-weight: bolder;
 }
 
-.nav-links a:hover {
-  color: #6a11cb;
+.nav-menu {
+  background: transparent;
+  border: none;
+}
+
+:deep(.el-menu--horizontal .el-menu-item) {
+  color: white;
+}
+
+:deep(.el-menu--horizontal .el-menu-item:hover) {
+  color: #409EFF;
+  background: rgba(64, 158, 255, 0.1);
+}
+
+:deep(.el-menu--horizontal .el-menu-item:not(.is-disabled):focus, .el-menu--horizontal .el-menu-item:not(.is-disabled):hover) {
+  background: rgba(64, 158, 255, 0.1);
+}
+
+.hero-section {
+  height: 100vh;
+  background-image: url('@/assets/images/home/bg.png');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  position: relative;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(64, 158, 255, 0.5);
+}
+
+.hero-subtitle {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #409EFF;
+}
+
+.hero-description {
+  font-size: 1.2rem;
+  color: #ffffff;
+}
+
+.feature-cards {
+  max-width: 1200px;
+  margin: -100px auto 0;
+  padding: 0 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.feature-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+
+  .feature-icon {
+    color: #40d9ff;
+    transition: transform 0.3s;
+  }
+}
+
+.feature-icon {
+  font-size: 100px;
+  color: #409EFF;
+  transition: transform 0.3s;
+  margin-bottom: 1rem;
+}
+
+.innovation-section {
+  max-width: 1200px;
+  margin: 100px auto;
+  padding: 0 20px;
   text-align: center;
 }
 
-.title {
-  font-size: 48px;
-  margin-bottom: 20px;
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(120deg, #409EFF, #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.subtitle {
-  font-size: 24px;
-  margin-bottom: 40px;
+.section-subtitle {
+  color: #909399;
+  margin-bottom: 2rem;
 }
 
-.cta-button {
-  background-color: #fff;
-  color: #6a11cb;
-  border: none;
-  padding: 10px 20px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease;
+.service-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: transform 0.3s;
 }
 
-.cta-button:hover {
-  background-color: #6a11cb;
-  color: #fff;
+.service-card:hover {
+  transform: translateY(-10px);
 }
 
-.hero-animation {
-  position: absolute;
-  bottom: 0;
-  left: 0;
+.service-image {
   width: 100%;
-  height: 100px;
-  background: url('https://via.placeholder.com/1500x100') repeat-x;
-  animation: moveBackground 10s linear infinite;
-}
+  height: 120px;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
 
-@keyframes moveBackground {
-  0% {
-    transform: translateX(0);
+  &.case {
+    background-image: url('@/assets/images/home/case.png');
   }
 
-  100% {
-    transform: translateX(-1500px);
+  &.communicate {
+    background-image: url('@/assets/images/home/communicate.png');
+  }
+
+  &.understand {
+    background-image: url('@/assets/images/home/understand.png');
   }
 }
 
-.section {
-  padding: 60px 20px;
-  text-align: center;
-  background-color: #1a1a1a;
+.floating-buttons {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 100;
 }
 
-.section h2 {
-  font-size: 36px;
-  margin-bottom: 20px;
-}
-
-.section p {
-  font-size: 18px;
-  line-height: 1.6;
-}
-
-.project-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.project-item {
-  background-color: #2c2c2c;
-  padding: 20px;
-  border-radius: 8px;
-}
-
-.contact-links {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-}
-
-.contact-links a {
-  text-decoration: none;
-  color: #6a11cb;
-  transition: color 0.3s ease;
-}
-
-.contact-links a:hover {
-  color: #fff;
+:deep(.el-button.is-circle) {
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  background: rgba(64, 158, 255, 0.9);
+  backdrop-filter: blur(10px);
 }
 </style>

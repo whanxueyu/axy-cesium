@@ -8,13 +8,13 @@ import ComprehensiveCase from '../views/ComprehensiveCase.vue';
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
+    name: 'Home',
+    component: Home
+  },
+  {
+    path: '/case',
     component: Layout,
     children: [
-      {
-        path: '',
-        name: 'Home',
-        component: Home
-      },
       {
         path: '/basicCase/:type',
         name: 'basicCase',
@@ -111,7 +111,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/example/primitiveCluster',
         name: 'primitiveCluster',
-        component: () => import('@/views/example/billboard/primitiveCluster.vue')
+        component: () => import('@/views/example/billboard/primitiveCluster2.vue')
       },
       {
         path: '/example/gifBillboard',

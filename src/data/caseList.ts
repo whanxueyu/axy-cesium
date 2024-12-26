@@ -12,6 +12,7 @@ import baselayer from '@/assets/images/example/baselayer.png';
 import editlayer from '@/assets/images/example/editlayer.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
 import cluster from '@/assets/images/example/cluster.png';
+import cluster2 from '@/assets/images/example/cluster2.png';
 import gifBillboard from '@/assets/images/example/gifBillboard.png';
 import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 
@@ -89,6 +90,12 @@ export const caseList = {
       description: '可根据调整参数，随意生成自己喜欢的底图颜色',
       path: '/example/editMapColor'
     },
+    {
+      imgurl: editlayer,
+      title: '区域地图加载',
+      description: '在指定区域加载图层',
+      path: ''
+    },
   ],
   billboard:[
     {
@@ -100,11 +107,11 @@ export const caseList = {
     {
       imgurl: cluster,
       title: 'entity标牌聚合效果1',
-      description: '随机生成1000个点位，并实现不同层级的自定义聚合效果',
+      description: '随机生成1000个点位，并实现不同层级的聚合效果',
       path: '/example/billboardCluster'
     },
     {
-      imgurl: cluster,
+      imgurl: cluster2,
       title: 'entity标牌聚合效果2',
       description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
       path: '/example/billboardCluster2'

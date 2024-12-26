@@ -2,7 +2,9 @@
 <template>
   <div class="case_list">
     <div class="case_item" v-for="(item, index) in caselist" :key="item.title" @click="showDetails(index)">
+      <div class="case_item_img">
       <img :src="item.imgurl" :alt="item.title">
+    </div>
       <div class="case_item_title">{{ item.title }}</div>
       <div class="case_item_description">{{ item.description }}</div>
     </div>
@@ -68,7 +70,7 @@ function openSource() {
       path: selectedCase.value.path,
     });
     window.open(url.href);
-  }else{
+  } else {
     ElMessage.warning('该功能暂未完成，待开发')
   }
 }
@@ -131,25 +133,36 @@ onMounted(() => {
 }
 
 .case_item {
-  border: 1px solid #ccc;
   padding: 15px;
   /* 统一样式 */
   width: 360px;
   cursor: pointer;
-  transition: transform 0.2s;
-  border-radius: 8px;
   /* 添加圆角 */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: transform 0.3s;
   /* 添加阴影 */
 }
-
+.case_item_img{
+  width: 360px;
+  height: 172px;
+  overflow: hidden;
+}
 .case_item:hover {
   transform: scale(1.05);
 }
-
+.case_item:hover img {
+  transform: scale(1.4);
+  transition: transform 0.3s;
+  transition-delay: 0.2s;
+}
 .case_item img {
   max-width: 100%;
   height: auto;
+  transition: transform 0.2s;
 }
 
 .case_item_title {
