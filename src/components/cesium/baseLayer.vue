@@ -82,7 +82,7 @@ const changeBaseMap = async (type: string) => {
             url: 'https://webst02.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}&lang=zh_cn',
             tileWidth: 256,
             tileHeight: 256,
-            tilingScheme: new AmapMercatorTilingScheme(),
+            tilingScheme: new AmapMercatorTilingScheme() as any,
             maximumLevel: 18, // 根据高德地图的实际最大层级设置  
         })
         viewer.imageryLayers.addImageryProvider(gdMap)
@@ -91,7 +91,7 @@ const changeBaseMap = async (type: string) => {
             url: 'https://webrd02.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=2&style=8&x={x}&y={y}&z={z}',
             tileWidth: 256,
             tileHeight: 256,
-            tilingScheme: new AmapMercatorTilingScheme(),
+            tilingScheme: new AmapMercatorTilingScheme() as any,
             maximumLevel: 18, // 根据高德地图的实际最大层级设置  
         })
         viewer.imageryLayers.addImageryProvider(gdvMap)
@@ -146,7 +146,7 @@ function removeTerrain() {
 
     if (currentTerrainProvider.value) {
         // 如果当前地形提供者存在，则移除它
-        viewer.scene.terrainProvider = undefined;
+        viewer.scene.terrainProvider = new Cesium.EllipsoidTerrainProvider();
     }
 
     // 或者替换为一个空的地形提供者

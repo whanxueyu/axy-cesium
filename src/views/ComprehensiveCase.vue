@@ -38,9 +38,14 @@
 <script setup lang="ts" name="Case2">
 import { ref } from 'vue';
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
-import { caseList } from '@/data/caseList';
+// import { caseList } from '@/data/caseList';
 const selectedIndex = ref<number | null>(null)
-const caselist = ref(caseList)
+const caselist = ref<{
+    imgurl: string;
+    title: string;
+    description: string;
+    path: string;
+}[]>([])
 const showCase = ref(false)
 const selectedCase = ref<{
   imgurl: string;

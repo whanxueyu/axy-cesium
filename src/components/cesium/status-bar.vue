@@ -77,12 +77,16 @@ const updatePosition = throttle((movement: { endPosition: Cesium.Cartesian2 }) =
   // 获取鼠标在屏幕上的位置
   const screenPosition = movement.endPosition;
   // 将屏幕位置转换为经纬度
-  const cartesian = viewer?.scene.globe.pick(viewer.camera.getPickRay(screenPosition), viewer.scene);
+  let ray = viewer?.camera.getPickRay(screenPosition)
+  if (!ray) return;
+  const cartesian = viewer?.scene.globe.pick(ray, viewer.scene);
   if (cartesian) {
     const cartographic = viewer?.scene.globe.ellipsoid.cartesianToCartographic(cartesian);
-    longitude.value = Cesium.Math.toDegrees(cartographic.longitude);
-    latitude.value = Cesium.Math.toDegrees(cartographic.latitude);
-    altitude.value = cartographic.height;
+    if (cartographic) {
+      longitude.value = Cesium.Math.toDegrees(cartographic.longitude);
+      latitude.value = Cesium.Math.toDegrees(cartographic.latitude);
+      altitude.value = cartographic.height;
+    }
   }
 }, 200)
 type ThrottleOrDebounceFunction<T extends (...args: any[]) => any> = T & {

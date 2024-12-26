@@ -1,15 +1,15 @@
-<script setup lang="ts">
+<script setup>
 import { onUnmounted, onMounted } from "vue";
 import 'cesium/Source/Widgets/widgets.css';
 import markList from '@/assets/images/marker/index'
 import * as Cesium from "cesium";
 import PrimitiveCluster from "@/modules/cesium/PrimitiveCluster.js";
 
-let viewer: Cesium.Viewer;
-let billboardsCollectionCombine: Cesium.BillboardCollection = new Cesium.BillboardCollection();
+let viewer;
+let billboardsCollectionCombine = new Cesium.BillboardCollection();
 
-let primitivesCollection: Cesium.PrimitiveCollection;
-let primitives: Cesium.Primitive | null = null;
+let primitivesCollection;
+let primitives = null;
 
 const onCluster = () => {
   primitivesCollection = new Cesium.PrimitiveCollection();
@@ -37,7 +37,8 @@ const onCluster = () => {
   primitives = viewer.scene.primitives.add(primitivesCollection);
 
   primitivecluster.clusterEvent.addEventListener(
-    (clusteredEntities: Cesium.Entity[], cluster: any) => {
+    (clusteredEntities, cluster) => {
+      console.log(clusteredEntities.length,cluster);
       // cluster.label.show = false;
       // cluster.billboard.show = true;
       // cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM;
@@ -56,7 +57,7 @@ const onCluster = () => {
   );
 };
 
-async function combineIconAndLabel(url: string, label: number, size: number): Promise<string> {
+async function combineIconAndLabel(url, label, size) {
   // 创建画布对象
   const canvas = document.createElement("canvas");
   canvas.width = size;

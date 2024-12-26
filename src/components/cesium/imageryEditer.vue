@@ -142,13 +142,13 @@ const setviewModel = () => {
     baseLayer.saturation = viewModel.saturation || 0
 }
 
-const setParmas = (name: string) => {
-    const layer = imageryLayers.value.get(0);
-    if (layer) {
-        layer[name] = viewModel[name]
+const setParmas = (name: keyof typeof viewModel) => {
+    const layer = imageryLayers.value?.get(0);
+    if (layer && name in viewModel) {
+        layer[name] = viewModel[name];
     }
-    setviewModel()
-}
+    setviewModel();
+};
 const hexColorToRgba = (color: string) => {
     // 检查输入颜色是否以 "#" 开头
     if (!color.startsWith('#')) {
@@ -200,7 +200,7 @@ onMounted(() => {
             // setBlackMap(true)
             updateViewModel()
         })
-        baseFragShader.value = (viewer.scene.globe)._surfaceShaderSet
+        baseFragShader.value = (viewer.scene.globe as any)._surfaceShaderSet
             .baseFragmentShaderSource.sources
     }
 });
