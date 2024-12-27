@@ -94,6 +94,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/imageLayer/editMapColor.vue')
       },
       {
+        path: '/example/areaMap',
+        name: 'areaMap',
+        component: () => import('@/views/example/imageLayer/areaMap.vue')
+      },
+      {
         path: '/example/basicBillboard',
         name: 'basicBillboard',
         component: () => import('@/views/example/billboard/basicBillboard.vue')

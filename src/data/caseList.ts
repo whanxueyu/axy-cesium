@@ -10,6 +10,7 @@ import tilegrid from '@/assets/images/example/tilegrid.png';
 import darkmap from '@/assets/images/example/darkmap.png';
 import baselayer from '@/assets/images/example/baselayer.png';
 import editlayer from '@/assets/images/example/editlayer.png';
+import areaMap from '@/assets/images/example/areaMap.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
 import cluster from '@/assets/images/example/cluster.png';
 import cluster2 from '@/assets/images/example/cluster2.png';
@@ -73,6 +74,12 @@ export const caseList = {
       path: '/example/tileGrid'
     },
     {
+      imgurl: areaMap,
+      title: '区域地图加载',
+      description: '在指定区域加载图层',
+      path: '/example/areaMap'
+    },
+    {
       imgurl: darkmap,
       title: '暗色（反色）地图',
       description: '通过修改涂层颜色通道生成暗色底图',
@@ -90,12 +97,7 @@ export const caseList = {
       description: '可根据调整参数，随意生成自己喜欢的底图颜色',
       path: '/example/editMapColor'
     },
-    {
-      imgurl: editlayer,
-      title: '区域地图加载',
-      description: '在指定区域加载图层',
-      path: ''
-    },
+    
   ],
   billboard:[
     {
