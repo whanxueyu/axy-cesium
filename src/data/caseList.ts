@@ -16,6 +16,7 @@ import cluster from '@/assets/images/example/cluster.png';
 import cluster2 from '@/assets/images/example/cluster2.png';
 import gifBillboard from '@/assets/images/example/gifbillboard.png';
 import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
+import night from '@/assets/images/example/night.png';
 
 export const caseList = {
   layers: [
@@ -76,8 +77,14 @@ export const caseList = {
     {
       imgurl: areaMap,
       title: '区域地图加载',
-      description: '在指定区域加载图层',
+      description: '在指定区域单独加载图层',
       path: '/example/areaMap'
+    },
+    {
+      imgurl: night,
+      title: '夜晚地图',
+      description: '夜晚地图效果，白天黑夜图层切换模拟地球自传动态效果',
+      path: '/example/night'
     },
     {
       imgurl: darkmap,
@@ -88,7 +95,7 @@ export const caseList = {
     {
       imgurl: baselayer,
       title: '切换底图',
-      description: '切换各种底图',
+      description: '自定义基础图层选择组件，点击随意切换各种底图',
       path: '/example/changeMap'
     },
     {

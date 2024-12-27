@@ -114,8 +114,7 @@ onMounted(() => {
 .case_list {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  justify-content: space-evenly;
+  gap: 30px;
 }
 
 .dialog_content {
@@ -166,7 +165,7 @@ onMounted(() => {
 }
 
 .case_item_title {
-  font-weight: bold;
+  font-weight: bolder;
   margin-top: 10px;
   font-size: 18px;
   /* 统一样式 */
@@ -174,7 +173,7 @@ onMounted(() => {
 
 .case_item_description {
   text-align: start;
-  color: #666;
+  color: #fff;
   margin-top: 5px;
   /* 添加间距 */
   width: 100%;

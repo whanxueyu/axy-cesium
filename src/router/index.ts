@@ -99,6 +99,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/imageLayer/areaMap.vue')
       },
       {
+        path: '/example/night',
+        name: 'night',
+        component: () => import('@/views/example/imageLayer/night.vue')
+      },
+      {
         path: '/example/basicBillboard',
         name: 'basicBillboard',
         component: () => import('@/views/example/billboard/basicBillboard.vue')
