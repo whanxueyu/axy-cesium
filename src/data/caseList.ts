@@ -14,9 +14,11 @@ import areaMap from '@/assets/images/example/areaMap.png';
 import basicBillboard from '@/assets/images/example/basicBillboard.png';
 import cluster from '@/assets/images/example/cluster.png';
 import cluster2 from '@/assets/images/example/cluster2.png';
+import primitiveBillboard from '@/assets/images/example/primitiveBillboard.png';
 import gifBillboard from '@/assets/images/example/gifbillboard.png';
 import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 import night from '@/assets/images/example/night.png';
+import divBillboard from '@/assets/images/example/divBillboard.png';
 
 export const caseList = {
   layers: [
@@ -115,20 +117,20 @@ export const caseList = {
     },
     {
       imgurl: cluster,
-      title: 'entity标牌聚合效果1',
-      description: '随机生成1000个点位，并实现不同层级的聚合效果',
+      title: 'entity标牌聚合效果',
+      description: '随机生成500个点位，并实现不同层级的聚合效果',
       path: '/example/billboardCluster'
     },
     {
       imgurl: cluster2,
-      title: 'entity标牌聚合效果2',
+      title: 'entity标牌自定义聚合效果',
       description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
       path: '/example/billboardCluster2'
     },
     {
-      imgurl: cluster,
-      title: 'primitive标牌聚合效果(高性能)',
-      description: '随机生成10000个点位，并实现不同层级的自定义聚合效果',
+      imgurl: primitiveBillboard,
+      title: 'primitive标牌(高性能)',
+      description: '随机生成10000个点位，可支持更多点位渲染',
       path: '/example/primitiveCluster'
     },
     {
@@ -144,10 +146,10 @@ export const caseList = {
       path: '/example/htmlBillboard'
     },
     {
-      imgurl: cluster,
+      imgurl: divBillboard,
       title: 'div标牌终极方案',
       description: '封装了divBillboard类，可以加载任意的vue组件',
-      path: ''
+      path: '/example/divBillboard'
     },
 
   ]

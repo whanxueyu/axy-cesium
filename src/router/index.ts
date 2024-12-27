@@ -121,7 +121,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/example/primitiveCluster',
         name: 'primitiveCluster',
-        component: () => import('@/views/example/billboard/primitiveCluster2.vue')
+        component: () => import('@/views/example/billboard/primitiveCluster.vue')
       },
       {
         path: '/example/gifBillboard',
