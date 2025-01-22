@@ -16,7 +16,7 @@ const props = defineProps({
     // 默认经纬度
     lazy: {
         type: Boolean,
-        default: true
+        default: false
     },
     duration: {
         type: Number,

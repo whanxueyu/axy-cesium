@@ -20,6 +20,7 @@ import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 import night from '@/assets/images/example/night.png';
 import divBillboard from '@/assets/images/example/divBillboard.png';
 import model from '@/assets/images/example/model.png';
+import tileset from '@/assets/images/example/tileset.png';
 import editModel from '@/assets/images/example/editModel.png';
 
 export const caseList = {
@@ -169,16 +170,16 @@ export const caseList = {
       path: '/example/model'
     },
     {
-      imgurl: model,
+      imgurl: tileset,
       title: '3D Tiles模型加载',
-      description: '加载模型',
-      path: '/example/tilesModel'
+      description: '加载大雁塔倾斜摄影模型',
+      path: '/example/tileset'
     },
     {
       imgurl: editModel,
       title: '模型编辑',
       description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
-      path: '/example/model'
+      path: '/example/editModel'
     },
 
   ]
