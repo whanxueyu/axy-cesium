@@ -146,13 +146,18 @@ onUnmounted(() => {
   justify-content: space-between;
   align-items: center;
   bottom: 0px;
+  font-size: 14px;
   left: 0px;
+  color: #fff;
   width: 100%;
-  background-color: #6f6f6fb3;
-  padding: 5px 0;
+  background-color: #646464;
+  padding: 2px 0;
 
   div {
     margin: 0 10px;
   }
+}
+.flex{
+  display: flex;
 }
 </style>
