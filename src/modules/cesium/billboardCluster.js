@@ -1,32 +1,45 @@
+
+import defaultValue from "../Core/defaultValue.js";
+import defined from "../Core/defined.js";
+import EllipsoidalOccluder from "../Core/EllipsoidalOccluder.js";
+import Event from "../Core/Event.js";
+import Matrix4 from "../Core/Matrix4.js";
+import Billboard from "../Scene/Billboard.js";
+import BillboardCollection from "../Scene/BillboardCollection.js";
+import Label from "../Scene/Label.js";
+import LabelCollection from "../Scene/LabelCollection.js";
+import PointPrimitive from "../Scene/PointPrimitive.js";
+import PointPrimitiveCollection from "../Scene/PointPrimitiveCollection.js";
+import SceneMode from "../Scene/SceneMode.js";
 import KDBush from "kdbush";
 import * as Cesium from "cesium";
-// cesium 1.105
+
 /**
  * Defines how screen space objects (billboards, points, labels) are clustered.
  *
- * @param {Object} [options] An object with the following properties:
- * @param {Boolean} [options.enabled=false] Whether or not to enable clustering.
- * @param {Number} [options.pixelRange=80] The pixel range to extend the screen space bounding box.
- * @param {Number} [options.minimumClusterSize=2] The minimum number of screen space objects that can be clustered.
- * @param {Boolean} [options.clusterBillboards=true] Whether or not to cluster the billboards of an entity.
- * @param {Boolean} [options.clusterLabels=true] Whether or not to cluster the labels of an entity.
- * @param {Boolean} [options.clusterPoints=true] Whether or not to cluster the points of an entity.
- * @param {Boolean} [options.show=true] Determines if the entities in the cluster will be shown.
+ * @param {object} [options] An object with the following properties:
+ * @param {boolean} [options.enabled=false] Whether or not to enable clustering.
+ * @param {number} [options.pixelRange=80] The pixel range to extend the screen space bounding box.
+ * @param {number} [options.minimumClusterSize=2] The minimum number of screen space objects that can be clustered.
+ * @param {boolean} [options.clusterBillboards=true] Whether or not to cluster the billboards of an entity.
+ * @param {boolean} [options.clusterLabels=true] Whether or not to cluster the labels of an entity.
+ * @param {boolean} [options.clusterPoints=true] Whether or not to cluster the points of an entity.
+ * @param {boolean} [options.show=true] Determines if the entities in the cluster will be shown.
  *
- * @alias PrimitiveCluster
+ * @alias EntityCluster
  * @constructor
  *
  * @demo {@link https://sandcastle.cesium.com/index.html?src=Clustering.html|Cesium Sandcastle Clustering Demo}
  */
-function PrimitiveCluster(options) {
-  options = Cesium.defaultValue(options, Cesium.defaultValue.EMPTY_OBJECT);
+function EntityCluster(options) {
+  options = defaultValue(options, defaultValue.EMPTY_OBJECT);
 
-  this._enabled = Cesium.defaultValue(options.enabled, false);
-  this._pixelRange = Cesium.defaultValue(options.pixelRange, 80);
-  this._minimumClusterSize = Cesium.defaultValue(options.minimumClusterSize, 2);
-  this._clusterBillboards = Cesium.defaultValue(options.clusterBillboards, true);
-  this._clusterLabels = Cesium.defaultValue(options.clusterLabels, true);
-  this._clusterPoints = Cesium.defaultValue(options.clusterPoints, true);
+  this._enabled = defaultValue(options.enabled, false);
+  this._pixelRange = defaultValue(options.pixelRange, 80);
+  this._minimumClusterSize = defaultValue(options.minimumClusterSize, 2);
+  this._clusterBillboards = defaultValue(options.clusterBillboards, true);
+  this._clusterLabels = defaultValue(options.clusterLabels, true);
+  this._clusterPoints = defaultValue(options.clusterPoints, true);
 
   this._labelCollection = undefined;
   this._billboardCollection = undefined;
@@ -51,23 +64,15 @@ function PrimitiveCluster(options) {
   this._cluster = undefined;
   this._removeEventListener = undefined;
 
-  this._clusterEvent = new Cesium.Event();
+  this._clusterEvent = new Event();
 
   /**
    * Determines if entities in this collection will be shown.
    *
-   * @type {Boolean}
+   * @type {boolean}
    * @default true
    */
-  this.show = Cesium.defaultValue(options.show, true);
-}
-
-function getX(point) {
-  return point.coord.x;
-}
-
-function getY(point) {
-  return point.coord.y;
+  this.show = defaultValue(options.show, true);
 }
 
 function expandBoundingBox(bbox, pixelRange) {
@@ -80,36 +85,36 @@ function expandBoundingBox(bbox, pixelRange) {
 const labelBoundingBoxScratch = new Cesium.BoundingRectangle();
 
 function getBoundingBox(item, coord, pixelRange, entityCluster, result) {
-  if (Cesium.defined(item._labelCollection) && entityCluster._clusterLabels) {
-    result = Cesium.Label.getScreenSpaceBoundingBox(item, coord, result);
+  if (defined(item._labelCollection) && entityCluster._clusterLabels) {
+    result = Label.getScreenSpaceBoundingBox(item, coord, result);
   } else if (
-    Cesium.defined(item._billboardCollection) &&
+    defined(item._billboardCollection) &&
     entityCluster._clusterBillboards
   ) {
-    result = Cesium.Billboard.getScreenSpaceBoundingBox(item, coord, result);
+    result = Billboard.getScreenSpaceBoundingBox(item, coord, result);
   } else if (
-    Cesium.defined(item._pointPrimitiveCollection) &&
+    defined(item._pointPrimitiveCollection) &&
     entityCluster._clusterPoints
   ) {
-    result = Cesium.PointPrimitive.getScreenSpaceBoundingBox(item, coord, result);
+    result = PointPrimitive.getScreenSpaceBoundingBox(item, coord, result);
   }
 
   expandBoundingBox(result, pixelRange);
 
   if (
     entityCluster._clusterLabels &&
-    !Cesium.defined(item._labelCollection) &&
-    Cesium.defined(item.id) &&
+    !defined(item._labelCollection) &&
+    defined(item.id) &&
     hasLabelIndex(entityCluster, item.id.id) &&
-    Cesium.defined(item.id._label)
+    defined(item.id._label)
   ) {
     const labelIndex =
       entityCluster._collectionIndicesByEntity[item.id.id].labelIndex;
     const label = entityCluster._labelCollection.get(labelIndex);
-    const labelBBox = Cesium.Label.getScreenSpaceBoundingBox(
+    const labelBBox = Label.getScreenSpaceBoundingBox(
       label,
       coord,
-      labelBoundingBoxScratch
+      labelBoundingBoxScratch,
     );
     expandBoundingBox(labelBBox, pixelRange);
     result = Cesium.BoundingRectangle.union(result, labelBBox, result);
@@ -122,10 +127,10 @@ function addNonClusteredItem(item, entityCluster) {
   item.clusterShow = true;
 
   if (
-    !Cesium.defined(item._labelCollection) &&
-    Cesium.defined(item.id) &&
+    !defined(item._labelCollection) &&
+    defined(item.id) &&
     hasLabelIndex(entityCluster, item.id.id) &&
-    Cesium.defined(item.id._label)
+    defined(item.id._label)
   ) {
     const labelIndex =
       entityCluster._collectionIndicesByEntity[item.id.id].labelIndex;
@@ -146,16 +151,19 @@ function addCluster(position, numPoints, ids, entityCluster) {
   cluster.label.show = true;
   cluster.label.text = numPoints.toLocaleString();
   cluster.label.id = ids;
-  cluster.billboard.position = cluster.label.position = cluster.point.position = position;
+  cluster.billboard.position =
+    cluster.label.position =
+    cluster.point.position =
+      position;
 
   entityCluster._clusterEvent.raiseEvent(ids, cluster);
 }
 
 function hasLabelIndex(entityCluster, entityId) {
   return (
-    Cesium.defined(entityCluster) &&
-    Cesium.defined(entityCluster._collectionIndicesByEntity[entityId]) &&
-    Cesium.defined(entityCluster._collectionIndicesByEntity[entityId].labelIndex)
+    defined(entityCluster) &&
+    defined(entityCluster._collectionIndicesByEntity[entityId]) &&
+    defined(entityCluster._collectionIndicesByEntity[entityId].labelIndex)
   );
 }
 
@@ -164,9 +172,9 @@ function getScreenSpacePositions(
   points,
   scene,
   occluder,
-  entityCluster
+  entityCluster,
 ) {
-  if (!Cesium.defined(collection)) {
+  if (!defined(collection)) {
     return;
   }
 
@@ -177,24 +185,24 @@ function getScreenSpacePositions(
 
     if (
       !item.show ||
-      (entityCluster._scene.mode === Cesium.SceneMode.SCENE3D &&
+      (entityCluster._scene.mode === SceneMode.SCENE3D &&
         !occluder.isPointVisible(item.position))
     ) {
       continue;
     }
 
-    // const canClusterLabels =
-    //   entityCluster._clusterLabels && Cesium.defined(item._labelCollection);
-    // const canClusterBillboards =
-    //   entityCluster._clusterBillboards && Cesium.defined(item.id._billboard);
-    // const canClusterPoints =
-    //   entityCluster._clusterPoints && Cesium.defined(item.id._point);
-    // if (canClusterLabels && (canClusterPoints || canClusterBillboards)) {
-    //   continue;
-    // }
+    const canClusterLabels =
+      entityCluster._clusterLabels && defined(item._labelCollection);
+    const canClusterBillboards =
+      entityCluster._clusterBillboards && defined(item.id._billboard);
+    const canClusterPoints =
+      entityCluster._clusterPoints && defined(item.id._point);
+    if (canClusterLabels && (canClusterPoints || canClusterBillboards)) {
+      continue;
+    }
 
     const coord = item.computeScreenSpacePosition(scene);
-    if (!Cesium.defined(coord)) {
+    if (!defined(coord)) {
       continue;
     }
 
@@ -213,7 +221,7 @@ const neighborBoundingRectangleScratch = new Cesium.BoundingRectangle();
 
 function createDeclutterCallback(entityCluster) {
   return function (amount) {
-    if ((Cesium.defined(amount) && amount < 0.05) || !entityCluster.enabled) {
+    if ((defined(amount) && amount < 0.05) || !entityCluster.enabled) {
       return;
     }
 
@@ -224,9 +232,9 @@ function createDeclutterCallback(entityCluster) {
     const pointCollection = entityCluster._pointCollection;
 
     if (
-      (!Cesium.defined(labelCollection) &&
-        !Cesium.defined(billboardCollection) &&
-        !Cesium.defined(pointCollection)) ||
+      (!defined(labelCollection) &&
+        !defined(billboardCollection) &&
+        !defined(pointCollection)) ||
       (!entityCluster._clusterBillboards &&
         !entityCluster._clusterLabels &&
         !entityCluster._clusterPoints)
@@ -239,30 +247,29 @@ function createDeclutterCallback(entityCluster) {
       entityCluster._clusterBillboardCollection;
     let clusteredPointCollection = entityCluster._clusterPointCollection;
 
-    if (Cesium.defined(clusteredLabelCollection)) {
+    if (defined(clusteredLabelCollection)) {
       clusteredLabelCollection.removeAll();
     } else {
-      clusteredLabelCollection = entityCluster._clusterLabelCollection = new Cesium.LabelCollection(
-        {
+      clusteredLabelCollection = entityCluster._clusterLabelCollection =
+        new LabelCollection({
           scene: scene,
-        }
-      );
+        });
     }
 
-    if (Cesium.defined(clusteredBillboardCollection)) {
+    if (defined(clusteredBillboardCollection)) {
       clusteredBillboardCollection.removeAll();
     } else {
-      clusteredBillboardCollection = entityCluster._clusterBillboardCollection = new Cesium.BillboardCollection(
-        {
+      clusteredBillboardCollection = entityCluster._clusterBillboardCollection =
+        new BillboardCollection({
           scene: scene,
-        }
-      );
+        });
     }
 
-    if (Cesium.defined(clusteredPointCollection)) {
+    if (defined(clusteredPointCollection)) {
       clusteredPointCollection.removeAll();
     } else {
-      clusteredPointCollection = entityCluster._clusterPointCollection = new Cesium.PointPrimitiveCollection();
+      clusteredPointCollection = entityCluster._clusterPointCollection =
+        new PointPrimitiveCollection();
     }
 
     const pixelRange = entityCluster._pixelRange;
@@ -274,9 +281,9 @@ function createDeclutterCallback(entityCluster) {
     const previousHeight = entityCluster._previousHeight;
     const currentHeight = scene.camera.positionCartographic.height;
 
-    const ellipsoid = scene.mapProjection.ellipsoid;
+    const ellipsoid = scene.ellipsoid;
     const cameraPosition = scene.camera.positionWC;
-    const occluder = new Cesium.EllipsoidalOccluder(ellipsoid, cameraPosition);
+    const occluder = new EllipsoidalOccluder(ellipsoid, cameraPosition);
 
     const points = [];
     if (entityCluster._clusterLabels) {
@@ -285,7 +292,7 @@ function createDeclutterCallback(entityCluster) {
         points,
         scene,
         occluder,
-        entityCluster
+        entityCluster,
       );
     }
     if (entityCluster._clusterBillboards) {
@@ -294,7 +301,7 @@ function createDeclutterCallback(entityCluster) {
         points,
         scene,
         occluder,
-        entityCluster
+        entityCluster,
       );
     }
     if (entityCluster._clusterPoints) {
@@ -303,7 +310,7 @@ function createDeclutterCallback(entityCluster) {
         points,
         scene,
         occluder,
-        entityCluster
+        entityCluster,
       );
     }
 
@@ -321,153 +328,159 @@ function createDeclutterCallback(entityCluster) {
     let collection;
     let collectionIndex;
 
-    const index = new KDBush(points, getX, getY, 64, Int32Array);
-    console.log(index)
-    if (currentHeight < previousHeight) {
-      length = clusters.length;
+    if (points.length > 0) {
+      const index = new KDBush(points.length, 64, Uint32Array);
+      for (let p = 0; p < points.length; ++p) {
+        index.add(points[p].coord.x, points[p].coord.y);
+      }
+      index.finish();
+
+      if (currentHeight < previousHeight) {
+        length = clusters.length;
+        for (i = 0; i < length; ++i) {
+          const cluster = clusters[i];
+
+          if (!occluder.isPointVisible(cluster.position)) {
+            continue;
+          }
+
+          const coord = Billboard._computeScreenSpacePosition(
+            Matrix4.IDENTITY,
+            cluster.position,
+            Cesium.Cartesian3.ZERO,
+            Cesium.Cartesian2.ZERO,
+            scene,
+          );
+          if (!defined(coord)) {
+            continue;
+          }
+
+          const factor = 1.0 - currentHeight / previousHeight;
+          let width = (cluster.width = cluster.width * factor);
+          let height = (cluster.height = cluster.height * factor);
+
+          width = Math.max(width, cluster.minimumWidth);
+          height = Math.max(height, cluster.minimumHeight);
+
+          const minX = coord.x - width * 0.5;
+          const minY = coord.y - height * 0.5;
+          const maxX = coord.x + width;
+          const maxY = coord.y + height;
+
+          neighbors = index.range(minX, minY, maxX, maxY);
+          neighborLength = neighbors.length;
+          numPoints = 0;
+          ids = [];
+
+          for (j = 0; j < neighborLength; ++j) {
+            neighborIndex = neighbors[j];
+            neighborPoint = points[neighborIndex];
+            if (!neighborPoint.clustered) {
+              ++numPoints;
+
+              collection = neighborPoint.collection;
+              collectionIndex = neighborPoint.index;
+              ids.push(collection.get(collectionIndex).id);
+            }
+          }
+
+          if (numPoints >= minimumClusterSize) {
+            addCluster(cluster.position, numPoints, ids, entityCluster);
+            newClusters.push(cluster);
+
+            for (j = 0; j < neighborLength; ++j) {
+              points[neighbors[j]].clustered = true;
+            }
+          }
+        }
+      }
+
+      length = points.length;
       for (i = 0; i < length; ++i) {
-        const cluster = clusters[i];
-
-        if (!occluder.isPointVisible(cluster.position)) {
+        const point = points[i];
+        if (point.clustered) {
           continue;
         }
 
-        const coord = Cesium.Billboard._computeScreenSpacePosition(
-          Cesium.Matrix4.IDENTITY,
-          cluster.position,
-          Cesium.Cartesian3.ZERO,
-          Cesium.Cartesian2.ZERO,
-          scene
+        point.clustered = true;
+
+        collection = point.collection;
+        collectionIndex = point.index;
+
+        const item = collection.get(collectionIndex);
+        bbox = getBoundingBox(
+          item,
+          point.coord,
+          pixelRange,
+          entityCluster,
+          pointBoundinRectangleScratch,
         );
-        if (!Cesium.defined(coord)) {
-          continue;
-        }
+        const totalBBox = Cesium.BoundingRectangle.clone(
+          bbox,
+          totalBoundingRectangleScratch,
+        );
 
-        const factor = 1.0 - currentHeight / previousHeight;
-        let width = (cluster.width = cluster.width * factor);
-        let height = (cluster.height = cluster.height * factor);
-
-        width = Math.max(width, cluster.minimumWidth);
-        height = Math.max(height, cluster.minimumHeight);
-
-        const minX = coord.x - width * 0.5;
-        const minY = coord.y - height * 0.5;
-        const maxX = coord.x + width;
-        const maxY = coord.y + height;
-
-        neighbors = index.range(minX, minY, maxX, maxY);
+        neighbors = index.range(
+          bbox.x,
+          bbox.y,
+          bbox.x + bbox.width,
+          bbox.y + bbox.height,
+        );
         neighborLength = neighbors.length;
-        numPoints = 0;
-        ids = [];
+
+        const clusterPosition = Cesium.Cartesian3.clone(item.position);
+        numPoints = 1;
+        ids = [item.id];
 
         for (j = 0; j < neighborLength; ++j) {
           neighborIndex = neighbors[j];
           neighborPoint = points[neighborIndex];
           if (!neighborPoint.clustered) {
+            const neighborItem = neighborPoint.collection.get(
+              neighborPoint.index,
+            );
+            const neighborBBox = getBoundingBox(
+              neighborItem,
+              neighborPoint.coord,
+              pixelRange,
+              entityCluster,
+              neighborBoundingRectangleScratch,
+            );
+
+            Cesium.Cartesian3.add(
+              neighborItem.position,
+              clusterPosition,
+              clusterPosition,
+            );
+
+            Cesium.BoundingRectangle.union(totalBBox, neighborBBox, totalBBox);
             ++numPoints;
 
-            collection = neighborPoint.collection;
-            collectionIndex = neighborPoint.index;
-            ids.push(collection.get(collectionIndex).id);
+            ids.push(neighborItem.id);
           }
         }
 
         if (numPoints >= minimumClusterSize) {
-          addCluster(cluster.position, numPoints, ids, entityCluster);
-          newClusters.push(cluster);
+          const position = Cesium.Cartesian3.multiplyByScalar(
+            clusterPosition,
+            1.0 / numPoints,
+            clusterPosition,
+          );
+          addCluster(position, numPoints, ids, entityCluster);
+          newClusters.push({
+            position: position,
+            width: totalBBox.width,
+            height: totalBBox.height,
+            minimumWidth: bbox.width,
+            minimumHeight: bbox.height,
+          });
 
           for (j = 0; j < neighborLength; ++j) {
             points[neighbors[j]].clustered = true;
           }
+        } else {
+          addNonClusteredItem(item, entityCluster);
         }
-      }
-    }
-
-    length = points.length;
-    for (i = 0; i < length; ++i) {
-      const point = points[i];
-      if (point.clustered) {
-        continue;
-      }
-
-      point.clustered = true;
-
-      collection = point.collection;
-      collectionIndex = point.index;
-
-      const item = collection.get(collectionIndex);
-      bbox = getBoundingBox(
-        item,
-        point.coord,
-        pixelRange,
-        entityCluster,
-        pointBoundinRectangleScratch
-      );
-      const totalBBox = Cesium.BoundingRectangle.clone(
-        bbox,
-        totalBoundingRectangleScratch
-      );
-
-      neighbors = index.range(
-        bbox.x,
-        bbox.y,
-        bbox.x + bbox.width,
-        bbox.y + bbox.height
-      );
-      neighborLength = neighbors.length;
-
-      const clusterPosition = Cesium.Cartesian3.clone(item.position);
-      numPoints = 1;
-      ids = [item.id];
-
-      for (j = 0; j < neighborLength; ++j) {
-        neighborIndex = neighbors[j];
-        neighborPoint = points[neighborIndex];
-        if (!neighborPoint.clustered) {
-          const neighborItem = neighborPoint.collection.get(
-            neighborPoint.index
-          );
-          const neighborBBox = getBoundingBox(
-            neighborItem,
-            neighborPoint.coord,
-            pixelRange,
-            entityCluster,
-            neighborBoundingRectangleScratch
-          );
-
-          Cesium.Cartesian3.add(
-            neighborItem.position,
-            clusterPosition,
-            clusterPosition
-          );
-
-          Cesium.BoundingRectangle.union(totalBBox, neighborBBox, totalBBox);
-          ++numPoints;
-
-          ids.push(neighborItem.id);
-        }
-      }
-
-      if (numPoints >= minimumClusterSize) {
-        const position = Cesium.Cartesian3.multiplyByScalar(
-          clusterPosition,
-          1.0 / numPoints,
-          clusterPosition
-        );
-        addCluster(position, numPoints, ids, entityCluster);
-        newClusters.push({
-          position: position,
-          width: totalBBox.width,
-          height: totalBBox.height,
-          minimumWidth: bbox.width,
-          minimumHeight: bbox.height,
-        });
-
-        for (j = 0; j < neighborLength; ++j) {
-          points[neighbors[j]].clustered = true;
-        }
-      } else {
-        addNonClusteredItem(item, entityCluster);
       }
     }
 
@@ -491,7 +504,7 @@ function createDeclutterCallback(entityCluster) {
   };
 }
 
-PrimitiveCluster.prototype._initialize = function (scene) {
+EntityCluster.prototype._initialize = function (scene) {
   this._scene = scene;
 
   const cluster = createDeclutterCallback(this);
@@ -499,11 +512,11 @@ PrimitiveCluster.prototype._initialize = function (scene) {
   this._removeEventListener = scene.camera.changed.addEventListener(cluster);
 };
 
-Object.defineProperties(PrimitiveCluster.prototype, {
+Object.defineProperties(EntityCluster.prototype, {
   /**
    * Gets or sets whether clustering is enabled.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Boolean}
+   * @memberof EntityCluster.prototype
+   * @type {boolean}
    */
   enabled: {
     get: function () {
@@ -516,8 +529,8 @@ Object.defineProperties(PrimitiveCluster.prototype, {
   },
   /**
    * Gets or sets the pixel range to extend the screen space bounding box.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Number}
+   * @memberof EntityCluster.prototype
+   * @type {number}
    */
   pixelRange: {
     get: function () {
@@ -530,8 +543,8 @@ Object.defineProperties(PrimitiveCluster.prototype, {
   },
   /**
    * Gets or sets the minimum number of screen space objects that can be clustered.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Number}
+   * @memberof EntityCluster.prototype
+   * @type {number}
    */
   minimumClusterSize: {
     get: function () {
@@ -544,9 +557,9 @@ Object.defineProperties(PrimitiveCluster.prototype, {
     },
   },
   /**
-   * Gets the event that will be raised when a new cluster will be displayed. The signature of the event listener is {@link PrimitiveCluster.newClusterCallback}.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Cesium.Event<PrimitiveCluster.newClusterCallback>}
+   * Gets the event that will be raised when a new cluster will be displayed. The signature of the event listener is {@link EntityCluster.newClusterCallback}.
+   * @memberof EntityCluster.prototype
+   * @type {Event<EntityCluster.newClusterCallback>}
    */
   clusterEvent: {
     get: function () {
@@ -555,8 +568,8 @@ Object.defineProperties(PrimitiveCluster.prototype, {
   },
   /**
    * Gets or sets whether clustering billboard entities is enabled.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Boolean}
+   * @memberof EntityCluster.prototype
+   * @type {boolean}
    */
   clusterBillboards: {
     get: function () {
@@ -570,8 +583,8 @@ Object.defineProperties(PrimitiveCluster.prototype, {
   },
   /**
    * Gets or sets whether clustering labels entities is enabled.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Boolean}
+   * @memberof EntityCluster.prototype
+   * @type {boolean}
    */
   clusterLabels: {
     get: function () {
@@ -584,8 +597,8 @@ Object.defineProperties(PrimitiveCluster.prototype, {
   },
   /**
    * Gets or sets whether clustering point entities is enabled.
-   * @memberof PrimitiveCluster.prototype
-   * @type {Boolean}
+   * @memberof EntityCluster.prototype
+   * @type {boolean}
    */
   clusterPoints: {
     get: function () {
@@ -602,18 +615,18 @@ function createGetEntity(
   collectionProperty,
   CollectionConstructor,
   unusedIndicesProperty,
-  entityIndexProperty
+  entityIndexProperty,
 ) {
   return function (entity) {
     let collection = this[collectionProperty];
 
-    if (!Cesium.defined(this._collectionIndicesByEntity)) {
+    if (!defined(this._collectionIndicesByEntity)) {
       this._collectionIndicesByEntity = {};
     }
 
     let entityIndices = this._collectionIndicesByEntity[entity.id];
 
-    if (!Cesium.defined(entityIndices)) {
+    if (!defined(entityIndices)) {
       entityIndices = this._collectionIndicesByEntity[entity.id] = {
         billboardIndex: undefined,
         labelIndex: undefined,
@@ -621,11 +634,11 @@ function createGetEntity(
       };
     }
 
-    if (Cesium.defined(collection) && Cesium.defined(entityIndices[entityIndexProperty])) {
+    if (defined(collection) && defined(entityIndices[entityIndexProperty])) {
       return collection.get(entityIndices[entityIndexProperty]);
     }
 
-    if (!Cesium.defined(collection)) {
+    if (!defined(collection)) {
       collection = this[collectionProperty] = new CollectionConstructor({
         scene: this._scene,
       });
@@ -636,7 +649,7 @@ function createGetEntity(
 
     const unusedIndices = this[unusedIndicesProperty];
     if (unusedIndices.length > 0) {
-      index = unusedIndices.pop();
+      index = unusedIndices.shift();
       entityItem = collection.get(index);
     } else {
       entityItem = collection.add();
@@ -658,42 +671,42 @@ function removeEntityIndicesIfUnused(entityCluster, entityId) {
   const indices = entityCluster._collectionIndicesByEntity[entityId];
 
   if (
-    !Cesium.defined(indices.billboardIndex) &&
-    !Cesium.defined(indices.labelIndex) &&
-    !Cesium.defined(indices.pointIndex)
+    !defined(indices.billboardIndex) &&
+    !defined(indices.labelIndex) &&
+    !defined(indices.pointIndex)
   ) {
     delete entityCluster._collectionIndicesByEntity[entityId];
   }
 }
 
 /**
- * Returns a new {@link Cesium.Label}.
- * @param {Entity} entity The entity that will use the returned {@link Cesium.Label} for visualization.
- * @returns {Cesium.Label} The label that will be used to visualize an entity.
+ * Returns a new {@link Label}.
+ * @param {Entity} entity The entity that will use the returned {@link Label} for visualization.
+ * @returns {Label} The label that will be used to visualize an entity.
  *
  * @private
  */
-PrimitiveCluster.prototype.getLabel = createGetEntity(
+EntityCluster.prototype.getLabel = createGetEntity(
   "_labelCollection",
-  Cesium.LabelCollection,
+  LabelCollection,
   "_unusedLabelIndices",
-  "labelIndex"
+  "labelIndex",
 );
 
 /**
- * Removes the {@link Cesium.Label} associated with an entity so it can be reused by another entity.
- * @param {Entity} entity The entity that will uses the returned {@link Cesium.Label} for visualization.
+ * Removes the {@link Label} associated with an entity so it can be reused by another entity.
+ * @param {Entity} entity The entity that will uses the returned {@link Label} for visualization.
  *
  * @private
  */
-PrimitiveCluster.prototype.removeLabel = function (entity) {
+EntityCluster.prototype.removeLabel = function (entity) {
   const entityIndices =
     this._collectionIndicesByEntity &&
     this._collectionIndicesByEntity[entity.id];
   if (
-    !Cesium.defined(this._labelCollection) ||
-    !Cesium.defined(entityIndices) ||
-    !Cesium.defined(entityIndices.labelIndex)
+    !defined(this._labelCollection) ||
+    !defined(entityIndices) ||
+    !defined(entityIndices.labelIndex)
   ) {
     return;
   }
@@ -713,33 +726,33 @@ PrimitiveCluster.prototype.removeLabel = function (entity) {
 };
 
 /**
- * Returns a new {@link Cesium.Billboard}.
- * @param {Entity} entity The entity that will use the returned {@link Cesium.Billboard} for visualization.
+ * Returns a new {@link Billboard}.
+ * @param {Entity} entity The entity that will use the returned {@link Billboard} for visualization.
  * @returns {Billboard} The label that will be used to visualize an entity.
  *
  * @private
  */
-PrimitiveCluster.prototype.getBillboard = createGetEntity(
+EntityCluster.prototype.getBillboard = createGetEntity(
   "_billboardCollection",
-  Cesium.BillboardCollection,
+  BillboardCollection,
   "_unusedBillboardIndices",
-  "billboardIndex"
+  "billboardIndex",
 );
 
 /**
- * Removes the {@link Cesium.Billboard} associated with an entity so it can be reused by another entity.
- * @param {Entity} entity The entity that will uses the returned {@link Cesium.Billboard} for visualization.
+ * Removes the {@link Billboard} associated with an entity so it can be reused by another entity.
+ * @param {Entity} entity The entity that will uses the returned {@link Billboard} for visualization.
  *
  * @private
  */
-PrimitiveCluster.prototype.removeBillboard = function (entity) {
+EntityCluster.prototype.removeBillboard = function (entity) {
   const entityIndices =
     this._collectionIndicesByEntity &&
     this._collectionIndicesByEntity[entity.id];
   if (
-    !Cesium.defined(this._billboardCollection) ||
-    !Cesium.defined(entityIndices) ||
-    !Cesium.defined(entityIndices.billboardIndex)
+    !defined(this._billboardCollection) ||
+    !defined(entityIndices) ||
+    !defined(entityIndices.billboardIndex)
   ) {
     return;
   }
@@ -765,11 +778,11 @@ PrimitiveCluster.prototype.removeBillboard = function (entity) {
  *
  * @private
  */
-PrimitiveCluster.prototype.getPoint = createGetEntity(
+EntityCluster.prototype.getPoint = createGetEntity(
   "_pointCollection",
-  Cesium.PointPrimitiveCollection,
+  PointPrimitiveCollection,
   "_unusedPointIndices",
-  "pointIndex"
+  "pointIndex",
 );
 
 /**
@@ -778,14 +791,14 @@ PrimitiveCluster.prototype.getPoint = createGetEntity(
  *
  * @private
  */
-PrimitiveCluster.prototype.removePoint = function (entity) {
+EntityCluster.prototype.removePoint = function (entity) {
   const entityIndices =
     this._collectionIndicesByEntity &&
     this._collectionIndicesByEntity[entity.id];
   if (
-    !Cesium.defined(this._pointCollection) ||
-    !Cesium.defined(entityIndices) ||
-    !Cesium.defined(entityIndices.pointIndex)
+    !defined(this._pointCollection) ||
+    !defined(entityIndices) ||
+    !defined(entityIndices.pointIndex)
   ) {
     return;
   }
@@ -804,7 +817,7 @@ PrimitiveCluster.prototype.removePoint = function (entity) {
 };
 
 function disableCollectionClustering(collection) {
-  if (!Cesium.defined(collection)) {
+  if (!defined(collection)) {
     return;
   }
 
@@ -819,13 +832,13 @@ function updateEnable(entityCluster) {
     return;
   }
 
-  if (Cesium.defined(entityCluster._clusterLabelCollection)) {
+  if (defined(entityCluster._clusterLabelCollection)) {
     entityCluster._clusterLabelCollection.destroy();
   }
-  if (Cesium.defined(entityCluster._clusterBillboardCollection)) {
+  if (defined(entityCluster._clusterBillboardCollection)) {
     entityCluster._clusterBillboardCollection.destroy();
   }
-  if (Cesium.defined(entityCluster._clusterPointCollection)) {
+  if (defined(entityCluster._clusterPointCollection)) {
     entityCluster._clusterPointCollection.destroy();
   }
 
@@ -843,7 +856,7 @@ function updateEnable(entityCluster) {
  * queues the draw commands for billboards/points/labels created for entities.
  * @private
  */
-PrimitiveCluster.prototype.update = function (frameState) {
+EntityCluster.prototype.update = function (frameState) {
   if (!this.show) {
     return;
   }
@@ -853,7 +866,7 @@ PrimitiveCluster.prototype.update = function (frameState) {
   // are incorrect.
   let commandList;
   if (
-    Cesium.defined(this._labelCollection) &&
+    defined(this._labelCollection) &&
     this._labelCollection.length > 0 &&
     this._labelCollection.get(0)._glyphs.length === 0
   ) {
@@ -867,9 +880,9 @@ PrimitiveCluster.prototype.update = function (frameState) {
   // the images haven't been added to the image atlas so the screen space bounding boxes
   // are incorrect.
   if (
-    Cesium.defined(this._billboardCollection) &&
+    defined(this._billboardCollection) &&
     this._billboardCollection.length > 0 &&
-    !Cesium.defined(this._billboardCollection.get(0).width)
+    !defined(this._billboardCollection.get(0).width)
   ) {
     commandList = frameState.commandList;
     frameState.commandList = [];
@@ -888,23 +901,23 @@ PrimitiveCluster.prototype.update = function (frameState) {
     this._cluster();
   }
 
-  if (Cesium.defined(this._clusterLabelCollection)) {
+  if (defined(this._clusterLabelCollection)) {
     this._clusterLabelCollection.update(frameState);
   }
-  if (Cesium.defined(this._clusterBillboardCollection)) {
+  if (defined(this._clusterBillboardCollection)) {
     this._clusterBillboardCollection.update(frameState);
   }
-  if (Cesium.defined(this._clusterPointCollection)) {
+  if (defined(this._clusterPointCollection)) {
     this._clusterPointCollection.update(frameState);
   }
 
-  if (Cesium.defined(this._labelCollection)) {
+  if (defined(this._labelCollection)) {
     this._labelCollection.update(frameState);
   }
-  if (Cesium.defined(this._billboardCollection)) {
+  if (defined(this._billboardCollection)) {
     this._billboardCollection.update(frameState);
   }
-  if (Cesium.defined(this._pointCollection)) {
+  if (defined(this._pointCollection)) {
     this._pointCollection.update(frameState);
   }
 };
@@ -917,7 +930,7 @@ PrimitiveCluster.prototype.update = function (frameState) {
  * from a data source collection and added to another.
  * </p>
  */
-PrimitiveCluster.prototype.destroy = function () {
+EntityCluster.prototype.destroy = function () {
   this._labelCollection =
     this._labelCollection && this._labelCollection.destroy();
   this._billboardCollection =
@@ -933,7 +946,7 @@ PrimitiveCluster.prototype.destroy = function () {
   this._clusterPointCollection =
     this._clusterPointCollection && this._clusterPointCollection.destroy();
 
-  if (Cesium.defined(this._removeEventListener)) {
+  if (defined(this._removeEventListener)) {
     this._removeEventListener();
     this._removeEventListener = undefined;
   }
@@ -964,14 +977,14 @@ PrimitiveCluster.prototype.destroy = function () {
 
 /**
  * A event listener function used to style clusters.
- * @callback PrimitiveCluster.newClusterCallback
+ * @callback EntityCluster.newClusterCallback
  *
  * @param {Entity[]} clusteredEntities An array of the entities contained in the cluster.
- * @param {Object} cluster An object containing the Billboard, Label, and Point
+ * @param {object} cluster An object containing the Billboard, Label, and Point
  * primitives that represent this cluster of entities.
- * @param {Cesium.Billboard} cluster.billboard
- * @param {Cesium.Label} cluster.label
- * @param {Cesium.PointPrimitive} cluster.point
+ * @param {Billboard} cluster.billboard
+ * @param {Label} cluster.label
+ * @param {PointPrimitive} cluster.point
  *
  * @example
  * // The default cluster values.
@@ -980,4 +993,4 @@ PrimitiveCluster.prototype.destroy = function () {
  *     cluster.label.text = entities.length.toLocaleString();
  * });
  */
-export default PrimitiveCluster;
+export default EntityCluster;

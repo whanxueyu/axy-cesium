@@ -38,7 +38,7 @@ const onCluster = () => {
 
   primitivecluster.clusterEvent.addEventListener(
     (clusteredEntities, cluster) => {
-      console.log(clusteredEntities.length,cluster);
+      console.log(clusteredEntities.length, cluster);
       // cluster.label.show = false;
       // cluster.billboard.show = true;
       // cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM;
@@ -96,7 +96,58 @@ const onClear = () => {
   primitivesCollection = new Cesium.PrimitiveCollection();
   billboardsCollectionCombine = new Cesium.BillboardCollection();
 };
-
+let primitivesCluster;
+const addCluster = () => {
+  // 使用primitives 添加点
+  var labels = new Cesium.LabelCollection()
+  var billboards = new Cesium.BillboardCollection()
+  var collection = new Cesium.PrimitiveCollection()
+  for (let i = 0; i < 10000; i++) {
+    const longitude = Math.random() * (110 - 90) + 90;
+    const latitude = Math.random() * (40 - 30) + 30;
+    let title = {
+      id: longitude,
+      position: Cesium.Cartesian3.fromDegrees(longitude, latitude, 10),
+      text: i,
+      font: "30px Source Han Sans CN", //字体样式
+      fillColor: new Cesium.Color.fromCssColorString("#ffffff"), //字体颜色
+      showBackground: true, //是否显示背景颜色
+      backgroundColor: new Cesium.Color.fromCssColorString("#000000"), //背景颜色
+      verticalOrigin: Cesium.VerticalOrigin.BOTTOM, //垂直位置
+      horizontalOrigin: Cesium.HorizontalOrigin.CENTER, //水平位置
+    }
+    let img = {
+      id: longitude,
+      position: Cesium.Cartesian3.fromDegrees(longitude, latitude, 10),
+      image: markList.LaceRed,
+      scale: 1,
+      verticalOrigin: Cesium.VerticalOrigin.TOP, //垂直位置
+    }
+    // labels.add(title)
+    billboards.add(img)
+  }
+  let primitivecluster = null
+  primitivecluster = new PrimitiveCluster()
+  primitivecluster.enabled = true
+  primitivecluster.pixelRange = 1
+  primitivecluster.minimumClusterSize = 10
+  primitivecluster._billboardCollection = billboards
+  // 同时在赋值时调用_initialize方法
+  primitivecluster._initialize(viewer.scene)
+  collection.add(primitivecluster)
+  primitivesCluster = viewer.scene.primitives.add(collection)
+  const pinBuilder = new Cesium.PinBuilder()
+  primitivecluster.clusterEvent.addEventListener((clusteredEntities, cluster) => {
+    // 关闭自带的显示聚合数量的标签
+    cluster.label.show = false
+    cluster.billboard.show = true
+    cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM
+    let pinImg = pinBuilder.fromText(cluster.label.text, Cesium.Color.RED, 60).toDataURL()
+    // 根据聚合数量的多少设置不同层级的图片以及大小
+    cluster.billboard.image = pinImg
+  })
+  return primitivecluster
+}
 onMounted(() => {
   viewer = new Cesium.Viewer("cesiumContainer", {
     // terrain: Cesium.Terrain.fromWorldTerrain(),
@@ -115,7 +166,7 @@ onUnmounted(() => {
   <div id="cesiumContainer" class="fullSize"></div>
 
   <div class="operation">
-    <el-button type="primary" @click="onCluster">primitive打点聚合</el-button>
+    <el-button type="primary" @click="addCluster">primitive打点聚合</el-button>
     <el-button type="primary" @click="onClear">清除打点</el-button>
   </div>
 </template>

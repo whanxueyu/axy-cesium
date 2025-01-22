@@ -19,6 +19,8 @@ import gifBillboard from '@/assets/images/example/gifbillboard.png';
 import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
 import night from '@/assets/images/example/night.png';
 import divBillboard from '@/assets/images/example/divBillboard.png';
+import model from '@/assets/images/example/model.png';
+import editModel from '@/assets/images/example/editModel.png';
 
 export const caseList = {
   layers: [
@@ -131,6 +133,12 @@ export const caseList = {
       imgurl: primitiveBillboard,
       title: 'primitive标牌(高性能)',
       description: '随机生成10000个点位，可支持更多点位渲染',
+      path: '/example/primitiveBillboard'
+    },
+    {
+      imgurl: primitiveBillboard,
+      title: 'primitive标牌聚合(高性能)',
+      description: '随机生成10000个点位，可支持更多点位渲染',
       path: '/example/primitiveCluster'
     },
     {
@@ -150,6 +158,27 @@ export const caseList = {
       title: 'div标牌终极方案',
       description: '封装了divBillboard类，可以加载任意的vue组件',
       path: '/example/divBillboard'
+    },
+
+  ],
+  model:[
+    {
+      imgurl: model,
+      title: 'gltf模型加载',
+      description: '加载基础的各类glb单体模型',
+      path: '/example/model'
+    },
+    {
+      imgurl: model,
+      title: '3D Tiles模型加载',
+      description: '加载模型',
+      path: '/example/tilesModel'
+    },
+    {
+      imgurl: editModel,
+      title: '模型编辑',
+      description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
+      path: '/example/model'
     },
 
   ]
