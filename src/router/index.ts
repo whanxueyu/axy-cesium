@@ -103,6 +103,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'night',
         component: () => import('@/views/example/imageLayer/night.vue')
       },
+      // billboard
       {
         path: '/example/basicBillboard',
         name: 'basicBillboard',
@@ -143,6 +144,22 @@ const routes: Array<RouteRecordRaw> = [
         name: 'divBillboard',
         component: () => import('@/views/example/billboard/divBillboard.vue')
       },
+      // model
+      {
+        path: '/example/model',
+        name: 'model',
+        component: () => import('@/views/example/model/model.vue')
+      },
+      {
+        path: '/example/tileset',
+        name: 'tileset',
+        component: () => import('@/views/example/model/tileset.vue')
+      },
+      {
+        path: '/example/editModel',
+        name: 'editModel',
+        component: () => import('@/views/example/model/editModel.vue')
+      }
     ]
   }
 ];
