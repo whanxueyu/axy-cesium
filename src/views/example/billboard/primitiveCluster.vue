@@ -27,13 +27,21 @@ const createBillboards = () => {
     const longitude = Math.random() * (110 - 90) + 90;
     const latitude = Math.random() * (40 - 30) + 30;
     data.push({
-      longitude, latitude
+      longitude,
+      latitude,
+      id: i + '-pb',
+      name: 'poi' + i
     });
   }
   addCluster(data);
 };
 let primitivesCluster: any;
-const addCluster = (data)=> {
+const addCluster = (data: {
+  longitude: number;
+  latitude: number;
+  id: string,
+  name?: string
+}[]) => {
   // 使用primitives 添加点
   var labels = new Cesium.LabelCollection()
   var billboards = new Cesium.BillboardCollection()
@@ -47,11 +55,11 @@ const addCluster = (data)=> {
     let title = {
       id: ele.id,
       position: Cesium.Cartesian3.fromDegrees(Number(center.lng), Number(center.lat), 0),
-      text: ele.name,
+      text: ele.name ?? ele.id,
       font: "30px Source Han Sans CN", //字体样式
-      fillColor: new Cesium.Color.fromCssColorString("#ffffff"), //字体颜色
+      fillColor: Cesium.Color.fromCssColorString("#ffffff"), //字体颜色
       showBackground: true, //是否显示背景颜色
-      backgroundColor: new Cesium.Color.fromCssColorString("#000000"), //背景颜色
+      backgroundColor: Cesium.Color.fromCssColorString("#000000"), //背景颜色
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM, //垂直位置
       horizontalOrigin: Cesium.HorizontalOrigin.CENTER, //水平位置
     }
@@ -59,8 +67,6 @@ const addCluster = (data)=> {
       id: ele.id,
       position: Cesium.Cartesian3.fromDegrees(Number(center.lng), Number(center.lat), 80),
       image: markList.LaceRed,
-      width: ele.poiWid,
-      height: ele.poiHig,
       scale: 1,
       verticalOrigin: Cesium.VerticalOrigin.TOP, //垂直位置
     }
