@@ -54,7 +54,7 @@
       <el-row :gutter="20" class="mt-8">
         <el-col :span="8" v-for="(service, index) in services" :key="index">
           <el-card class="service-card">
-            <div :class="['service-image',service.image]"></div>
+            <div :class="['service-image', service.image]"></div>
             <h3>{{ service.title }}</h3>
             <p>{{ service.description }}</p>
           </el-card>
@@ -64,16 +64,26 @@
 
     <!-- Floating Action Buttons -->
     <div class="floating-buttons">
-      <el-button type="primary" circle :icon="Download">
-      </el-button>
-      <el-button type="primary" circle :icon="Message">
-      </el-button>
+      <el-popover placement="top" :width="340" trigger="click">
+        <img width="300px" src="@/assets/images/home/qrCode.jpg" alt="" srcset="">
+        <template #reference>
+          <el-button type="primary" circle :icon="Comment">
+          </el-button>
+        </template>
+      </el-popover>
+      <el-popover placement="top" :width="240" trigger="click">
+        很多地方都点不了，没想好呢，暂时只是一个架子，等待后续开源吧
+        <template #reference>
+          <el-button type="primary" circle :icon="InfoFilled">
+          </el-button>
+        </template>
+      </el-popover>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Download, Message, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
+import { InfoFilled, Comment, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import router from '@/router';
 interface Feature {
