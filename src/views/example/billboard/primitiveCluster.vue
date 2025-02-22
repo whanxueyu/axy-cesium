@@ -7,17 +7,15 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import { onMounted, ref, watch } from 'vue';
 import * as Cesium from "cesium";
 import markList from '@/assets/images/marker/index'
 import 'cesium/Source/Widgets/widgets.css';
 import PrimitiveCluster from "@/modules/cesium/PrimitiveCluster.js"
 
-var viewer: Cesium.Viewer;
-var billboards: Cesium.BillboardCollection;
+var viewer;
 const pointNum = ref(10000);
-const pixelRange = 40; // 聚合范围（像素）
 
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 
@@ -35,13 +33,8 @@ const createBillboards = () => {
   }
   addCluster(data);
 };
-let primitivesCluster: any;
-const addCluster = (data: {
-  longitude: number;
-  latitude: number;
-  id: string,
-  name?: string
-}[]) => {
+let primitivesCluster;
+const addCluster = (data) => {
   // 使用primitives 添加点
   var labels = new Cesium.LabelCollection()
   var billboards = new Cesium.BillboardCollection()
@@ -86,6 +79,7 @@ const addCluster = (data: {
   const pinBuilder = new Cesium.PinBuilder()
   primitivecluster.clusterEvent.addEventListener((clusteredEntities, cluster) => {
     // 关闭自带的显示聚合数量的标签
+    console.log(clusteredEntities, cluster)
     cluster.label.show = false
     cluster.billboard.show = true
     cluster.billboard.verticalOrigin = Cesium.VerticalOrigin.BOTTOM
