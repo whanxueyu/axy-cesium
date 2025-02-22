@@ -103,6 +103,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'night',
         component: () => import('@/views/example/imageLayer/night.vue')
       },
+      // skybox
+      {
+        path: '/example/skybox',
+        name: 'skybox',
+        component: () => import('@/views/example/skybox/skybox.vue')
+      },
       // billboard
       {
         path: '/example/basicBillboard',

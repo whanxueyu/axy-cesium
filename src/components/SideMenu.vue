@@ -25,6 +25,7 @@ const router = useRouter();
 
 const menuItems: MenuItem[] = [
     { name: 'ImagerLayer案例', path: '/basicCase/layers' },
+    { name: '天空盒案例', path: '/basicCase/skybox' },
     { name: '标牌案例', path: '/basicCase/billboard' },
     { name: '模型案例', path: '/basicCase/model' },
     { name: '自定义材质案例', path: '/basicCase/material' },

@@ -111,6 +111,14 @@ export const caseList = {
     },
     
   ],
+  skybox:[
+    {
+      imgurl: tileset,
+      title: '天空盒',
+      description: '自定义不同类型的天空盒效果',
+      path: '/example/skybox'
+    },
+  ],
   billboard:[
     {
       imgurl: basicBillboard,
