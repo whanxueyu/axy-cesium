@@ -8,7 +8,7 @@ import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import AmapMercatorTilingScheme from '@/modules/AmapMercatorTilingScheme/AmapMercatorTilingScheme';
 
-// Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 const viewModel = reactive({
     brightness: 0,
     contrast: 0,
@@ -33,7 +33,6 @@ const setBlackMap = () => {
             gamma: 0.2,
             contrast: 3,
             saturation: 1.5,
-            // color: 'rgb('+red+','+green+','+blue+')',
         });
 }
 
@@ -71,7 +70,7 @@ const modifyMap = (viewer: Cesium.Viewer, options: any) => {
     })
 }
 const updateViewModel = () => {
-    if (imageryLayers.value.length > 0) {
+    if (imageryLayers?.value?.length > 0) {
         const layer = imageryLayers.value.get(0);
         viewModel.brightness = layer.brightness;
         viewModel.contrast = layer.contrast;

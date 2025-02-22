@@ -14,6 +14,7 @@ const dynamicLighting = ref(false);
 const imageryLayers = ref<Cesium.ImageryLayerCollection | null>(null);
 const nightLayer = ref<Cesium.ImageryLayer | null>(null);
 const dayLayer = ref<Cesium.ImageryLayer | null>(null);
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 
 // Add a button to toggle dynamic lighting
 const handleRoate = () => {
