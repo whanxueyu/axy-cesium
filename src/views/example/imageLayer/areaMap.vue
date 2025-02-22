@@ -14,6 +14,7 @@ const TDT_FORMAT = 'image/jpeg';
 const TDT_TILE_SIZE = 256;
 const TDT_MAX_LEVEL = 18;
 const TDT_TILE_MATRIX_SET_ID = 'GoogleMapsCompatible';
+Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 
 const BOUNDARY_COORDINATES = [
     [117, 39],
