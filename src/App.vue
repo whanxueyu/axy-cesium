@@ -11,8 +11,8 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-@import '@/static/css/theme.scss';
-@import '@/static/css/common.scss';
+@use '@/static/css/theme.scss';
+@use '@/static/css/common.scss';
 *{
     margin: 0;
     padding: 0;

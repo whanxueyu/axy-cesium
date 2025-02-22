@@ -1,13 +1,14 @@
 import type { UserConfig, ConfigEnv } from "vite";
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import cesium from 'vite-plugin-cesium'
 import path from 'path';
 const ENV_DIR = path.join(__dirname, "envs");
 
 export default defineConfig(({ mode }: ConfigEnv): UserConfig => {
   const env = loadEnv(mode, process.cwd(), "VITE")
   return {
-    plugins: [vue()],
+    plugins: [vue(),cesium()],
     base: './',
     define: {
       "process.env": JSON.stringify(env),

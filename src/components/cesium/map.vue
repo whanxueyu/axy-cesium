@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref, defineEmits } from "vue";
+import { nextTick, onMounted, ref } from "vue";
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import baseLayer from '@/components/cesium/baseLayer.vue'
