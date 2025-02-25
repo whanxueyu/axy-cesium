@@ -145,7 +145,7 @@ const handleSelect = (key: string) => {
     router.push('/');
   } else if (key === '2') {
     const url = router.resolve({
-      path: '/basicCase/layers',
+      path: '/basicCase',
     });
     window.open(url.href);
   }

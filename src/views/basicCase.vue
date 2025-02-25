@@ -1,12 +1,14 @@
-<!-- src/views/Case2.vue -->
 <template>
-  <div class="case_list">
-    <div class="case_item" v-for="(item, index) in caselist" :key="item.title" @click="showDetails(index)">
-      <div class="case_item_img">
-      <img :src="item.imgurl" :alt="item.title">
-    </div>
-      <div class="case_item_title">{{ item.title }}</div>
-      <div class="case_item_description">{{ item.description }}</div>
+  <div v-for="(cat, index) in caselist" :key="cat.title+index" :href="cat.type">
+    <div class="case_title">{{ cat.title }}（{{cat.list.length}}）</div>
+    <div class="case_list" :id="cat.type">
+      <div class="case_item" v-for="(item, i) in cat.list" :key="item.title" @click="showDetails(index,i)">
+        <div class="case_item_img">
+          <img :src="item.imgurl" :alt="item.title">
+        </div>
+        <div class="case_item_title">{{ item.title }}</div>
+        <div class="case_item_description">{{ item.description }}</div>
+      </div>
     </div>
   </div>
   <el-dialog :title="selectedCase.title" v-model="showCase" @close="closeDetails">
@@ -41,12 +43,13 @@ import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
 import { caseList } from '@/data/caseList';
 import router from '@/router';
 import { ElMessage } from 'element-plus';
+const caselist = ref(caseList)
 interface Props {
   type: 'layers' | 'billboard'; // 只允许 'layer' 或 'billboard'
 }
 const props = defineProps<Props>();
 const selectedIndex = ref<number | null>(null)
-const caselist = ref<any>([])
+const caseArr = ref<any>([])
 const showCase = ref(false)
 const selectedCase = ref<{
   imgurl: string;
@@ -76,21 +79,22 @@ function openSource() {
 }
 function prevCase() {
   if (selectedIndex.value !== null) {
-    selectedIndex.value = (selectedIndex.value - 1 + caselist.value.length) % caselist.value.length
-    selectedCase.value = caselist.value[selectedIndex.value]
+    selectedIndex.value = (selectedIndex.value - 1 + caseArr.value.length) % caseArr.value.length
+    selectedCase.value = caseArr.value[selectedIndex.value]
   }
 }
 
 function nextCase() {
   if (selectedIndex.value !== null) {
-    selectedIndex.value = (selectedIndex.value + 1) % caselist.value.length
-    selectedCase.value = caselist.value[selectedIndex.value]
+    selectedIndex.value = (selectedIndex.value + 1) % caseArr.value.length
+    selectedCase.value = caseArr.value[selectedIndex.value]
   }
 }
-function showDetails(index: number) {
-  selectedIndex.value = index;
+function showDetails(index: number,i:number) {
+  selectedIndex.value = i;
+  caseArr.value = caseList[index].list;
   showCase.value = true;
-  selectedCase.value = caselist.value[index];
+  selectedCase.value = caseList[index].list[i];
 }
 // 监听 props.type 的变化
 watch(
@@ -102,19 +106,37 @@ watch(
 
 function updateCaselist(type: 'layers' | 'billboard' = props.type) {
   console.log(type, caseList);
-  caselist.value = caseList[type];
-  console.log(caseList[type]);
+  caseArr.value = caseList;
+  // console.log(caseList[type]);
 }
 onMounted(() => {
   updateCaselist();
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+.case_title {
+  position: relative;
+  margin-top: 20px;
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: white;
+  overflow-x: hidden;
+  text-align: left;
+  &::after{
+    content: '';
+    width: 100%;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+    position: absolute;
+    top: 20px;
+  }
+}
 .case_list {
   display: flex;
   flex-wrap: wrap;
-  gap: 30px;
+  margin-bottom: 30px;
+  gap: 20px;
 }
 
 .dialog_content {
@@ -145,19 +167,23 @@ onMounted(() => {
   transition: transform 0.3s;
   /* 添加阴影 */
 }
-.case_item_img{
+
+.case_item_img {
   width: 360px;
   height: 172px;
   overflow: hidden;
 }
+
 .case_item:hover {
   transform: scale(1.05);
 }
+
 .case_item:hover img {
   transform: scale(1.4);
   transition: transform 0.3s;
   transition-delay: 0.2s;
 }
+
 .case_item img {
   max-width: 100%;
   height: auto;

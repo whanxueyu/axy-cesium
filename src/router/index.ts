@@ -1,5 +1,5 @@
 // src/router/index.ts
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteRecordRaw,createWebHistory } from 'vue-router';
 import Layout from '../views/Layout.vue';
 import Home from '../views/Home.vue';
 import basicCase from '../views/basicCase.vue';
@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
     component: Layout,
     children: [
       {
-        path: '/basicCase/:type',
+        path: '/basicCase',
         name: 'basicCase',
         props: true,
         component: basicCase
@@ -171,7 +171,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(process.env.BASE_URL),
+  history: createWebHistory(process.env.BASE_URL),
   routes
 });
 

@@ -4,53 +4,61 @@
             <img src="@/assets/images/home/fishshell.svg?height=40&width=40" alt="Logo" class="mr-2">
             <span class="text-xl font-bold">AXY-Cesium</span>
         </div>
-        <div v-for="item in menuItems" :key="item.name" :class="['menu-item', { active: isCurrentRoute(item.path) }]"
-            @click="navigateTo(item.path)">
-            {{ item.name }}
+        <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
+            <a :href="`#${cat.type}`">{{ cat.title }}</a>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-
-interface MenuItem {
-    name: string;
-    path: string;
-}
-
+import { caseList } from '@/data/caseList';
 
 const route = useRoute();
 const router = useRouter();
 
-const menuItems: MenuItem[] = [
-    { name: 'ImagerLayer案例', path: '/basicCase/layers' },
-    { name: '天空盒案例', path: '/basicCase/skybox' },
-    { name: '标牌案例', path: '/basicCase/billboard' },
-    { name: '模型案例', path: '/basicCase/model' },
-    { name: '自定义材质案例', path: '/basicCase/material' },
-    { name: '综合案例', path: '/ComprehensiveCase' },
-];
+const activeSection = ref<string | null>(null);
 
-const isCurrentRoute = (path: string): boolean => {
-    return route.path === path;
+const observer = ref<IntersectionObserver | null>(null);
+
+const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            activeSection.value = entry.target.id;
+        }
+    });
 };
 
-const navigateTo = (path: string): void => {
-    router.push(path);
-};
+onMounted(() => {
+    observer.value = new IntersectionObserver(handleIntersection, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    });
+
+    caseList.forEach(cat => {
+        const element = document.getElementById(cat.type);
+        if (element) {
+            observer.value?.observe(element);
+        }
+    });
+});
+
+onUnmounted(() => {
+    observer.value?.disconnect();
+});
+
 const backHome = () => {
     router.push('/');
-}
-
+};
 </script>
 
 <style scoped lang="scss">
 .side-menu-section {
     width: 200px;
     color: #fff;
-    /* 文字颜色改为白色 */
-    // padding: 20px;
+    padding: 10px;
 }
 
 .logo {
@@ -79,15 +87,18 @@ const backHome = () => {
 
     &:hover {
         background-color: rgba(255, 255, 255, 0.1);
-        /* 鼠标悬停时的背景颜色 */
     }
 
     &.active {
         background-color: #233c4a;
-        /* 激活状态下的背景颜色 */
         color: #409EFF;
-        /* 激活状态下的文字颜色 */
         font-weight: bold;
+    }
+
+    a {
+        color: #fff;
+        width: 100%;
+        display: block;
     }
 }
 </style>
