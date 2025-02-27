@@ -48,6 +48,7 @@ const initCesium = () => {
             requestVertexNormals: true,
         }),
     });
+    viewer.imageryLayers.removeAll();
     viewer.scene.screenSpaceCameraController.zoomEventTypes = [Cesium.CameraEventType.WHEEL, Cesium.CameraEventType.PINCH];
     viewer.scene.screenSpaceCameraController.tiltEventTypes = [Cesium.CameraEventType.PINCH, Cesium.CameraEventType.RIGHT_DRAG];
     (viewer.cesiumWidget.creditContainer as HTMLBaseElement).style.display = "none";
