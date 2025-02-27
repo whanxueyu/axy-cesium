@@ -4,6 +4,7 @@ import 'element-plus/dist/index.css'
 import './style.css'
 import App from './App.vue';
 import router from './router';
+window.CESIUM_BASE_URL = '/cesium';
 const app = createApp(App)
 app.use(router);
 app.use(ElementPlus)
