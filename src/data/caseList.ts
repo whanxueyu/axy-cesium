@@ -23,6 +23,7 @@ import model from '@/assets/images/example/model.png';
 import tileset from '@/assets/images/example/tileset.png';
 import editModel from '@/assets/images/example/editModel.png';
 import skybox from '@/assets/images/example/skybox.png';
+import background from '@/assets/images/example/background.png';
 
 export const caseList = [
   {
@@ -187,10 +188,10 @@ export const caseList = [
       //   path: '/example/skybox'
       // },
       {
-        imgurl: skybox,
+        imgurl: background,
         title: '设置背景图',
         description: '设置背景图',
-        path: '/example/skybox'
+        path: '/example/background'
       },
     ]
   },

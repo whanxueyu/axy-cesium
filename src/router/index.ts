@@ -109,6 +109,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'skybox',
         component: () => import('@/views/example/skybox/skybox.vue')
       },
+      {
+        path: '/example/background',
+        name: 'background',
+        component: () => import('@/views/example/skybox/background.vue')
+      },
       // billboard
       {
         path: '/example/basicBillboard',
