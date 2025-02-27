@@ -22,6 +22,7 @@ import divBillboard from '@/assets/images/example/divBillboard.png';
 import model from '@/assets/images/example/model.png';
 import tileset from '@/assets/images/example/tileset.png';
 import editModel from '@/assets/images/example/editModel.png';
+import skybox from '@/assets/images/example/skybox.png';
 
 export const caseList = [
   {
@@ -174,9 +175,21 @@ export const caseList = [
     type: 'skybox',
     list: [
       {
-        imgurl: tileset,
+        imgurl: skybox,
         title: '天空盒',
         description: '自定义不同类型的天空盒效果',
+        path: '/example/skybox'
+      },
+      // {
+      //   imgurl: skyboxGround,
+      //   title: '近地天空盒',
+      //   description: '自定义不同类型的近地天空盒效果',
+      //   path: '/example/skybox'
+      // },
+      {
+        imgurl: skybox,
+        title: '设置背景图',
+        description: '设置背景图',
         path: '/example/skybox'
       },
     ]
