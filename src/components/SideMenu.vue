@@ -12,10 +12,9 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { caseList } from '@/data/caseList';
 
-const route = useRoute();
 const router = useRouter();
 
 const activeSection = ref<string | null>(null);

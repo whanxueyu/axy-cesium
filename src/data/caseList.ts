@@ -22,7 +22,6 @@ import divBillboard from '@/assets/images/example/divBillboard.png';
 import model from '@/assets/images/example/model.png';
 import tileset from '@/assets/images/example/tileset.png';
 import editModel from '@/assets/images/example/editModel.png';
-import { title } from 'process';
 
 export const caseList = [
   {

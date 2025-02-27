@@ -1,5 +1,5 @@
 // src/router/index.ts
-import { createRouter, createWebHashHistory, RouteRecordRaw,createWebHistory } from 'vue-router';
+import { createRouter, RouteRecordRaw,createWebHistory } from 'vue-router';
 import Layout from '../views/Layout.vue';
 import Home from '../views/Home.vue';
 import basicCase from '../views/basicCase.vue';
