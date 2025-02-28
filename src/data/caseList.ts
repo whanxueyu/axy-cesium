@@ -24,6 +24,7 @@ import tileset from '@/assets/images/example/tileset.png';
 import editModel from '@/assets/images/example/editModel.png';
 import skybox from '@/assets/images/example/skybox.png';
 import background from '@/assets/images/example/background.png';
+import groundSkybox from '@/assets/images/example/groundSkybox.png';
 
 export const caseList = [
   {
@@ -181,12 +182,12 @@ export const caseList = [
         description: '自定义不同类型的天空盒效果',
         path: '/example/skybox'
       },
-      // {
-      //   imgurl: skyboxGround,
-      //   title: '近地天空盒',
-      //   description: '自定义不同类型的近地天空盒效果',
-      //   path: '/example/skybox'
-      // },
+      {
+        imgurl: groundSkybox,
+        title: '近地天空盒',
+        description: '自定义不同类型的近地天空盒效果',
+        path: '/example/groundSkybox'
+      },
       {
         imgurl: background,
         title: '设置背景图',

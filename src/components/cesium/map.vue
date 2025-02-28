@@ -20,12 +20,28 @@ const props = defineProps({
     },
     duration: {
         type: Number,
-        default: 8
+        default: 1
     },
     // 默认地图类型
     mapType: {
         type: String,
         default: 'tdt'
+    },
+    destination: {
+        type: Object,
+        default: {
+            longitude: 105,
+            latitude: 35,
+            height: 10000000
+        }
+    },
+    orientation: {
+        type: Object,
+        default: {
+            heading: 0,
+            pitch: -90,
+            roll: 0.0,
+        }
     }
 })
 const emits = defineEmits(['loaded'])
@@ -80,11 +96,11 @@ const initCesium = () => {
 const reset = () => {
     if (viewer)
         viewer.camera.flyTo({
-            destination: Cesium.Cartesian3.fromDegrees(105, 35, 10000000),
+            destination: Cesium.Cartesian3.fromDegrees(props.destination.longitude, props.destination.latitude, props.destination.height),
             orientation: {
-                heading: Cesium.Math.toRadians(0),
-                pitch: Cesium.Math.toRadians(-90),
-                roll: 0.0,
+                heading: Cesium.Math.toRadians(props.orientation.heading),
+                pitch: Cesium.Math.toRadians(props.orientation.pitch),
+                roll: Cesium.Math.toRadians(props.orientation.roll),
             },
             duration: props.duration
         });
