@@ -7,8 +7,9 @@
         </div>
         <div class="el-tabs">
             <div class="itemList">
-                <div :class="['name', currentSkyBox?.id === skybox.id ? 'active' : '']" v-for="skybox in skyboxList"
-                    :key="skybox.id" @click="selectSkybox(skybox)">{{ skybox.name }}</div>
+                <div :class="['name', currentSkyBox?.id === skybox.id ? 'active' : '']"
+                    v-for="skybox in groundSkyboxList" :key="skybox.id" @click="selectSkybox(skybox)">{{ skybox.name }}
+                </div>
             </div>
         </div>
         <div class="menucell">
@@ -27,7 +28,7 @@ import { onMounted, ref } from 'vue';
 import * as Cesium from "cesium";
 import { Grid, Close } from '@element-plus/icons-vue'
 import Map from '@/components/cesium/map.vue'
-import { skyboxList } from '@/assets/images/skybox';
+import { groundSkyboxList } from '@/assets/images/skybox';
 import SkyBoxOnGround from "@/modules/cesium/groundSkybox.js"
 var viewer: Cesium.Viewer;
 type skyboxListType = {
@@ -74,8 +75,8 @@ const handleShowPanel = () => {
 }
 onMounted(() => {
     // 默认加载天空盒1
-    currentSkyBox.value = skyboxList[0];
-    selectSkybox(skyboxList[0])
+    currentSkyBox.value = groundSkyboxList[0];
+    selectSkybox(groundSkyboxList[0])
 });
 </script>
 

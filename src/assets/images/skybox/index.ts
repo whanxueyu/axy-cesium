@@ -40,6 +40,28 @@ import pz4 from './4/tycho2t3_80_pz.jpg';
 import pz5 from './5/tycho2t3_80_pz.jpg';
 import pz6 from './6/tycho2t3_80_pz.jpg';
 
+import rightav9 from './qingtian/rightav9.jpg';
+import leftav9 from './qingtian/leftav9.jpg';
+import frontav9 from './qingtian/frontav9.jpg';
+import backav9 from './qingtian/backav9.jpg';
+import topav9 from './qingtian/topav9.jpg';
+import bottomav9 from './qingtian/bottomav9.jpg';
+
+import SunSetRight from './wanxia/SunSetRight.png';
+import SunSetLeft from './wanxia/SunSetLeft.png';
+import SunSetFront from './wanxia/SunSetFront.png';
+import SunSetBack from './wanxia/SunSetBack.png';
+import SunSetUp from './wanxia/SunSetUp.png';
+import SunSetDown from './wanxia/SunSetDown.png';
+
+import Right from './lantian/Right.jpg';
+import Left from './lantian/Left.jpg';
+import Front from './lantian/Front.jpg';
+import Back from './lantian/Back.jpg';
+import Up from './lantian/Up.jpg';
+import Down from './lantian/Down.jpg';
+
+
 export const skyboxList = [
     {
         name: "天空盒1",
@@ -114,5 +136,44 @@ export const skyboxList = [
             positiveY: py6,
             positiveZ: pz6
         },
+    }
+]
+
+export const groundSkyboxList = [
+    {
+        name: "晴天",
+        id: "sunny",
+        source: {
+            positiveX: rightav9,
+            negativeX: leftav9,
+            positiveY: frontav9,
+            negativeY: backav9,
+            positiveZ: topav9,
+            negativeZ: bottomav9
+        }
+    },
+    {
+        name: "晚霞",
+        id: "night",
+        source: {
+            positiveX: SunSetRight,
+            negativeX: SunSetLeft,
+            positiveY: SunSetFront,
+            negativeY: SunSetBack,
+            positiveZ: SunSetUp,
+            negativeZ: SunSetDown
+        }
+    },
+    {
+        name: "云天",
+        id: "cloud",
+        source: {
+            positiveX: Right,
+            negativeX: Left,
+            positiveY: Front,
+            negativeY: Back,
+            positiveZ: Up,
+            negativeZ: Down
+        }
     }
 ]
