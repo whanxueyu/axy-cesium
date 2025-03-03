@@ -144,10 +144,11 @@ const handleSelect = (key: string) => {
   if (key === '1') {
     router.push('/');
   } else if (key === '2') {
-    const url = router.resolve({
-      path: '/basicCase',
-    });
-    window.open(url.href);
+    // const url = router.resolve({
+    //   path: '/basicCase',
+    // });
+    // window.open(url.href);
+    router.push('/basicCase');
   }
 }
 </script>
