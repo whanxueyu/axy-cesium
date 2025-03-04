@@ -29,7 +29,7 @@ import * as Cesium from "cesium";
 import { Grid, Close } from '@element-plus/icons-vue'
 import Map from '@/components/cesium/map.vue'
 import { groundSkyboxList } from '@/assets/images/skybox';
-import SkyBoxOnGround from "@/modules/cesium/groundSkybox.js"
+import SkyBoxOnGround from "@/modules/cesium/groundskybox"
 var viewer: Cesium.Viewer;
 type skyboxListType = {
     name: string;

@@ -1,4 +1,4 @@
-import img1 from '@/assets/images/example/init.png';
+import defaultImg from '@/assets/images/skybox/lxy.jpg';
 
 type ImageImport = Record<string, { default: string }>;
 const exampleImages = import.meta.glob('@/assets/images/example/*.png', { eager: true }) as ImageImport;
@@ -34,7 +34,8 @@ const imageResources = {
     groundSkybox: 'groundSkybox.png',
     background: 'background.png',
     dynamicSkybox: 'dynamicSkybox.png',
-    shaderSkybox: 'shaderSkybox.png'
+    shaderSkybox: 'shaderSkybox.png',
+    weatherSkybox: 'weatherSkybox.png',
   },
   model: {
     model: 'model.png',
@@ -66,10 +67,10 @@ const getImagePath = <T extends ImageCategory>(category: T, name: ImageName<T>):
     if (filePath) {
       return filePath.default;
     } else {
-      return img1;
+      return defaultImg;
     }
   } else {
-    return img1;
+    return defaultImg;
   }
 };
 
@@ -255,7 +256,7 @@ export var caseList = [
         path: '/example/shaderSkybox'
       },
       {
-        imgurl: getImagePath('skybox', 'skybox'),  // 复用现有图片或新建weatherSkybox.png
+        imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
         title: '天气天空盒',
         description: '结合雨雪雾天气效果的复合天空盒',
         path: '/example/weatherSkybox'
