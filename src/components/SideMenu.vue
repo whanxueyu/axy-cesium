@@ -11,16 +11,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { caseList } from '@/data/caseList';
 
 const router = useRouter();
+const route = useRoute();
 
 const activeSection = ref<string | null>(null);
 
 const observer = ref<IntersectionObserver | null>(null);
-
+console.log(caseList);
 const handleIntersection = (entries: IntersectionObserverEntry[]) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -28,6 +29,13 @@ const handleIntersection = (entries: IntersectionObserverEntry[]) => {
         }
     });
 };
+
+// 监听路由变化
+watch(() => route.hash, (newHash) => {
+    if (newHash) {
+        activeSection.value = newHash.slice(1);
+    }
+});
 
 onMounted(() => {
     observer.value = new IntersectionObserver(handleIntersection, {
@@ -42,6 +50,11 @@ onMounted(() => {
             observer.value?.observe(element);
         }
     });
+
+    // 初始化时根据路由设置 activeSection
+    if (route.hash) {
+        activeSection.value = route.hash.slice(1);
+    }
 });
 
 onUnmounted(() => {

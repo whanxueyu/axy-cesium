@@ -1,5 +1,5 @@
 <template>
-  <div v-for="(cat, index) in caselist" :key="cat.title+index" :href="cat.type">
+  <div v-for="(cat, index) in caseList" :key="cat.title+index" :href="cat.type">
     <div class="case_title">{{ cat.title }}（{{cat.list.length}}）</div>
     <div class="case_list" :id="cat.type">
       <div class="case_item" v-for="(item, i) in cat.list" :key="item.title" @click="showDetails(index,i)">
@@ -38,16 +38,12 @@
 </template>
 
 <script setup lang="ts" name="Case2">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { ArrowLeft, ArrowRight } from "@element-plus/icons-vue";
 import { caseList } from '@/data/caseList';
 import router from '@/router';
 import { ElMessage } from 'element-plus';
-const caselist = ref(caseList)
-interface Props {
-  type: 'layers' | 'billboard'; // 只允许 'layer' 或 'billboard'
-}
-const props = defineProps<Props>();
+
 const selectedIndex = ref<number | null>(null)
 const caseArr = ref<any>([])
 const showCase = ref(false)
@@ -96,21 +92,10 @@ function showDetails(index: number,i:number) {
   showCase.value = true;
   selectedCase.value = caseList[index].list[i];
 }
-// 监听 props.type 的变化
-watch(
-  () => props.type,
-  (newType) => {
-    updateCaselist(newType);
-  }
-);
 
-function updateCaselist(type: 'layers' | 'billboard' = props.type) {
-  console.log(type, caseList);
-  caseArr.value = caseList;
-  // console.log(caseList[type]);
-}
 onMounted(() => {
-  updateCaselist();
+  caseArr.value = caseList;
+
 })
 </script>
 

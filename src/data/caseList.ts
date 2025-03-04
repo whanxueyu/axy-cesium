@@ -1,116 +1,164 @@
 import img1 from '@/assets/images/example/init.png';
-import tdtimg from '@/assets/images/example/tdtimg.png';
-import tdtvector from '@/assets/images/example/tdtvector.png';
-import gaodeimg from '@/assets/images/example/gaodeimg.png';
-import gaodevector from '@/assets/images/example/gaodevector.png';
-import bingimg from '@/assets/images/example/bingimg.png';
-import bingvector from '@/assets/images/example/bingvector.png';
-import grid from '@/assets/images/example/gird.png';
-import tilegrid from '@/assets/images/example/tilegrid.png';
-import darkmap from '@/assets/images/example/darkmap.png';
-import baselayer from '@/assets/images/example/baselayer.png';
-import editlayer from '@/assets/images/example/editlayer.png';
-import areaMap from '@/assets/images/example/areaMap.png';
-import basicBillboard from '@/assets/images/example/basicBillboard.png';
-import cluster from '@/assets/images/example/cluster.png';
-import cluster2 from '@/assets/images/example/cluster2.png';
-import primitiveBillboard from '@/assets/images/example/primitiveBillboard.png';
-import gifBillboard from '@/assets/images/example/gifbillboard.png';
-import htmlBillboard from '@/assets/images/example/htmlBillboard.png';
-import night from '@/assets/images/example/night.png';
-import divBillboard from '@/assets/images/example/divBillboard.png';
-import model from '@/assets/images/example/model.png';
-import tileset from '@/assets/images/example/tileset.png';
-import editModel from '@/assets/images/example/editModel.png';
-import skybox from '@/assets/images/example/skybox.png';
-import background from '@/assets/images/example/background.png';
-import groundSkybox from '@/assets/images/example/groundSkybox.png';
 
-export const caseList = [
+type ImageImport = Record<string, { default: string }>;
+const exampleImages = import.meta.glob('@/assets/images/example/*.png', { eager: true }) as ImageImport;
+
+const imageResources = {
+  layers: {
+    init: 'init.png',
+    tdtimg: 'tdtimg.png',
+    tdtvector: 'tdtvector.png',
+    gaodeimg: 'gaodeimg.png',
+    gaodevector: 'gaodevector.png',
+    bingimg: 'bingimg.png',
+    bingvector: 'bingvector.png',
+    grid: 'gird.png',
+    tilegrid: 'tilegrid.png',
+    darkmap: 'darkmap.png',
+    baselayer: 'baselayer.png',
+    editlayer: 'editlayer.png',
+    areaMap: 'areaMap.png',
+    night: 'night.png'
+  },
+  billboard: {
+    basicBillboard: 'basicBillboard.png',
+    cluster: 'cluster.png',
+    cluster2: 'cluster2.png',
+    primitiveBillboard: 'primitiveBillboard.png',
+    gifBillboard: 'gifbillboard.png',
+    htmlBillboard: 'htmlBillboard.png',
+    divBillboard: 'divBillboard.png'
+  },
+  skybox: {
+    skybox: 'skybox.png',
+    groundSkybox: 'groundSkybox.png',
+    background: 'background.png',
+    dynamicSkybox: 'dynamicSkybox.png',
+    shaderSkybox: 'shaderSkybox.png'
+  },
+  model: {
+    model: 'model.png',
+    tileset: 'tileset.png',
+    editModel: 'editModel.png'
+  },
+  material: {
+    postProcess: 'postProcess.png',
+    heatmap: 'heatmap.png',
+    terrain: 'terrain.png',
+    animation: 'animation.png'
+  },
+  comprehensive: {
+    measurement: 'measurement.png',
+    dynamicData: 'dynamicData.png',
+    cameraFlight: 'cameraFlight.png',
+    undergroundMode: 'undergroundMode.png',
+  }
+};
+
+// 定义 imageResources 的类型
+type ImageCategory = keyof typeof imageResources;
+type ImageName<T extends ImageCategory> = keyof typeof imageResources[T];
+
+const getImagePath = <T extends ImageCategory>(category: T, name: ImageName<T>): string => {
+  const fileName = imageResources[category][name];
+  if (fileName) {
+    let filePath = exampleImages[`/src/assets/images/example/${fileName}`];
+    if (filePath) {
+      return filePath.default;
+    } else {
+      return img1;
+    }
+  } else {
+    return img1;
+  }
+};
+
+
+export var caseList = [
   {
     title: '图层',
     type: 'layers',
     list: [
       {
-        imgurl: img1,
+        imgurl: getImagePath('layers', 'init'),
         title: '初始化',
         description: '最基础的初始化 Cesium 案例。',
         path: '/example/initCesium'
       },
       {
-        imgurl: tdtimg,
+        imgurl: getImagePath('layers', 'tdtimg'),
         title: '天地图影像',
         description: '添加天地图影像，并取消无关图标和widgets。',
         path: '/example/tdt_img'
       },
       {
-        imgurl: tdtvector,
+        imgurl: getImagePath('layers', 'tdtvector'),
         title: '天地图矢量',
         description: '添加天地图矢量，并取消无关图标和widgets。',
         path: '/example/tdt_vector'
       },
       {
-        imgurl: gaodeimg,
+        imgurl: getImagePath('layers', 'gaodeimg'),
         title: '高德地图影像',
         description: '添加高德地图影像，并取消无关图标和widgets。',
         path: '/example/gaode_img'
       },
       {
-        imgurl: gaodevector,
+        imgurl: getImagePath('layers', 'gaodevector'),
         title: '高德地图矢量',
         description: '添加高德地图矢量，并取消无关图标和widgets。',
         path: '/example/gaode_vector'
       },
       {
-        imgurl: bingimg,
+        imgurl: getImagePath('layers', 'bingimg'),
         title: '必应地图影像',
         description: '添加必应地图影像，并取消无关图标和widgets。',
         path: '/example/bing_img'
       },
       {
-        imgurl: bingvector,
+        imgurl: getImagePath('layers', 'bingvector'),
         title: '必应地图矢量',
         description: '添加必应地图矢量，并取消无关图标和widgets。',
         path: '/example/bing_vector'
       },
       {
-        imgurl: grid,
+        imgurl: getImagePath('layers', 'grid'),
         title: '网格地图',
         description: '生成网格地图，并取消无关图标和widgets。',
         path: '/example/grid'
       },
       {
-        imgurl: tilegrid,
+        imgurl: getImagePath('layers', 'tilegrid'),
         title: '瓦片网格地图',
         description: '生成瓦片网格地图，并取消无关图标和widgets。',
         path: '/example/tileGrid'
       },
       {
-        imgurl: areaMap,
+        imgurl: getImagePath('layers', 'areaMap'),
         title: '区域地图加载',
         description: '在指定区域单独加载图层',
         path: '/example/areaMap'
       },
       {
-        imgurl: night,
+        imgurl: getImagePath('layers', 'night'),
         title: '夜晚地图',
         description: '夜晚地图效果，白天黑夜图层切换模拟地球自传动态效果',
         path: '/example/night'
       },
       {
-        imgurl: darkmap,
+        imgurl: getImagePath('layers', 'darkmap'),
         title: '暗色（反色）地图',
         description: '通过修改涂层颜色通道生成暗色底图',
         path: '/example/darkmap'
       },
       {
-        imgurl: baselayer,
+        imgurl: getImagePath('layers', 'baselayer'),
         title: '切换底图',
         description: '自定义基础图层选择组件，点击随意切换各种底图',
         path: '/example/changeMap'
       },
       {
-        imgurl: editlayer,
+        imgurl: getImagePath('layers', 'editlayer'),
         title: '编辑地图颜色',
         description: '可根据调整参数，随意生成自己喜欢的底图颜色',
         path: '/example/editMapColor'
@@ -123,49 +171,49 @@ export const caseList = [
     type: 'billboard',
     list: [
       {
-        imgurl: basicBillboard,
+        imgurl: getImagePath('billboard', 'basicBillboard'),
         title: '基础标牌',
         description: '基础标牌的各个参数效果对比展示',
         path: '/example/basicBillboard'
       },
       {
-        imgurl: cluster,
+        imgurl: getImagePath('billboard', 'cluster'),
         title: 'entity标牌聚合效果',
         description: '随机生成500个点位，并实现不同层级的聚合效果',
         path: '/example/billboardCluster'
       },
       {
-        imgurl: cluster2,
+        imgurl: getImagePath('billboard', 'cluster2'),
         title: 'entity标牌自定义聚合效果',
         description: '随机生成500个点位，并实现不同层级的自定义聚合效果',
         path: '/example/billboardCluster2'
       },
       {
-        imgurl: primitiveBillboard,
+        imgurl: getImagePath('billboard', 'primitiveBillboard'),
         title: 'primitive标牌(高性能)',
         description: '随机生成10000个点位，可支持更多点位渲染',
         path: '/example/primitiveBillboard'
       },
       {
-        imgurl: primitiveBillboard,
+        imgurl: getImagePath('billboard', 'primitiveBillboard'),
         title: 'primitive标牌聚合(高性能)',
         description: '随机生成10000个点位，可支持更多点位渲染',
         path: '/example/primitiveCluster'
       },
       {
-        imgurl: gifBillboard,
+        imgurl: getImagePath('billboard', 'gifBillboard'),
         title: '动态标牌',
         description: '使用gif动图实现动态标牌效果。（目前使用gifler库解析gif，但是效果不理想，无法加载超过1.6M的动图，且加载动图数量稍多就会卡顿，后续寻找更优解）',
         path: '/example/gifBillboard'
       },
       {
-        imgurl: htmlBillboard,
+        imgurl: getImagePath('billboard', 'htmlBillboard'),
         title: 'html自定义标牌',
         description: '使用html作为标牌，有更高的自由度，可以实现自己的交互逻辑',
         path: '/example/htmlBillboard'
       },
       {
-        imgurl: divBillboard,
+        imgurl: getImagePath('billboard', 'divBillboard'),
         title: 'div标牌终极方案',
         description: '封装了divBillboard类，可以加载任意的vue组件',
         path: '/example/divBillboard'
@@ -177,23 +225,41 @@ export const caseList = [
     type: 'skybox',
     list: [
       {
-        imgurl: skybox,
+        imgurl: getImagePath('skybox', 'skybox'),
         title: '天空盒',
         description: '自定义不同类型的天空盒效果',
         path: '/example/skybox'
       },
       {
-        imgurl: groundSkybox,
+        imgurl: getImagePath('skybox', 'groundSkybox'),
         title: '近地天空盒',
         description: '自定义不同类型的近地天空盒效果',
         path: '/example/groundSkybox'
       },
       {
-        imgurl: background,
+        imgurl: getImagePath('skybox', 'background'),
         title: '设置背景图',
         description: '设置背景图',
         path: '/example/background'
       },
+      {
+        imgurl: getImagePath('skybox', 'dynamicSkybox'),
+        title: '动态天空盒',
+        description: '随时间变化的动态天空盒效果，模拟日夜转换',
+        path: '/example/dynamicSkybox'
+      },
+      {
+        imgurl: getImagePath('skybox', 'shaderSkybox'),
+        title: '着色器天空盒',
+        description: '使用自定义着色器实现的特殊天空效果',
+        path: '/example/shaderSkybox'
+      },
+      {
+        imgurl: getImagePath('skybox', 'skybox'),  // 复用现有图片或新建weatherSkybox.png
+        title: '天气天空盒',
+        description: '结合雨雪雾天气效果的复合天空盒',
+        path: '/example/weatherSkybox'
+      }
     ]
   },
   {
@@ -201,19 +267,19 @@ export const caseList = [
     type: 'model',
     list: [
       {
-        imgurl: model,
+        imgurl: getImagePath('model', 'model'),
         title: 'gltf模型加载',
         description: '加载基础的各类glb单体模型',
         path: '/example/model'
       },
       {
-        imgurl: tileset,
+        imgurl: getImagePath('model', 'tileset'),
         title: '3D Tiles模型加载',
         description: '加载大雁塔倾斜摄影模型',
         path: '/example/tileset'
       },
       {
-        imgurl: editModel,
+        imgurl: getImagePath('model', 'editModel'),
         title: '模型编辑',
         description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
         path: '/example/editModel'
@@ -223,11 +289,61 @@ export const caseList = [
   {
     title: '效果',
     type: 'material',
-    list: []
+    list: [
+      {
+        imgurl: getImagePath('material', 'postProcess'),
+        title: '后期处理效果',
+        description: '泛光、景深、环境光遮蔽等屏幕空间特效',
+        path: '/example/postProcessing'
+      },
+      {
+        imgurl: getImagePath('material', 'heatmap'),
+        title: '热力图效果',
+        description: '基于地理坐标的热力数据可视化',
+        path: '/example/heatmap'
+      },
+      {
+        imgurl: getImagePath('material', 'terrain'),
+        title: '地形加载',
+        description: 'Cesium地形服务与自定义地形高度图',
+        path: '/example/terrain'
+      },
+      {
+        imgurl: getImagePath('material', 'animation'),
+        title: '天气效果',
+        description: '雨雪雾动态天气模拟与切换',
+        path: '/example/weatherEffects'
+      }
+    ]
   },
   {
     title: '综合案例',
     type: 'comprehensive',
-    list: []
+    list: [
+      {
+        imgurl: getImagePath('comprehensive', 'measurement'),
+        title: '测量工具',
+        description: '三维空间距离、面积、高度测量工具',
+        path: '/example/measurement'
+      },
+      {
+        imgurl: getImagePath('comprehensive', 'cameraFlight'),
+        title: '相机飞行',
+        description: '自定义相机飞行路径与视角切换动画',
+        path: '/example/cameraFlight'
+      },
+      {
+        imgurl: getImagePath('comprehensive', 'undergroundMode'),
+        title: '地下模式',
+        description: '地下场景可视化与透明地表效果',
+        path: '/example/undergroundMode'
+      },
+      {
+        imgurl: getImagePath('comprehensive', 'dynamicData'),
+        title: '动态数据更新',
+        description: '实时数据流可视化与动态更新',
+        path: '/example/dynamicData'
+      }
+    ]
   },
 ]
