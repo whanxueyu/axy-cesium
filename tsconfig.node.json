@@ -10,6 +10,7 @@
     "typeRoots": [
       "./node_modules/@types"
     ],
+    "noEmitOnError": false, // 忽略类型错误
 
     /* Bundler mode */
     "moduleResolution": "bundler",

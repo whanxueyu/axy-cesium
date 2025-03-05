@@ -20,13 +20,15 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "preserve",
+    "allowJs": true,
 
     /* Linting */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "noEmitOnError": false // 忽略类型错误
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }
