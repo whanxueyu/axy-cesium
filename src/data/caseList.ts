@@ -1,4 +1,4 @@
-import defaultImg from '@/assets/images/skybox/lxy.jpg';
+import defaultImg from '@/assets/images/home/todo.png';
 
 type ImageImport = Record<string, { default: string }>;
 const exampleImages = import.meta.glob('@/assets/images/example/*.png', { eager: true }) as ImageImport;
@@ -243,24 +243,24 @@ export var caseList = [
         description: '设置背景图',
         path: '/example/background'
       },
-      {
-        imgurl: getImagePath('skybox', 'dynamicSkybox'),
-        title: '动态天空盒',
-        description: '随时间变化的动态天空盒效果，模拟日夜转换',
-        path: '/example/dynamicSkybox'
-      },
-      {
-        imgurl: getImagePath('skybox', 'shaderSkybox'),
-        title: '着色器天空盒',
-        description: '使用自定义着色器实现的特殊天空效果',
-        path: '/example/shaderSkybox'
-      },
-      {
-        imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
-        title: '天气天空盒',
-        description: '结合雨雪雾天气效果的复合天空盒',
-        path: '/example/weatherSkybox'
-      }
+      // {
+      //   imgurl: getImagePath('skybox', 'dynamicSkybox'),
+      //   title: '动态天空盒',
+      //   description: '随时间变化的动态天空盒效果，模拟日夜转换',
+      //   path: '/example/dynamicSkybox'
+      // },
+      // {
+      //   imgurl: getImagePath('skybox', 'shaderSkybox'),
+      //   title: '着色器天空盒',
+      //   description: '使用自定义着色器实现的特殊天空效果',
+      //   path: '/example/shaderSkybox'
+      // },
+      // {
+      //   imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
+      //   title: '天气天空盒',
+      //   description: '结合雨雪雾天气效果的复合天空盒',
+      //   path: '/example/weatherSkybox'
+      // }
     ]
   },
   {
