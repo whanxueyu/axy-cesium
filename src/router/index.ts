@@ -1,5 +1,5 @@
 // src/router/index.ts
-import { createRouter, RouteRecordRaw,createWebHistory } from 'vue-router';
+import { createRouter, RouteRecordRaw,createWebHashHistory } from 'vue-router';
 import Layout from '../views/Layout.vue';
 import Home from '../views/Home.vue';
 import basicCase from '../views/basicCase.vue';
@@ -186,7 +186,7 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(),
   routes
 });
 
