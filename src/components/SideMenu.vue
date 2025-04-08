@@ -5,13 +5,16 @@
             <span class="text-xl font-bold">AXY-Cesium</span>
         </div>
         <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
-            <a :href="`#${cat.type}`">{{ cat.title }}</a>
+            <!-- <a :href="`#${cat.type}`">{{ cat.title }}</a> -->
+            <div  class="menu-item"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >
+            {{ cat.title }}
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { caseList } from '@/data/caseList';
 
@@ -29,19 +32,28 @@ const handleIntersection = (entries: IntersectionObserverEntry[]) => {
         }
     });
 };
-
+const handleMenuClick = (sectionId: string) => {
+  // 更新路由哈希（Vue Router会自动监听）
+  router.replace(`#${sectionId}`);
+  
+  // 手动滚动到目标元素
+  const targetElement = document.getElementById(sectionId);
+  if (targetElement) {
+    targetElement.scrollIntoView({ behavior: 'smooth' });
+  }
+};
 // 监听路由变化
-watch(() => route.hash, (newHash) => {
-    if (newHash) {
-        activeSection.value = newHash.slice(1);
-    }
-});
+// watch(() => route.hash, (newHash) => {
+//     if (newHash) {
+//         activeSection.value = newHash.slice(1);
+//     }
+// });
 
 onMounted(() => {
     observer.value = new IntersectionObserver(handleIntersection, {
         root: null,
         rootMargin: '0px',
-        threshold: 0.1
+        threshold: 0.5
     });
 
     caseList.forEach(cat => {
