@@ -10,6 +10,11 @@
             {{ cat.title }}
             </div>
         </div>
+        <div class="github">
+            <a href="https://github.com/whanxueyu/axy-cesium" target="_blank">
+                <img src="https://img.shields.io/github/stars/whanxueyu/axy-cesium?style=social" alt="GitHub stars">
+            </a>
+        </div>
     </div>
 </template>
 
@@ -82,7 +87,13 @@ const backHome = () => {
 .side-menu-section {
     width: 200px;
     color: #fff;
+    height: calc(100vh - 60px);
     padding: 10px;
+}
+
+.github {
+    position: absolute;
+    bottom: 20px;
 }
 
 .logo {
