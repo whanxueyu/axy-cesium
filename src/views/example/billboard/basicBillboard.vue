@@ -1,5 +1,4 @@
 <template>
-    <div id="cesiumContainer" class="fullSize"></div>
     <div class="side-panel">
         <el-tree node-key="id" ref="treeRef" :data="dataList" :props="defaultProps" show-checkbox
             :default-checked-keys="checkList" @check-change="checkListChange" default-expand-all>
@@ -15,14 +14,16 @@
             </template>
         </el-tree>
     </div>
+    <Map @loaded="handleMapLoaded"></Map>
 </template>
 
 <script setup lang="ts">
 import { Location} from "@element-plus/icons-vue";
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import iconList from "@/assets/images/icon";
+import Map from '@/components/cesium/map.vue'
 const defaultProps = {
     children: "children",
     label: "name",
@@ -261,6 +262,7 @@ const location = (item: {
         viewer.zoomTo(entity)
     }
 }
+const mapLoaded = ref(false)
 const checkList = ref<string[]>()
 checkList.value = dataList.map(item => item.id)
 // 原点在对象的顶部。
@@ -307,30 +309,33 @@ const addBillboard = () => {
         viewer.zoomTo(billboard)
     })
 }
-onMounted(() => {
-    viewer = new Cesium.Viewer("cesiumContainer", {
-        // terrain: Cesium.Terrain.fromWorldTerrain(),
-    });
-    console.log(iconList)
+const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
+    viewer = MapViewer;
     addBillboard()
-});
+    mapLoaded.value = true;
+    reset()
+}
+const reset = () => {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(116.405, 39.875, 2500),
+        orientation: {
+            heading: Cesium.Math.toRadians(0),
+            pitch: Cesium.Math.toRadians(-40),
+            roll: 0.0,
+        },
+        duration: 1
+    });
+}
 </script>
 
 <style scoped>
-.fullSize {
-    width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
 .side-panel {
     position: absolute;
     padding: 10px;
     top: 10px;
     left: 10px;
     background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999;
 }
 .custom-tree-node{
     width: 100%;

@@ -150,7 +150,7 @@ onUnmounted(() => {
   left: 0px;
   color: #fff;
   width: 100%;
-  background-color: #74747449;
+  background-color: #454545ab;
   padding: 2px 0;
   text-shadow: #000000 2px 2px 2px;
 

@@ -1,5 +1,4 @@
 <template>
-    <div id="cesiumContainer" class="fullSize"></div>
     <div class="side-panel">
         <el-tree node-key="id" ref="treeRef" :data="dataList" :props="defaultProps" show-checkbox
             :default-checked-keys="checkList" @check-change="checkListChange" default-expand-all>
@@ -15,18 +14,21 @@
             </template>
         </el-tree>
     </div>
+    <Map @loaded="handleMapLoaded"></Map>
 </template>
 
 <script setup lang="ts">
 import { Location} from "@element-plus/icons-vue";
-import { onMounted, ref } from 'vue';
+import { ref } from 'vue';
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import iconList from "@/assets/images/icon";
+import Map from '@/components/cesium/map.vue'
 const defaultProps = {
     children: "children",
     label: "name",
 };
+const mapLoaded = ref(false)
 var viewer: Cesium.Viewer
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 const dataList = [
@@ -206,33 +208,35 @@ const addBounceBillboard2 = () => {
         updateHtmlPosition(htmlOverlay, position)
     });
 }
-onMounted(() => {
-    viewer = new Cesium.Viewer("cesiumContainer", {
-        // terrain: Cesium.Terrain.fromWorldTerrain(),
-    });
-    console.log(iconList)
-    // addBillboard()
+const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
+    viewer = MapViewer;
     addBounceBillboard()
     addBounceBillboard1()
     addBounceBillboard2()
-});
+    mapLoaded.value = true;
+    reset()
+}
+const reset = () => {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(116.405, 39.875, 2500),
+        orientation: {
+            heading: Cesium.Math.toRadians(0),
+            pitch: Cesium.Math.toRadians(-40),
+            roll: 0.0,
+        },
+        duration: 1
+    });
+}
 </script>
 
 <style scoped>
-.fullSize {
-    width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-}
-
 .side-panel {
     position: absolute;
     padding: 10px;
     top: 10px;
     left: 10px;
     background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999;
 }
 .custom-tree-node{
     width: 100%;

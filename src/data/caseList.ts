@@ -22,9 +22,11 @@ const imageResources = {
   },
   billboard: {
     basicBillboard: 'basicBillboard.png',
-    cluster: 'cluster.png',
-    cluster2: 'cluster2.png',
+    bounceBillboard: 'bounceBillboard.png',
+    cluster: 'billboardCluster.png',
+    cluster2: 'billboardCluster.png',
     primitiveBillboard: 'primitiveBillboard.png',
+    primitiveCluster: 'primitiveCluster.png',
     gifBillboard: 'gifbillboard.png',
     htmlBillboard: 'htmlBillboard.png',
     divBillboard: 'divBillboard.png'
@@ -178,9 +180,9 @@ export var caseList = [
         path: '/example/basicBillboard'
       },
       {
-        imgurl: getImagePath('billboard', 'basicBillboard'),
+        imgurl: getImagePath('billboard', 'bounceBillboard'),
         title: '跳动标牌',
-        description: '基础标牌的各个参数效果对比展示',
+        description: '用三种方式实现标牌跳动效果，三种方式对比',
         path: '/example/bounceBillboard'
       },
       {
@@ -202,7 +204,7 @@ export var caseList = [
         path: '/example/primitiveBillboard'
       },
       {
-        imgurl: getImagePath('billboard', 'primitiveBillboard'),
+        imgurl: getImagePath('billboard', 'primitiveCluster'),
         title: 'primitive标牌聚合(高性能)',
         description: '随机生成10000个点位，可支持更多点位渲染',
         path: '/example/primitiveCluster'

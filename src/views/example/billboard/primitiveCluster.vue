@@ -1,10 +1,10 @@
 <template>
-  <div id="cesiumContainer" class="fullSize"></div>
   <div class="operation">
     <span>随机生成点位</span>
     <el-input-number :min="1" v-model="pointNum" :step="100"></el-input-number>
     <el-button type="primary" @click="generatePoints">生成</el-button>
   </div>
+  <Map @loaded="handleMapLoaded"></Map>
 </template>
 
 <script setup>
@@ -13,7 +13,8 @@ import * as Cesium from "cesium";
 import markList from '@/assets/images/marker/index'
 import 'cesium/Source/Widgets/widgets.css';
 import PrimitiveCluster from "@/modules/cesium/PrimitiveCluster.js"
-
+import Map from '@/components/cesium/map.vue'
+const mapLoaded = ref(false)
 var viewer;
 const pointNum = ref(10000);
 
@@ -95,31 +96,35 @@ const generatePoints = () => {
   createBillboards();
 };
 
-onMounted(() => {
-  viewer = new Cesium.Viewer("cesiumContainer", {
-    // terrain: Cesium.Terrain.fromWorldTerrain(),
-  });
-  alert("当前cesium版本 1.124 版本过高，该聚合方法不可用，经测试可在 1.105 版本可用");
-});
+const handleMapLoaded = (MapViewer) => {
+    viewer = MapViewer;
+    alert("当前cesium版本 1.124 版本过高，该聚合方法不可用，经测试可在 1.105 版本可用");
+    mapLoaded.value = true;
+    reset()
+}
+const reset = () => {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(101.405, 36.5, 2500000),
+        orientation: {
+            heading: Cesium.Math.toRadians(0),
+            pitch: Cesium.Math.toRadians(-90),
+            roll: 0.0,
+        },
+        duration: 1
+    });
+}
 
 watch(pointNum, () => {
   generatePoints();
 });
 </script>
 <style scoped>
-.fullSize {
-  width: 100%;
-  height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
 .operation {
   position: fixed;
   top: 20px;
   left: 20px;
   background-color: #fff;
   width: 200px;
+  z-index: 9999;
 }
 </style>
