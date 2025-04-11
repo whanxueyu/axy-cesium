@@ -178,6 +178,12 @@ export var caseList = [
         path: '/example/basicBillboard'
       },
       {
+        imgurl: getImagePath('billboard', 'basicBillboard'),
+        title: '跳动标牌',
+        description: '基础标牌的各个参数效果对比展示',
+        path: '/example/bounceBillboard'
+      },
+      {
         imgurl: getImagePath('billboard', 'cluster'),
         title: 'entity标牌聚合效果',
         description: '随机生成500个点位，并实现不同层级的聚合效果',

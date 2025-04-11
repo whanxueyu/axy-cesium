@@ -131,6 +131,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/billboard/basicBillboard.vue')
       },
       {
+        path: '/example/bounceBillboard',
+        name: 'bounceBillboard',
+        component: () => import('@/views/example/billboard/bounceBillboard.vue')
+      },
+      {
         path: '/example/billboardCluster',
         name: 'billboardCluster',
         component: () => import('@/views/example/billboard/billboardCluster.vue')

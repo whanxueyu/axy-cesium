@@ -100,12 +100,39 @@ button:focus-visible {
   font-size: 14px;
 }
 
+.bounce-html {
+  text-align: center;
+  width: 85px;
+  color: #fff;
+  line-height: 40px;
+  height: 85px;
+}
+.bounce-html-title{
+  background-image: url('./assets/images/icon/map-title-y.png');
+  background-repeat: no-repeat;
+  width: 85px;
+  height: 59px;
+  animation: bounce 1s infinite;
+  text-shadow: 0 0 5px #1a1a1a;
+}
+@keyframes bounce {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(20px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
 .div-billboard1 {
   text-align: center;
   padding: 5px 30px;
   margin: 0;
   color: #fff;
-  background: linear-gradient(rgb(7 10 203 / 75%), rgb(16 238 220));
+  background: linear-gradient(#070acbbf, #10eedc);
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
