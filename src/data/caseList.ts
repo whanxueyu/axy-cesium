@@ -21,6 +21,7 @@ const imageResources = {
     night: 'night.png'
   },
   billboard: {
+    animationBillboard: 'animationBillboard',
     basicBillboard: 'basicBillboard.png',
     bounceBillboard: 'bounceBillboard.png',
     cluster: 'billboardCluster.png',
@@ -184,6 +185,12 @@ export var caseList = [
         title: '跳动标牌',
         description: '用三种方式实现标牌跳动效果，三种方式对比',
         path: '/example/bounceBillboard'
+      },
+      {
+        imgurl: getImagePath('billboard', 'animationBillboard'),
+        title: '动画标牌',
+        description: '标牌坠落、变大、透明等动画效果',
+        path: '/example/animationBillboard'
       },
       {
         imgurl: getImagePath('billboard', 'cluster'),
