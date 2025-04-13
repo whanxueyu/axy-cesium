@@ -1,35 +1,17 @@
 <template>
     <div class="side-panel">
-        <el-tree node-key="id" ref="treeRef" :data="dataList" :props="defaultProps" show-checkbox
-            :default-checked-keys="checkList" @check-change="checkListChange" default-expand-all>
-            <template #default="{ data }">
-                <div class="custom-tree-node flex-sb-center" @dblclick="location(data)">
-                    <div class="node-name">{{ data.name }}</div>
-                    <div @click="location(data)">
-                        <el-icon size="16" color="#ff404E">
-                            <Location />
-                        </el-icon>
-                    </div>
-                </div>
-            </template>
-        </el-tree>
         <el-button @click="addFallingBillboard">下落标牌</el-button>
-        <el-button @click="addScaleBillboard">添加下坠</el-button>
+        <el-button @click="addScaleBillboard">缩放标牌</el-button>
     </div>
     <Map @loaded="handleMapLoaded"></Map>
 </template>
 
 <script setup lang="ts">
-import { Location} from "@element-plus/icons-vue";
 import { ref } from 'vue';
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import markList from "@/assets/images/marker";
 import Map from '@/components/cesium/map.vue'
-const defaultProps = {
-    children: "children",
-    label: "name",
-};
 const mapLoaded = ref(false)
 var viewer: Cesium.Viewer
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
@@ -52,20 +34,23 @@ const dataList = [
         position: [116.4, 39.8, 10],
     }
 ]
-const checkListChange = (value: { [key: string]: any; }, check: boolean) => {
-    const entity = viewer?.entities?.getById(value.id);
-    if (entity) {
-        entity.show = check
-    }
-}
-const location = (item: {
-    [key: string]: any;
-}) => {
-    const entity = viewer?.entities?.getById(item.id);
-    if (entity) {
-        viewer.zoomTo(entity)
-    }
-}
+// 测试代码
+// const addLine = () => {
+//     viewer.entities.add({
+//             id: "test-line-20250413-zoom",
+//             polyline: {
+//     positions: Cesium.Cartesian3.fromDegreesArray([115.3, 38.9, 116.4, 39.9, 116.4, 39.8]), 
+//     width: 5,
+//     material: Cesium.Color.RED,
+//   },
+//     })
+// }
+// const location = () => {
+//     const entity = viewer?.entities?.getById("test-line-20250413-zoom");
+//     if (entity) {
+//         viewer.zoomTo(entity)
+//     }
+// }
 const checkList = ref<string[]>()
 checkList.value = dataList.map(item => item.id)
 let offset = 0;
@@ -79,7 +64,7 @@ const addFallingBillboard = () => {
             position: Cesium.Cartesian3.fromDegrees(item.longitude, item.latitude, 0),
             billboard: {
                 image: markList.LaceBlue,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                verticalOrigin: Cesium.VerticalOrigin.CENTER,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                 pixelOffset: new Cesium.CallbackProperty(
                     (time) => {
@@ -118,7 +103,7 @@ const addScaleBillboard = () => {
             position: Cesium.Cartesian3.fromDegrees(item.longitude, item.latitude, 0),
             billboard: {
                 image: markList.LaceBlue,
-                verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                verticalOrigin: Cesium.VerticalOrigin.CENTER,
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER,
                 scale: new Cesium.CallbackProperty(
                     () => {

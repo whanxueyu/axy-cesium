@@ -21,7 +21,7 @@ const imageResources = {
     night: 'night.png'
   },
   billboard: {
-    animationBillboard: 'animationBillboard',
+    animationBillboard: 'animationBillboard.png',
     basicBillboard: 'basicBillboard.png',
     bounceBillboard: 'bounceBillboard.png',
     cluster: 'billboardCluster.png',
