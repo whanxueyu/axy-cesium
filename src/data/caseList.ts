@@ -20,6 +20,14 @@ const imageResources = {
     areaMap: 'areaMap.png',
     night: 'night.png'
   },
+  skybox: {
+    skybox: 'skybox.png',
+    groundSkybox: 'groundSkybox.png',
+    background: 'background.png',
+    dynamicSkybox: 'dynamicSkybox.png',
+    shaderSkybox: 'shaderSkybox.png',
+    weatherSkybox: 'weatherSkybox.png',
+  },
   billboard: {
     animationBillboard: 'animationBillboard.png',
     basicBillboard: 'basicBillboard.png',
@@ -32,13 +40,10 @@ const imageResources = {
     htmlBillboard: 'htmlBillboard.png',
     divBillboard: 'divBillboard.png'
   },
-  skybox: {
-    skybox: 'skybox.png',
-    groundSkybox: 'groundSkybox.png',
-    background: 'background.png',
-    dynamicSkybox: 'dynamicSkybox.png',
-    shaderSkybox: 'shaderSkybox.png',
-    weatherSkybox: 'weatherSkybox.png',
+  polyline: {
+    basicPolyline: 'basicPolyline.png',
+    dynamicPolyline: 'dynamicPolyline.png',
+    imagePolyline: 'imagePolyline.png',
   },
   model: {
     model: 'model.png',
@@ -171,6 +176,48 @@ export var caseList = [
     ]
   },
   {
+    title: '天空盒',
+    type: 'skybox',
+    list: [
+      {
+        imgurl: getImagePath('skybox', 'skybox'),
+        title: '天空盒',
+        description: '自定义不同类型的天空盒效果',
+        path: '/example/skybox'
+      },
+      {
+        imgurl: getImagePath('skybox', 'groundSkybox'),
+        title: '近地天空盒',
+        description: '自定义不同类型的近地天空盒效果',
+        path: '/example/groundSkybox'
+      },
+      {
+        imgurl: getImagePath('skybox', 'background'),
+        title: '设置背景图',
+        description: '设置背景图',
+        path: '/example/background'
+      },
+      // {
+      //   imgurl: getImagePath('skybox', 'dynamicSkybox'),
+      //   title: '动态天空盒',
+      //   description: '随时间变化的动态天空盒效果，模拟日夜转换',
+      //   path: '/example/dynamicSkybox'
+      // },
+      // {
+      //   imgurl: getImagePath('skybox', 'shaderSkybox'),
+      //   title: '着色器天空盒',
+      //   description: '使用自定义着色器实现的特殊天空效果',
+      //   path: '/example/shaderSkybox'
+      // },
+      // {
+      //   imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
+      //   title: '天气天空盒',
+      //   description: '结合雨雪雾天气效果的复合天空盒',
+      //   path: '/example/weatherSkybox'
+      // }
+    ]
+  },
+  {
     title: '标牌',
     type: 'billboard',
     list: [
@@ -237,45 +284,27 @@ export var caseList = [
     ]
   },
   {
-    title: '天空盒',
+    title: '线_Polyline',
     type: 'skybox',
     list: [
       {
-        imgurl: getImagePath('skybox', 'skybox'),
-        title: '天空盒',
-        description: '自定义不同类型的天空盒效果',
-        path: '/example/skybox'
+        imgurl: getImagePath('polyline', 'basicPolyline'),
+        title: '基础线',
+        description: '基础polyline效果,',
+        path: '/example/basicPolyline'
       },
       {
-        imgurl: getImagePath('skybox', 'groundSkybox'),
-        title: '近地天空盒',
-        description: '自定义不同类型的近地天空盒效果',
-        path: '/example/groundSkybox'
+        imgurl: getImagePath('polyline', 'imagePolyline'),
+        title: '图片材质线',
+        description: '为Polyline设置图片作为材质',
+        path: '/example/imagePolyline'
       },
       {
-        imgurl: getImagePath('skybox', 'background'),
-        title: '设置背景图',
-        description: '设置背景图',
-        path: '/example/background'
+        imgurl: getImagePath('polyline', 'dynamicPolyline'),
+        title: '动态线',
+        description: '动态效果的Polyline',
+        path: '/example/dynamicPolyline'
       },
-      // {
-      //   imgurl: getImagePath('skybox', 'dynamicSkybox'),
-      //   title: '动态天空盒',
-      //   description: '随时间变化的动态天空盒效果，模拟日夜转换',
-      //   path: '/example/dynamicSkybox'
-      // },
-      // {
-      //   imgurl: getImagePath('skybox', 'shaderSkybox'),
-      //   title: '着色器天空盒',
-      //   description: '使用自定义着色器实现的特殊天空效果',
-      //   path: '/example/shaderSkybox'
-      // },
-      // {
-      //   imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
-      //   title: '天气天空盒',
-      //   description: '结合雨雪雾天气效果的复合天空盒',
-      //   path: '/example/weatherSkybox'
-      // }
     ]
   },
   {

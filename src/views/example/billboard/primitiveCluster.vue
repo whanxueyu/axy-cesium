@@ -68,10 +68,17 @@ const addCluster = (data) => {
     billboards.add(img)
   })
   let primitivecluster = null
-  primitivecluster = new PrimitiveCluster()
-  primitivecluster.enabled = true
-  primitivecluster.pixelRange = 1
-  primitivecluster.minimumClusterSize = 10
+  primitivecluster = new PrimitiveCluster({
+    enabled: true,
+    pixelRange: 60,
+    minimumClusterSize: 2,
+    clusterBillboards: true,
+    clusterPoints: true,
+    clusterLabels: true,
+  })
+  // primitivecluster.enabled = true
+  // primitivecluster.pixelRange = 1
+  // primitivecluster.minimumClusterSize = 10
   primitivecluster._billboardCollection = billboards
   // 同时在赋值时调用_initialize方法
   primitivecluster._initialize(viewer.scene)

@@ -175,6 +175,22 @@ const routes: Array<RouteRecordRaw> = [
         name: 'divBillboard',
         component: () => import('@/views/example/billboard/divBillboard.vue')
       },
+      // polyline
+      {
+        path: '/example/basicPolyline',
+        name: 'basicPolyline',
+        component: () => import('@/views/example/polyline/basicPolyline.vue')
+      },
+      {
+        path: '/example/imagePolyline',
+        name: 'imagePolyline',
+        component: () => import('@/views/example/polyline/imagePolyline.vue')
+      },
+      {
+        path: '/example/dynamicPolyline',
+        name: 'dynamicPolyline',
+        component: () => import('@/views/example/polyline/dynamicPolyline.vue')
+      },
       // model
       {
         path: '/example/model',

@@ -1,6 +1,22 @@
+// import {
+//   BoundingRectangle,
+//   Cartesian2,
+//   Cartesian3,
+//   defaultValue,
+//   defined,
+//   EllipsoidalOccluder,
+//   Event,
+//   Matrix4,
+//   Billboard,
+//   BillboardCollection,
+//   Label,
+//   LabelCollection,
+//   PointPrimitive,
+//   PointPrimitiveCollection,
+//   SceneMode,
+// } from "cesium";
 import KDBush from "kdbush";
 import * as Cesium from "cesium";
-// cesium 1.105
 /**
  * Defines how screen space objects (billboards, points, labels) are clustered.
  *
@@ -27,7 +43,7 @@ function PrimitiveCluster(options) {
   this._clusterBillboards = Cesium.defaultValue(options.clusterBillboards, true);
   this._clusterLabels = Cesium.defaultValue(options.clusterLabels, true);
   this._clusterPoints = Cesium.defaultValue(options.clusterPoints, true);
-
+  this._delay = Cesium.defaultValue(options.delay, 800)
   this._labelCollection = undefined;
   this._billboardCollection = undefined;
   this._pointCollection = undefined;
@@ -496,7 +512,18 @@ PrimitiveCluster.prototype._initialize = function (scene) {
 
   const cluster = createDeclutterCallback(this);
   this._cluster = cluster;
-  this._removeEventListener = scene.camera.changed.addEventListener(cluster);
+  var _t = null;
+  const _self = this;
+  // this._removeEventListener = scene.camera.changed.addEventListener(cluster);
+  this._removeEventListener = scene.camera.changed.addEventListener(function(amount) {
+    if (_t) {
+      clearTimeout(_t);
+      _t = null;
+    }
+    _t = setTimeout(() => {
+      cluster(amount);
+    }, _self._delay);
+  });
 };
 
 Object.defineProperties(PrimitiveCluster.prototype, {
@@ -512,6 +539,14 @@ Object.defineProperties(PrimitiveCluster.prototype, {
     set: function (value) {
       this._enabledDirty = value !== this._enabled;
       this._enabled = value;
+    },
+  },
+  delay: {
+    get: function () {
+      return this._delay;
+    },
+    set: function (value) {
+      this._delay = value;
     },
   },
   /**
