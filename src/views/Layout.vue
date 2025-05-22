@@ -1,6 +1,6 @@
 <template>
   <div class="layout-container">
-    <menu-header></menu-header>
+    <Header active-num="2"></Header>
     <div class="main">
       <div class="side-menu">
         <SideMenu />
@@ -15,13 +15,13 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SideMenu from '@/components/SideMenu.vue';
-import menuHeader from "./header.vue"
+import Header from "./header.vue"
 
 export default defineComponent({
   name: 'Layout',
   components: {
     SideMenu,
-    menuHeader
+    Header
   }
 });
 </script>

@@ -1,4 +1,5 @@
 <template>
+    <Header active-num="3"></Header>
     <div class="projects-container">
         <h1>我的项目案例</h1>
         <div class="project-list">
@@ -15,6 +16,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
+import Header from "./header.vue"
 
 interface Project {
     id: number
@@ -76,7 +78,7 @@ const openProject = (url: string) => {
 
 <style scoped>
 .projects-container {
-    padding: 60px;
+    padding: 120px 60px 60px;
     max-width: 1400px;
     margin: auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;

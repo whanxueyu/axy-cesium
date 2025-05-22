@@ -1,22 +1,7 @@
 <template>
   <div class="homepage">
     <!-- Navigation Bar -->
-    <el-header class="nav-header">
-      <div class="nav-content">
-        <div class="logo">
-          <img src="@/assets/images/home/fishshell.svg?height=40&width=40" alt="Logo" class="mr-2">
-          <span class="text-xl font-bold">AXY-Cesium</span>
-        </div>
-        <el-menu mode="horizontal" class="nav-menu" :default-active="activeIndex" @select="handleSelect">
-          <el-menu-item index="1">Home</el-menu-item>
-          <el-menu-item index="2">Example</el-menu-item>
-          <el-menu-item index="3">Projects</el-menu-item>
-          <el-menu-item index="4">Documentation</el-menu-item>
-          <el-menu-item index="5">Download</el-menu-item>
-          <el-menu-item index="6">Support</el-menu-item>
-        </el-menu>
-      </div>
-    </el-header>
+    <Header active-num="1"></Header>
 
     <!-- Hero Section -->
     <div class="hero-section">
@@ -86,6 +71,7 @@
 import { InfoFilled, Comment, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 import router from '@/router';
+import Header from "./header.vue"
 interface Feature {
   icon: any;
   title: string;

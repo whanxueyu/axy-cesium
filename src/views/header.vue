@@ -20,7 +20,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import router from '@/router';
-const activeIndex = ref('2')
+const props = defineProps({
+    activeNum: {
+        type: String,
+        default: "2"
+    }
+})
+const activeIndex = ref(props.activeNum)
 const handleSelect = (key: string) => {
     console.log(key)
     if (key === '1') {

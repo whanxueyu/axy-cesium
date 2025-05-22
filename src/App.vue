@@ -20,5 +20,7 @@ export default defineComponent({
 html,body{
     width: 100%;
     height: 100%;
+    background: #000;
+    color: #fff;
 }
 </style>
