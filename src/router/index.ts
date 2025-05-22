@@ -4,6 +4,7 @@ import Layout from '../views/Layout.vue';
 import Home from '../views/Home.vue';
 import basicCase from '../views/basicCase.vue';
 import ComprehensiveCase from '../views/ComprehensiveCase.vue';
+import Projects from '../views/projects.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -208,6 +209,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/model/editModel.vue')
       }
     ]
+  },
+  {
+    path: '/projects',
+    name: 'projects',
+    component: Projects
   }
 ];
 

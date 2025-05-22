@@ -1,10 +1,13 @@
 <template>
   <div class="layout-container">
-    <div class="side-menu">
-      <SideMenu />
-    </div>
-    <div class="content">
-      <router-view />
+    <menu-header></menu-header>
+    <div class="main">
+      <div class="side-menu">
+        <SideMenu />
+      </div>
+      <div class="content">
+        <router-view />
+      </div>
     </div>
   </div>
 </template>
@@ -12,22 +15,29 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import SideMenu from '@/components/SideMenu.vue';
+import menuHeader from "./header.vue"
 
 export default defineComponent({
   name: 'Layout',
   components: {
-    SideMenu
+    SideMenu,
+    menuHeader
   }
 });
 </script>
 
 <style scoped>
 .layout-container {
-  display: flex;
-  height: 100vh;
   background: #000;
   /* 更新背景渐变 */
   color: #fff;
+}
+
+.main {
+  display: flex;
+  height: calc(100vh - 60px);
+  padding-top: 60px;
+  overflow: hidden;
 }
 
 .side-menu {

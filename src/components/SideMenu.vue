@@ -1,9 +1,9 @@
 <template>
     <div class="side-menu-section">
-        <div class="logo" @click="backHome">
+        <!-- <div class="logo" @click="backHome">
             <img src="@/assets/images/home/fishshell.svg?height=40&width=40" alt="Logo" class="mr-2">
             <span class="text-xl font-bold">AXY-Cesium</span>
-        </div>
+        </div> -->
         <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
             <!-- <a :href="`#${cat.type}`">{{ cat.title }}</a> -->
             <div  class="menu-item"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >

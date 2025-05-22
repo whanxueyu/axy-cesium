@@ -149,7 +149,16 @@ const handleSelect = (key: string) => {
     // });
     // window.open(url.href);
     router.push('/basicCase');
-  }
+  } else if (key === '3') {
+    router.push('/projects');
+  } 
+  // else if (key === '4') {
+  //   router.push('/documentation');
+  // } else if (key === '5') {
+  //   router.push('/download');
+  // } else if (key === '6') {
+  //   router.push('/support');
+  // }
 }
 </script>
 

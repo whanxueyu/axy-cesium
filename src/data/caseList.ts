@@ -56,6 +56,9 @@ const imageResources = {
     terrain: 'terrain.png',
     animation: 'animation.png'
   },
+  analysis:{
+    basic: 'basic.png'
+  },
   comprehensive: {
     measurement: 'measurement.png',
     dynamicData: 'dynamicData.png',
@@ -358,6 +361,18 @@ export var caseList = [
         title: '天气效果',
         description: '雨雪雾动态天气模拟与切换',
         path: '/example/weatherEffects'
+      }
+    ]
+  },
+    {
+    title: '测量分析',
+    type: 'analysis',
+    list: [
+      {
+        imgurl: getImagePath('analysis', 'basic'),
+        title: '基础测量',
+        description: '点位测量、高度测量、距离测量、面积测量',
+        path: '/example/postProcessing'
       }
     ]
   },
