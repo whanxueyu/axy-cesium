@@ -1,11 +1,6 @@
 <template>
     <div class="side-menu-section">
-        <!-- <div class="logo" @click="backHome">
-            <img src="@/assets/images/home/fishshell.svg?height=40&width=40" alt="Logo" class="mr-2">
-            <span class="text-xl font-bold">AXY-Cesium</span>
-        </div> -->
         <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
-            <!-- <a :href="`#${cat.type}`">{{ cat.title }}</a> -->
             <div  class="menu-item"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >
             {{ cat.title }}
             </div>
@@ -40,19 +35,12 @@ const handleIntersection = (entries: IntersectionObserverEntry[]) => {
 const handleMenuClick = (sectionId: string) => {
   // 更新路由哈希（Vue Router会自动监听）
   router.replace(`#${sectionId}`);
-  
   // 手动滚动到目标元素
   const targetElement = document.getElementById(sectionId);
   if (targetElement) {
     targetElement.scrollIntoView({ behavior: 'smooth' });
   }
 };
-// 监听路由变化
-// watch(() => route.hash, (newHash) => {
-//     if (newHash) {
-//         activeSection.value = newHash.slice(1);
-//     }
-// });
 
 onMounted(() => {
     observer.value = new IntersectionObserver(handleIntersection, {
@@ -77,10 +65,6 @@ onMounted(() => {
 onUnmounted(() => {
     observer.value?.disconnect();
 });
-
-const backHome = () => {
-    router.push('/');
-};
 </script>
 
 <style scoped lang="scss">

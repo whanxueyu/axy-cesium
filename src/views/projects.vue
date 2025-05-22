@@ -82,8 +82,6 @@ const openProject = (url: string) => {
     max-width: 1400px;
     margin: auto;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* background-color: #f9f9f966; */
-    /* border-top: #409eff  dashed 4px; */
     color: #333;
 }
 

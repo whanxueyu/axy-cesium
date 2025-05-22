@@ -2,7 +2,6 @@
   <div class="homepage">
     <!-- Navigation Bar -->
     <Header active-num="1"></Header>
-
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
@@ -13,7 +12,6 @@
         </div>
       </div>
     </div>
-
     <!-- Feature Cards -->
     <div class="feature-cards">
       <el-row :gutter="20">
@@ -69,8 +67,6 @@
 
 <script setup lang="ts">
 import { InfoFilled, Comment, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
-import { ref } from 'vue'
-import router from '@/router';
 import Header from "./header.vue"
 interface Feature {
   icon: any;
@@ -124,28 +120,6 @@ const services: Service[] = [
     description: 'On-line technology exchange group with like-minded friends together exchange'
   }
 ]
-const activeIndex = ref('1')
-const handleSelect = (key: string) => {
-  console.log(key)
-  if (key === '1') {
-    router.push('/');
-  } else if (key === '2') {
-    // const url = router.resolve({
-    //   path: '/basicCase',
-    // });
-    // window.open(url.href);
-    router.push('/basicCase');
-  } else if (key === '3') {
-    router.push('/projects');
-  } 
-  // else if (key === '4') {
-  //   router.push('/documentation');
-  // } else if (key === '5') {
-  //   router.push('/download');
-  // } else if (key === '6') {
-  //   router.push('/support');
-  // }
-}
 </script>
 
 <style scoped lang="scss">
@@ -155,56 +129,6 @@ const handleSelect = (key: string) => {
   color: white;
   position: relative;
   overflow: hidden;
-}
-
-.nav-header {
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(10px);
-  position: fixed;
-  width: 100%;
-  z-index: 100;
-}
-
-.nav-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  height: 100%;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  color: white;
-}
-
-.logo img {
-  margin-right: 10px;
-  height: 50px;
-}
-
-.font-bold {
-  font-weight: bolder;
-}
-
-.nav-menu {
-  background: transparent;
-  border: none;
-}
-
-:deep(.el-menu--horizontal .el-menu-item) {
-  color: white;
-}
-
-:deep(.el-menu--horizontal .el-menu-item:hover) {
-  color: #409EFF;
-  background: rgba(64, 158, 255, 0.1);
-}
-
-:deep(.el-menu--horizontal .el-menu-item:not(.is-disabled):focus, .el-menu--horizontal .el-menu-item:not(.is-disabled):hover) {
-  background: rgba(64, 158, 255, 0.1);
 }
 
 .hero-section {
