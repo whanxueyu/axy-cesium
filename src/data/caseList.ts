@@ -33,7 +33,7 @@ const imageResources = {
     basicBillboard: 'basicBillboard.png',
     bounceBillboard: 'bounceBillboard.png',
     cluster: 'billboardCluster.png',
-    cluster2: 'billboardCluster.png',
+    cluster2: 'billboardCluster2.png',
     primitiveBillboard: 'primitiveBillboard.png',
     primitiveCluster: 'primitiveCluster.png',
     gifBillboard: 'gifbillboard.png',

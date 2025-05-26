@@ -48,7 +48,7 @@ npm run dev
 # 或者使用 Yarn
 yarn dev
 ```
-启动后，浏览器会自动打开 http://localhost:3000。
+启动后，浏览器会自动打开 http://localhost:5137。
 
 ### 构建生产版本
 ```bash
@@ -77,8 +77,6 @@ yarn preview
 欢迎任何人对 axy-cesium 进行贡献！你可以通过以下方式参与：
 
 提交问题：如果你发现了任何问题或有改进建议，请在 GitHub Issues 中提交。
-提交 Pull Request：如果你修复了某个问题或添加了新功能，请提交 Pull Request。
-提交 Pull Request 的步骤
 
 
 如果你有任何问题或需要进一步的帮助，请随时联系我！
