@@ -176,6 +176,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'divBillboard',
         component: () => import('@/views/example/billboard/divBillboard.vue')
       },
+      {
+        path: '/example/dragableBillboard',
+        name: 'dragableBillboard',
+        component: () => import('@/views/example/billboard/dragableBillboard.vue')
+      },
+      {
+        path: '/example/css3DdivBillboard',
+        name: 'css3DdivBillboard',
+        component: () => import('@/views/example/billboard/css3DdivBillboard.vue')
+      },
       // polyline
       {
         path: '/example/basicPolyline',
@@ -192,6 +202,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'dynamicPolyline',
         component: () => import('@/views/example/polyline/dynamicPolyline.vue')
       },
+      {
+        path: '/example/polygon',
+        name: 'polygon',
+        component: () => import('@/views/example/polyline/polygon.vue')
+      },
       // model
       {
         path: '/example/model',
@@ -207,6 +222,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/example/editModel',
         name: 'editModel',
         component: () => import('@/views/example/model/editModel.vue')
+      },
+      {
+        path: '/example/developing',
+        name: 'developing',
+        component: () => import('@/views/developing.vue')
       }
     ]
   },

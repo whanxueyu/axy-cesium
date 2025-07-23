@@ -38,12 +38,15 @@ const imageResources = {
     primitiveCluster: 'primitiveCluster.png',
     gifBillboard: 'gifbillboard.png',
     htmlBillboard: 'htmlBillboard.png',
-    divBillboard: 'divBillboard.png'
+    divBillboard: 'divBillboard.png',
+    dragableBillboard: 'dragableBillboard.png',
+    css3DdivBillboard: 'css3DdivBillboard.png'
   },
   polyline: {
     basicPolyline: 'basicPolyline.png',
     dynamicPolyline: 'dynamicPolyline.png',
     imagePolyline: 'imagePolyline.png',
+    polygon: 'polygon.png',
   },
   model: {
     model: 'model.png',
@@ -284,11 +287,25 @@ export var caseList = [
         description: '封装了divBillboard类，可以加载任意的vue组件',
         path: '/example/divBillboard'
       },
+      {
+        imgurl: getImagePath('billboard', 'dragableBillboard'),
+        title: '可拖动的标牌，结合div',
+        description: '支持拖拽，可在地图上显示带连接线的信息弹窗',
+        // path: '/example/dragableBillboard'
+        path: '/example/developing'
+      },
+      {
+        imgurl: getImagePath('billboard', 'css3DdivBillboard'),
+        title: 'css3Ddiv标牌',
+        description: '使用css3D技术在cesium中加载有三维效果的div标牌',
+        // path: '/example/css3DdivBillboard'
+        path: '/example/developing'
+      },
     ]
   },
   {
-    title: '线_Polyline',
-    type: 'skybox',
+    title: '基础图形',
+    type: 'polyline',
     list: [
       {
         imgurl: getImagePath('polyline', 'basicPolyline'),
@@ -307,6 +324,12 @@ export var caseList = [
         title: '动态线',
         description: '动态效果的Polyline',
         path: '/example/dynamicPolyline'
+      },
+      {
+        imgurl: getImagePath('polyline', 'polygon'),
+        title: '面状',
+        description: '面状效果',
+        path: '/example/polygon'
       },
     ]
   },
@@ -403,6 +426,11 @@ export var caseList = [
         title: '动态数据更新',
         description: '实时数据流可视化与动态更新',
         path: '/example/dynamicData'
+      },{
+        imgurl: getImagePath('comprehensive', 'dynamicData'),
+        title: '场景日夜交替',
+        description: '根据时间变化模拟日夜交替效果，光照天空变换',
+        path: '/example/developing'
       }
     ]
   },
