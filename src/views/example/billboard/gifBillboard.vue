@@ -1,4 +1,19 @@
 <template>
+    <div class="side-panel">
+        <el-tree node-key="id" ref="treeRef" :data="dataList" :props="defaultProps" show-checkbox
+            :default-checked-keys="checkList" @check-change="checkListChange" default-expand-all>
+            <template #default="{ data }">
+                <div class="custom-tree-node flex-sb-center" @dblclick="location(data)">
+                    <div class="node-name">{{ data.name }}</div>
+                    <div @click="location(data)">
+                        <el-icon size="16" color="#ff404E">
+                            <Location />
+                        </el-icon>
+                    </div>
+                </div>
+            </template>
+        </el-tree>
+    </div>
     <Map @loaded="handleMapLoaded"></Map>
 </template>
 
@@ -9,8 +24,21 @@ import 'cesium/Source/Widgets/widgets.css';
 import gifList from "@/assets/images/particle";
 import Map from '@/components/cesium/map.vue'
 const mapLoaded = ref(false)
-var viewer: Cesium.Viewer
+var viewer: Cesium.Viewer;
+const defaultProps = {
+    children: "children",
+    label: "name",
+};
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
+type Billboard = {
+    id: string;
+    name: string;
+    position: number[];
+    scale: number;
+    width: number;
+    height: number;
+    image: string;
+}
 const dataList = [
     {
         id: '10',
@@ -64,6 +92,7 @@ const addBillboard = () => {
                 }, false)
             })
         }
+        billboardMap[item.id] = billboard;
         viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(116.41, 39.88, 2000), 2000))
     })
 }
@@ -72,7 +101,23 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     addBillboard()
     mapLoaded.value = true;
     reset()
+    
 }
+var billboardMap: { [key: string]: any } = {}
+const checkListChange = (value:Billboard, check: boolean) => {
+    const entity = billboardMap[value.id];
+    if (entity) {
+        entity.show = check
+    }
+}
+const location = (data:Billboard) => {
+    const entity = billboardMap[data.id];
+    if (entity) {
+        viewer.zoomTo(entity)
+    }
+}
+const checkList = ref<string[]>()
+checkList.value = dataList.map(item => item.id)
 const reset = () => {
     viewer.camera.flyTo({
         destination: Cesium.Cartesian3.fromDegrees(116.41, 39.9, 4000),
@@ -87,11 +132,25 @@ const reset = () => {
 </script>
 
 <style scoped>
-.fullSize {
+.side-panel {
+    position: absolute;
+    padding: 10px;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 999;
+}
+
+.custom-tree-node {
     width: 100%;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.node-name {
+    width: 200px;
     overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: start;
 }
 </style>
