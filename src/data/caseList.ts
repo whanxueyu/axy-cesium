@@ -291,8 +291,8 @@ export var caseList = [
         imgurl: getImagePath('billboard', 'dragableBillboard'),
         title: '可拖动的标牌，结合div',
         description: '支持拖拽，可在地图上显示带连接线的信息弹窗',
-        // path: '/example/dragableBillboard'
-        path: '/example/developing'
+        path: '/example/dragableBillboard'
+        // path: '/example/developing'
       },
       {
         imgurl: getImagePath('billboard', 'css3DdivBillboard'),
