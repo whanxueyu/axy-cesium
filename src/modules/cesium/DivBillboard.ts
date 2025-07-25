@@ -24,7 +24,7 @@ class DivBillboard {
      * @param vueComponent vue组件
      * @param enableMouse 是否允许鼠标事件
      */
-    constructor(viewer: Viewer, position: Cartesian3, content: string, vueComponent: any, enableMouse?: boolean) {
+    constructor(viewer: Viewer, position: Cartesian3, content: string, vueComponent: any, enableMouse?: boolean, id?: string) {
         this.viewer = viewer;
         this.position = position;
         this.content = content;
@@ -32,7 +32,7 @@ class DivBillboard {
         this.enableMouse = enableMouse || false
         this.maxRenderDis =
             Math.round(viewer.camera.positionCartographic.height) * 5;
-        this.id = new Date().getTime().toString();
+        this.id = id ?? new Date().getTime().toString();
         this.show = true;
         this.initBillboard();
     }
@@ -103,6 +103,31 @@ class DivBillboard {
         if (this.element) {
             const app = createApp({
                 render: () => h(this.vueComponent, { id: this.id, htmlContent: this.content })
+            });
+            app.mount(this.element); // 重新渲染组件
+        }
+    }
+    public visiable(val: boolean) {
+        this.show = val;
+        this.render()
+
+    }
+    public flyTo() {
+        if (this.viewer)
+            this.viewer.camera.flyTo({
+                destination: this.position,
+                orientation: {
+                    heading: 0,
+                    pitch: Math.PI / 4,
+                    roll: 0.0,
+                },
+                duration: 1
+            });
+    }
+    private render() {
+        if (this.element) {
+            const app = createApp({
+                render: () => h(this.vueComponent, { id: this.id, htmlContent: this.content, show: this.show })
             });
             app.mount(this.element); // 重新渲染组件
         }
