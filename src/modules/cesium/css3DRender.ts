@@ -12,6 +12,7 @@ export class CSS3DEarthSync {
   private radius: number;
   private enableDebug: boolean;
   private container: HTMLElement;
+  private sphereContainer: HTMLElement;
   
   constructor(viewer: Cesium.Viewer, container: HTMLElement, options?: CSS3DEarthSyncOptions) {
     this.viewer = viewer;
@@ -19,15 +20,18 @@ export class CSS3DEarthSync {
     this.radius = options?.radius || 6378137; // 地球半径(米)
     this.enableDebug = options?.enableDebug || false;
     
+    // 设置容器的透视属性
+    this.container.style.perspective = '1000px';
+    
     this.sphere = this.createCSS3DSphere();
     this.setupSync();
   }
   
   private createCSS3DSphere(): HTMLElement {
     // 创建容器
-    const sphereContainer = document.createElement('div');
-    sphereContainer.className = 'cesium-css3d-sphere-container';
-    sphereContainer.style.cssText = `
+    this.sphereContainer = document.createElement('div');
+    this.sphereContainer.className = 'cesium-css3d-sphere-container';
+    this.sphereContainer.style.cssText = `
       position: absolute;
       top: 0;
       left: 0;
@@ -35,7 +39,6 @@ export class CSS3DEarthSync {
       height: 100%;
       pointer-events: none;
       transform-style: preserve-3d;
-      perspective: 1000px;
     `;
     
     // 创建球体
@@ -43,13 +46,15 @@ export class CSS3DEarthSync {
     sphere.className = 'cesium-css3d-sphere';
     sphere.style.cssText = `
       position: absolute;
-      top: 50%;
-      left: 50%;
+      top: 0;
+      left: 0;
       width: 200px;
       height: 200px;
-      margin-left: -100px;
-      margin-top: -100px;
       transform-style: preserve-3d;
+      backface-visibility: visible;
+      -webkit-backface-visibility: visible;
+      -webkit-transform-style: preserve-3d;
+      transform-origin: center center;
     `;
     
     // 创建球体表面（使用多个div模拟球体）
@@ -73,6 +78,7 @@ export class CSS3DEarthSync {
         border: ${this.enableDebug ? '1px solid rgba(0, 150, 255, 0.5)' : 'none'};
         transform-style: preserve-3d;
         backface-visibility: visible;
+        -webkit-backface-visibility: visible;
         transform: rotateY(${theta * 180 / Math.PI}deg) 
                   rotateZ(${phi * 180 / Math.PI}deg) 
                   translateZ(100px);
@@ -81,8 +87,8 @@ export class CSS3DEarthSync {
       sphere.appendChild(face);
     }
     
-    sphereContainer.appendChild(sphere);
-    this.container.appendChild(sphereContainer);
+    this.sphereContainer.appendChild(sphere);
+    this.container.appendChild(this.sphereContainer);
     
     return sphere;
   }
@@ -96,11 +102,24 @@ export class CSS3DEarthSync {
   
   private syncTransform(): void {
     const camera = this.viewer.camera;
-    // const scene = this.viewer.scene;
+    const scene = this.viewer.scene;
+    
+    // 获取地球中心在世界坐标系中的位置
+    const earthCenter = new Cesium.Cartesian3(0, 0, 0);
+    
+    // 将地球中心转换为屏幕坐标
+    const screenPosition = Cesium.SceneTransforms.worldToWindowCoordinates(
+      scene,
+      earthCenter
+    );
+    
+    if (!screenPosition) {
+      return;
+    }
     
     // 计算相机到地球中心的距离
-    const cameraPosition = camera.position;
-    const distanceToCenter = Cesium.Cartesian3.magnitude(cameraPosition);
+    const cameraPosition = camera.positionWC;
+    const distanceToCenter = Cesium.Cartesian3.distance(cameraPosition, earthCenter);
     
     // 计算适当的缩放因子
     const scale = this.calculateScale(distanceToCenter);
@@ -108,51 +127,81 @@ export class CSS3DEarthSync {
     // 计算旋转
     const rotation = this.calculateRotation(camera);
     
-    // 获取屏幕中心点
-    const centerScreenPos = this.getScreenCenter();
-    
-    // 应用变换
-    this.sphere.style.transform = `
-      translate3d(${centerScreenPos.x}px, ${centerScreenPos.y}px, 0)
-      ${rotation}
-      scale3d(${scale}, ${scale}, ${scale})
+    // 应用变换到容器而不是球体本身
+    this.sphereContainer.style.transform = `
+      translate3d(${screenPosition.x - 100}px, ${screenPosition.y - 100}px, 0px)
     `;
+    
+    // 球体本身的变换只包含缩放和旋转
+    this.sphere.style.transform = `
+      scale3d(${scale}, ${scale}, ${scale})
+      ${rotation}
+    `;
+    
+    // 添加硬件加速
+    this.sphere.style.webkitTransform = this.sphere.style.transform;
+    this.sphereContainer.style.webkitTransform = this.sphereContainer.style.transform;
   }
   
   private calculateScale(distance: number): number {
     // 基于相机距离计算缩放因子
-    const fov = (this.viewer.camera.frustum as Cesium.PerspectiveFrustum).fov;
+    const frustum = this.viewer.camera.frustum as Cesium.PerspectiveFrustum;
     const viewportHeight = this.viewer.container.clientHeight;
     
-    // 计算地球在屏幕上的投影大小
-    const angularSize = 2 * Math.atan(this.radius / distance);
-    const screenSize = (angularSize / fov) * viewportHeight;
+    // 使用更精确的计算方法
+    const verticalFov = frustum.fovy;
+    const earthAngularSize = 2 * Math.atan(this.radius / distance);
+    const screenSize = (earthAngularSize / verticalFov) * viewportHeight;
     const sphereBaseSize = 200; // 球体基础大小
     
     return screenSize / sphereBaseSize;
   }
   
   private calculateRotation(camera: Cesium.Camera): string {
-    // 获取相机方向并转换为CSS旋转
-    const heading = Cesium.Math.toDegrees(camera.heading);
-    const pitch = Cesium.Math.toDegrees(camera.pitch);
-    const roll = Cesium.Math.toDegrees(camera.roll);
+    // 创建一个从east-north-up到view的变换矩阵
+    const modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(
+      new Cesium.Cartesian3(0, 0, 0)
+    );
     
-    // 注意坐标系转换
-    return `rotateZ(${-roll}deg) rotateX(${-pitch}deg) rotateY(${heading}deg)`;
+    // 获取view到east-north-up的变换矩阵
+    const viewMatrix = Cesium.Matrix4.inverseTransformation(
+      camera.viewMatrix,
+      new Cesium.Matrix4()
+    );
+    
+    // 计算最终的变换矩阵
+    const finalMatrix = new Cesium.Matrix4();
+    Cesium.Matrix4.multiply(viewMatrix, modelMatrix, finalMatrix);
+    
+    // 提取旋转矩阵
+    const rotationMatrix = Cesium.Matrix4.getMatrix3(finalMatrix, new Cesium.Matrix3());
+    
+    // 将旋转矩阵转换为CSS3D变换
+    const cssMatrix = this.matrix3ToCSSMatrix(rotationMatrix);
+    
+    return cssMatrix;
   }
   
-  private getScreenCenter(): { x: number; y: number } {
-    const containerRect = this.viewer.container.getBoundingClientRect();
-    return {
-      x: containerRect.width / 2,
-      y: containerRect.height / 2
-    };
+  private matrix3ToCSSMatrix(matrix: Cesium.Matrix3): string {
+    // 获取矩阵元素
+    const m = matrix;
+    
+    // 构造CSS3D变换矩阵字符串
+    // 注意CSS矩阵是列优先，而Cesium是行优先
+    return `matrix3d(
+      ${m[0]}, ${m[3]}, ${m[6]}, 0,
+      ${m[1]}, ${m[4]}, ${m[7]}, 0,
+      ${m[2]}, ${m[5]}, ${m[8]}, 0,
+      0, 0, 0, 1
+    )`;
   }
   
   public destroy(): void {
     if (this.sphere && this.sphere.parentNode) {
       this.sphere.parentNode.removeChild(this.sphere);
+    }
+    if (this.sphereContainer && this.sphereContainer.parentNode) {
+      this.sphereContainer.parentNode.removeChild(this.sphereContainer);
     }
   }
   

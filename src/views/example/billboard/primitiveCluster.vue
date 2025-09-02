@@ -21,9 +21,7 @@ const pointNum = ref(10000);
 Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 // ***************************************************************************
 
-const billboardsCollection = viewer.scene.primitives.add(
-  new Cesium.BillboardCollection()
-);
+let billboardsCollection;
 let billboardsCollectionCombine = new Cesium.BillboardCollection();
 
 let primitivesCollection = null;
@@ -175,6 +173,9 @@ const generatePoints = () => {
 
 const handleMapLoaded = (MapViewer) => {
     viewer = MapViewer;
+    billboardsCollection = viewer.scene.primitives.add(
+  new Cesium.BillboardCollection()
+);
     alert("当前cesium版本 1.124 版本过高，该聚合方法不可用，经测试可在 1.105 版本可用");
     mapLoaded.value = true;
     reset()

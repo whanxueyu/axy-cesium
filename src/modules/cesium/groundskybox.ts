@@ -39,7 +39,9 @@ const Matrix3 = Cesium.Matrix3;
 const Matrix4 = Cesium.Matrix4;
 const Transforms = Cesium.Transforms;
 const VertexFormat = Cesium.VertexFormat;
-const BufferUsage = Cesium.BufferUsage;
+const BufferUsage = {
+    _DRAW: 'dynamic' as const
+}
 const CubeMap = Cesium.CubeMap;
 const DrawCommand = Cesium.DrawCommand;
 const loadCubeMap = Cesium.loadCubeMap;
@@ -71,7 +73,7 @@ type skyboxSource = {
  * @type Object
  * @default undefined
  */
-export default class SkyBoxOnGround {
+export default class SkyBoxOnGround extends Cesium.SkyBox {
     public sources: skyboxSource;
     private _sources: skyboxSource | undefined;
     public show: boolean;
@@ -81,6 +83,7 @@ export default class SkyBoxOnGround {
     private _useHdr: boolean | undefined;
 
     constructor(options: { sources: skyboxSource; show?: boolean }) {
+        super(options);
         this.sources = options.sources;
         this._sources = undefined;
         this.show = defaultValue(options.show, true);
