@@ -44,6 +44,7 @@ let initialHeading: number | null = null;
 
 const handleMapLoaded = (Viewer: Cesium.Viewer) => {
     viewer = Viewer;
+    reset()
 }
 
 const handleShowPanel = () => {
@@ -172,6 +173,17 @@ const handlePickPosition = () => {
 
 onMounted(() => {
 });
+const reset = () => {
+    viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(108, 33.5, 24000),
+        orientation: {
+            heading: Cesium.Math.toRadians(0),
+            pitch: Cesium.Math.toRadians(-50),
+            roll: 0.0,
+        },
+        duration: 1
+    });
+}
 </script>
 
 <style scoped lang="scss">
