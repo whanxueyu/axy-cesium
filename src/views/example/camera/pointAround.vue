@@ -45,7 +45,7 @@ const targetEntity = ref<Cesium.Entity | null>(null);  // 目标点实体
 const targetCartesian = ref<Cesium.Cartesian3>();  // 目标点坐标
 
 // 动画状态
-let animationId: number | null = null;
+let animationId: (() => void) | null = null;
 let isFlying = ref(false);
 let currentHeading = 0;  // 当前 Heading（弧度）
 
@@ -111,7 +111,7 @@ function startFlight() {
         const now = performance.now();
         const elapsed = (now - startTime) / 1000;
         currentHeading = (elapsed * speed.value) % (2 * Math.PI);
-
+        if (!targetCartesian.value) return
         // 计算新相机位置
         const newPosition = calculateCameraPosition(
             targetCartesian.value,
