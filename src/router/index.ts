@@ -223,6 +223,17 @@ const routes: Array<RouteRecordRaw> = [
         name: 'editModel',
         component: () => import('@/views/example/model/editModel.vue')
       },
+      // camera
+      {
+        path: '/example/pointAround',
+        name: 'pointAround',
+        component: () => import('@/views/example/camera/pointAround.vue')
+      },
+      {
+        path: '/example/pointRotation',
+        name: 'pointRotation',
+        component: () => import('@/views/example/camera/pointRotation.vue')
+      },
       {
         path: '/example/developing',
         name: 'developing',

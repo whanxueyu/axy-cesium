@@ -59,8 +59,12 @@ const imageResources = {
     terrain: 'terrain.png',
     animation: 'animation.png'
   },
-  analysis:{
+  analysis: {
     basic: 'basic.png'
+  },
+  camera: {
+    around: 'around.png',
+    rotation: 'rotation.png'
   },
   comprehensive: {
     measurement: 'measurement.png',
@@ -388,6 +392,24 @@ export var caseList = [
     ]
   },
     {
+    title: '相机控制',
+    type: 'camera',
+    list: [
+      {
+        imgurl: getImagePath('camera', 'around'),
+        title: '绕点飞行',
+        description: '点位测量、高度测量、距离测量、面积测量',
+        path: '/example/pointAround'
+      },
+      {
+        imgurl: getImagePath('camera', 'rotation'),
+        title: '定点旋转',
+        description: '点位测量、高度测量、距离测量、面积测量',
+        path: '/example/pointRotation'
+      }
+    ]
+  },
+  {
     title: '测量分析',
     type: 'analysis',
     list: [
@@ -426,7 +448,7 @@ export var caseList = [
         title: '动态数据更新',
         description: '实时数据流可视化与动态更新',
         path: '/example/dynamicData'
-      },{
+      }, {
         imgurl: getImagePath('comprehensive', 'dynamicData'),
         title: '场景日夜交替',
         description: '根据时间变化模拟日夜交替效果，光照天空变换',
