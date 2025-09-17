@@ -46,7 +46,7 @@ const dataList = [
             transparent: true,
         }),
         shadows: Cesium.ShadowMode.DISABLED,
-        positions: [116.3862, 39.89, 116.3874, 39.92]
+        positions: [116.388, 39.92, 116.388, 39.895, 116.394, 39.905]
     },
     {
         id: 'imageMaterial',
@@ -60,7 +60,7 @@ const dataList = [
             transparent: true,
         }),
         shadows: Cesium.ShadowMode.DISABLED,
-        positions: [116.394131, 39.889676, 116.399608, 39.926483]
+        positions: [116.4, 39.92, 116.4, 39.895,116.406, 39.905]
     },
     {
         id: 'stripeMaterial',
@@ -74,7 +74,7 @@ const dataList = [
             transparent: true,
         }),
         shadows: Cesium.ShadowMode.DISABLED,
-        positions: [116.405974, 39.890034, 116.40609, 39.924371]
+        positions: [116.412, 39.92, 116.412, 39.895, 116.418, 39.905]
     },
     {
         id: 'fakeroad',
@@ -89,7 +89,7 @@ const dataList = [
             transparent: true,
         }),
         shadows: Cesium.ShadowMode.DISABLED,
-        positions: [116.412844, 39.889677, 116.411463, 39.9236]
+        positions: [116.424, 39.92, 116.424, 39.895, 116.430, 39.905]
     },
 ];
 const checkListChange = (value: { [key: string]: any; }, check: boolean) => {
