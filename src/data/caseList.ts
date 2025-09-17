@@ -398,13 +398,13 @@ export var caseList = [
       {
         imgurl: getImagePath('camera', 'around'),
         title: '绕点飞行',
-        description: '点位测量、高度测量、距离测量、面积测量',
+        description: '绕点飞行是三维场景中一种非常常见的的动画效果，需要围绕其中心点进行旋转浏览',
         path: '/example/pointAround'
       },
       {
         imgurl: getImagePath('camera', 'rotation'),
         title: '定点旋转',
-        description: '点位测量、高度测量、距离测量、面积测量',
+        description: '定点旋转是指在目标点旋转看向四周进行浏览',
         path: '/example/pointRotation'
       }
     ]
