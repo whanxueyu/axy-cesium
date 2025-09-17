@@ -35,39 +35,47 @@ const dataList = [
     // 原有Color案例
     {
         id: 'polyline001',
-        name: "绿色实线",
+        name: "绿色实线（线宽5）",
         arcType: Cesium.ArcType.NONE,
         width: 5,
         material: Cesium.Color.GREENYELLOW, // 基础颜色材质
         shadows: Cesium.ShadowMode.CAST_ONLY,
-        positions: [115.5, 37, 115.5, 38, 116.5, 39]
+        positions: [116.388, 39.92, 116.388, 39.895, 116.394, 39.905]
     },
     
     // 新增材质案例
     {
         id: 'polylineGlow',
-        name: "黄色光晕线",
+        name: "黄色光晕线（线宽10）",
         arcType: Cesium.ArcType.GEODESIC,
-        width: 8,
+        width: 10,
         material: new Cesium.PolylineGlowMaterialProperty({
             color: Cesium.Color.YELLOW,
             glowPower: 0.3 // 光晕强度
         }),
         shadows: Cesium.ShadowMode.DISABLED,
-        positions: [116, 38, 117, 39, 118, 40]
+        positions: [116.4, 39.92, 116.4, 39.895,116.406, 39.905]
     },
     {
         id: 'polylineOutline',
-        name: "蓝色带边框线",
+        name: "边框线（线宽15，边框2）",
         arcType: Cesium.ArcType.RHUMB,
-        width: 5,
+        width: 15,
         material: new Cesium.PolylineOutlineMaterialProperty({
             color: Cesium.Color.BLUE, // 内部颜色
             outlineColor: Cesium.Color.WHITE, // 边框颜色
             outlineWidth: 2 // 边框宽度
         }),
         shadows: Cesium.ShadowMode.ENABLED,
-        positions: [114, 38, 115, 39, 116, 40]
+        positions: [116.412, 39.92, 116.412, 39.895, 116.418, 39.905]
+    },
+    {
+        id: 'arrowPolyline',
+        name: "带箭头的线（线宽15）",
+        width: 15,
+        material: new Cesium.PolylineArrowMaterialProperty(Cesium.Color.RED),
+        shadows: Cesium.ShadowMode.ENABLED,
+        positions: [116.424, 39.92, 116.424, 39.895, 116.430, 39.905]
     },
 ];
 const checkListChange = (value: { [key: string]: any; }, check: boolean) => {
