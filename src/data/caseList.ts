@@ -53,6 +53,11 @@ const imageResources = {
     tileset: 'tileset.png',
     editModel: 'editModel.png'
   },
+  radar:{
+    scan: 'scan.png',
+    wave: 'wave.png',
+    jam: 'jam.png',
+  },
   material: {
     postProcess: 'postProcess.png',
     heatmap: 'heatmap.png',
@@ -358,6 +363,24 @@ export var caseList = [
         title: '模型编辑',
         description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
         path: '/example/editModel'
+      },
+    ]
+  },
+  {
+    title: '雷达',
+    type: 'radar',
+    list: [
+      {
+        imgurl: getImagePath('radar', 'jam'),
+        title: '干扰雷达',
+        description: '自定义干扰雷达效果',
+        path: '/example/jamRadar'
+      },
+      {
+        imgurl: getImagePath('radar', 'scan'),
+        title: '扫描雷达',
+        description: '多种方法实现雷达扫描效果',
+        path: '/example/scanRadar'
       },
     ]
   },

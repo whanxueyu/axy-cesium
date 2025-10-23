@@ -223,6 +223,12 @@ const routes: Array<RouteRecordRaw> = [
         name: 'editModel',
         component: () => import('@/views/example/model/editModel.vue')
       },
+      // 雷达
+      {
+        path: '/example/jamRadar',
+        name: 'jamRadar',
+        component: () => import('@/views/example/radar/jamRadar.vue')
+      },
       // camera
       {
         path: '/example/pointAround',
