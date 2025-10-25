@@ -287,7 +287,7 @@ const checkVisibility = () => {
     // 显示结果
     visibilityResult.value = result;
 
-    distanceResult.value = true;
+    distanceResult.value = false;
 
     // 如果有遮挡，显示遮挡点信息
     if (!result && obstructionPoint.value) {
