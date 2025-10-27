@@ -53,8 +53,8 @@ const imageResources = {
     tileset: 'tileset.png',
     editModel: 'editModel.png'
   },
-  radar:{
-    scan: 'scan.png',
+  radar: {
+    scan: 'scanRadar.png',
     wave: 'wave.png',
     jam: 'jamRadar.png',
   },
@@ -373,7 +373,7 @@ export var caseList = [
       {
         imgurl: getImagePath('radar', 'jam'),
         title: '干扰雷达',
-        description: '自定义干扰雷达效果',
+        description: '干扰雷达效果,根据地形及雷达参数计算通讯链路连通性',
         path: '/example/jamRadar'
       },
       {
@@ -382,6 +382,12 @@ export var caseList = [
         description: '多种方法实现雷达扫描效果',
         path: '/example/scanRadar'
       },
+      {
+        imgurl: getImagePath('radar', 'wave'),
+        title: '扩散雷达',
+        description: '多种方法实现雷达扫描效果',
+        path: '/example/waveRadar'
+      },
     ]
   },
   {
@@ -389,10 +395,10 @@ export var caseList = [
     type: 'material',
     list: [
       {
-        imgurl: getImagePath('material', 'postProcess'),
-        title: '后期处理效果',
-        description: '泛光、景深、环境光遮蔽等屏幕空间特效',
-        path: '/example/postProcessing'
+        imgurl: getImagePath('material', 'animation'),
+        title: '天气效果',
+        description: '雨雪雾动态天气模拟与切换',
+        path: '/example/weatherEffects'
       },
       {
         imgurl: getImagePath('material', 'heatmap'),
@@ -400,21 +406,9 @@ export var caseList = [
         description: '基于地理坐标的热力数据可视化',
         path: '/example/heatmap'
       },
-      {
-        imgurl: getImagePath('material', 'terrain'),
-        title: '地形加载',
-        description: 'Cesium地形服务与自定义地形高度图',
-        path: '/example/terrain'
-      },
-      {
-        imgurl: getImagePath('material', 'animation'),
-        title: '天气效果',
-        description: '雨雪雾动态天气模拟与切换',
-        path: '/example/weatherEffects'
-      }
     ]
   },
-    {
+  {
     title: '相机控制',
     type: 'camera',
     list: [
@@ -449,29 +443,6 @@ export var caseList = [
     type: 'comprehensive',
     list: [
       {
-        imgurl: getImagePath('comprehensive', 'measurement'),
-        title: '测量工具',
-        description: '三维空间距离、面积、高度测量工具',
-        path: '/example/measurement'
-      },
-      {
-        imgurl: getImagePath('comprehensive', 'cameraFlight'),
-        title: '相机飞行',
-        description: '自定义相机飞行路径与视角切换动画',
-        path: '/example/cameraFlight'
-      },
-      {
-        imgurl: getImagePath('comprehensive', 'undergroundMode'),
-        title: '地下模式',
-        description: '地下场景可视化与透明地表效果',
-        path: '/example/undergroundMode'
-      },
-      {
-        imgurl: getImagePath('comprehensive', 'dynamicData'),
-        title: '动态数据更新',
-        description: '实时数据流可视化与动态更新',
-        path: '/example/dynamicData'
-      }, {
         imgurl: getImagePath('comprehensive', 'dynamicData'),
         title: '场景日夜交替',
         description: '根据时间变化模拟日夜交替效果，光照天空变换',
