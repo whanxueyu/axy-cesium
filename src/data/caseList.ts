@@ -56,7 +56,7 @@ const imageResources = {
   radar:{
     scan: 'scan.png',
     wave: 'wave.png',
-    jam: 'jam.png',
+    jam: 'jamRadar.png',
   },
   material: {
     postProcess: 'postProcess.png',

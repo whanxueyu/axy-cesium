@@ -91,7 +91,7 @@
                     遮挡位置: {{ obstructionInfo }}
                 </div>
             </div>
-            <div v-if="distanceResult !== null" class="result-box">
+            <div v-if="visibilityResult&&distanceResult !== null" class="result-box">
                 <span :class="distanceResult ? 'success' : 'error'">
                     {{ distanceResult ? '✅ 两点距离符合要求' : '❌ 两点距离大于最大通信距离' }}
                 </span>
