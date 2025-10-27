@@ -229,6 +229,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'jamRadar',
         component: () => import('@/views/example/radar/jamRadar.vue')
       },
+      {
+        path: '/example/scanRadar',
+        name: 'scanRadar',
+        component: () => import('@/views/example/radar/scanRadar.vue')
+      },
+      {
+        path: '/example/waveRadar',
+        name: 'waveRadar',
+        component: () => import('@/views/example/radar/waveRadar.vue')
+      },
       // camera
       {
         path: '/example/pointAround',

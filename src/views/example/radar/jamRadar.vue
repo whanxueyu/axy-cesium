@@ -111,8 +111,8 @@ import { onMounted, ref } from 'vue';
 import * as Cesium from "cesium";
 import Map from '@/components/cesium/map.vue'
 import * as turf from "@turf/turf";
-import EllipsoidGradientMaterialProperty from "./gradientMaterial.js"
-import RFLinkBudget from "./RFLinkBudget.js"
+import EllipsoidGradientMaterialProperty from "@/modules/cesium/gradientMaterial.js"
+import RFLinkBudget from "@/modules/math/RFLinkBudget.js"
 
 var viewer: Cesium.Viewer;
 const defaultProps = {
