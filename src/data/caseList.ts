@@ -51,12 +51,15 @@ const imageResources = {
   model: {
     model: 'model.png',
     tileset: 'tileset.png',
-    editModel: 'editModel.png'
+    editModel: 'editModel.png',
+    cityModel: 'cityModel.png',
+    modelMove: 'modelMove.png',
   },
   radar: {
     scan: 'scanRadar.png',
-    wave: 'wave.png',
+    wave: 'waveRadar.png',
     jam: 'jamRadar.png',
+    ellipsoid: 'ellipsoidRadar.png'
   },
   material: {
     postProcess: 'postProcess.png',
@@ -354,15 +357,27 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('model', 'tileset'),
-        title: '3D Tiles模型加载',
+        title: '倾斜摄影模型加载',
         description: '加载大雁塔倾斜摄影模型',
         path: '/example/tileset'
+      },
+      {
+        imgurl: getImagePath('model', 'cityModel'),
+        title: '城市白膜',
+        description: '城市白膜加载，picker功能，自定义材质',
+        path: '/example/developing'
       },
       {
         imgurl: getImagePath('model', 'editModel'),
         title: '模型编辑',
         description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
         path: '/example/editModel'
+      },
+      {
+        imgurl: getImagePath('model', 'modelMove'),
+        title: '模型移动',
+        description: '鼠标控制模型移动方向',
+        path: '/example/developing'
       },
     ]
   },
@@ -387,6 +402,18 @@ export var caseList = [
         title: '扩散雷达',
         description: '多种方法实现雷达扫描效果',
         path: '/example/waveRadar'
+      },
+      // {
+      //   imgurl: getImagePath('radar', 'volume'),
+      //   title: '圆锥体雷达',
+      //   description: '多种方法实现雷达扫描效果',
+      //   path: '/example/developing'
+      // },
+      {
+        imgurl: getImagePath('radar', 'ellipsoid'),
+        title: '球体雷达',
+        description: '多种方法实现雷达扫描效果',
+        path: '/example/developing'
       },
     ]
   },
