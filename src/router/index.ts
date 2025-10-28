@@ -223,6 +223,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'editModel',
         component: () => import('@/views/example/model/editModel.vue')
       },
+      {
+        path: '/example/cityTileset',
+        name: 'cityTileset',
+        component: () => import('@/views/example/model/cityTileset.vue')
+      },
       // 雷达
       {
         path: '/example/jamRadar',

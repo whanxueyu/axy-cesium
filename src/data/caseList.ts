@@ -365,7 +365,7 @@ export var caseList = [
         imgurl: getImagePath('model', 'cityModel'),
         title: '城市白膜',
         description: '城市白膜加载，picker功能，自定义材质',
-        path: '/example/developing'
+        path: '/example/cityTileset'
       },
       {
         imgurl: getImagePath('model', 'editModel'),

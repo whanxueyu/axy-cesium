@@ -35,6 +35,16 @@ const load3DTileset = async () => {
         );
         viewer.scene.primitives.add(tileset);
         // var height = 738.0
+        // tileset.customShader = new Cesium.CustomShader({
+        //     lightingModel: Cesium.LightingModel.UNLIT,
+        //     fragmentShaderText: `
+        //     // Color tiles by distance to the camera
+        //     void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material)
+        //     {
+        //         material.diffuse = vec3(0.0, 0.0, 1.0);
+        //         material.diffuse.g = -fsInput.attributes.positionEC.z / 1.0e4;
+        //     }`,
+        // });
         tileset.initialTilesLoaded.addEventListener(function () {
             console.log('Initial tiles are loaded');
             var cartographic = Cesium.Cartographic.fromCartesian(tileset.boundingSphere.center)
