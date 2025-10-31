@@ -59,6 +59,7 @@ const imageResources = {
     scan: 'scanRadar.png',
     wave: 'waveRadar.png',
     jam: 'jamRadar.png',
+    volume: 'volumeRadar.png',
     ellipsoid: 'ellipsoidRadar.png'
   },
   material: {
@@ -400,20 +401,20 @@ export var caseList = [
       {
         imgurl: getImagePath('radar', 'wave'),
         title: '扩散雷达',
-        description: '多种方法实现雷达扫描效果',
+        description: '不同大小、颜色、波纹数量和速度的波纹雷达效果',
         path: '/example/waveRadar'
       },
-      // {
-      //   imgurl: getImagePath('radar', 'volume'),
-      //   title: '圆锥体雷达',
-      //   description: '多种方法实现雷达扫描效果',
-      //   path: '/example/developing'
-      // },
+      {
+        imgurl: getImagePath('radar', 'volume'),
+        title: '圆锥体雷达',
+        description: '不同大小、颜色、波纹数量和波纹宽度的雷达效果',
+        path: '/example/volumeRadar'
+      },
       {
         imgurl: getImagePath('radar', 'ellipsoid'),
         title: '球体雷达',
         description: '多种方法实现雷达扫描效果',
-        path: '/example/developing'
+        path: '/example/ellipsoidRadar'
       },
     ]
   },
