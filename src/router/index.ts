@@ -244,6 +244,21 @@ const routes: Array<RouteRecordRaw> = [
         name: 'waveRadar',
         component: () => import('@/views/example/radar/waveRadar.vue')
       },
+      {
+        path: '/example/volumeRadar',
+        name: 'volumeRadar',
+        component: () => import('@/views/example/radar/volumeRadar.vue')
+      },
+      {
+        path: '/example/electricRadar',
+        name: 'electricRadar',
+        component: () => import('@/views/example/radar/electricRadar.vue')
+      },
+      {
+        path: '/example/ellipsoidRadar',
+        name: 'ellipsoidRadar',
+        component: () => import('@/views/example/radar/ellipsoidRadar.vue')
+      },
       // camera
       {
         path: '/example/pointAround',
