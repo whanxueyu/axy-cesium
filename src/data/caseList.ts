@@ -60,7 +60,8 @@ const imageResources = {
     wave: 'waveRadar.png',
     jam: 'jamRadar.png',
     volume: 'volumeRadar.png',
-    ellipsoid: 'ellipsoidRadar.png'
+    ellipsoid: 'ellipsoidRadar.png',
+    electric: 'electricRadar.png',
   },
   material: {
     postProcess: 'postProcess.png',
@@ -411,9 +412,15 @@ export var caseList = [
         path: '/example/volumeRadar'
       },
       {
+        imgurl: getImagePath('radar', 'electric'),
+        title: '电光球体雷达',
+        description: '有点光特效的球体雷达效果',
+        path: '/example/electricRadar'
+      },
+      {
         imgurl: getImagePath('radar', 'ellipsoid'),
-        title: '球体雷达',
-        description: '多种方法实现雷达扫描效果',
+        title: '球体扫描雷达',
+        description: '不同大小、颜色和速度的球体扫描雷达效果',
         path: '/example/ellipsoidRadar'
       },
     ]

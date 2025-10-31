@@ -1,4 +1,5 @@
- class EllipsoidElectricMaterialProperty {
+import * as Cesium from 'cesium';
+export default class EllipsoidElectricMaterialProperty {
     constructor(options) {
         this._definitionChanged = new Cesium.Event();
         this._color = undefined;
@@ -44,7 +45,7 @@ Object.defineProperties(EllipsoidElectricMaterialProperty.prototype, {
     speed: Cesium.createPropertyDescriptor('speed')
 })
 
-Cesium.EllipsoidElectricMaterialProperty = EllipsoidElectricMaterialProperty;
+// Cesium.EllipsoidElectricMaterialProperty = EllipsoidElectricMaterialProperty;
 Cesium.Material.EllipsoidElectricMaterialProperty = 'EllipsoidElectricMaterialProperty';
 Cesium.Material.EllipsoidElectricMaterialType = 'EllipsoidElectricMaterialType';
 Cesium.Material.EllipsoidElectricMaterialSource =
