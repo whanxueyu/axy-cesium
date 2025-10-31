@@ -13,7 +13,10 @@ import * as Cesium from "cesium";
 import Map from '@/components/cesium/map.vue'
 var viewer: Cesium.Viewer;
 const mapLoaded = ref(false)
-const selected = {
+const selected: {
+    feature: any;
+    originalColor: Cesium.Color;
+} = {
     feature: undefined,
     originalColor: new Cesium.Color(),
 };
@@ -209,7 +212,10 @@ const handlePick = () => {
         // Silhouettes are not supported. Instead, change the feature color.
 
         // Information about the currently highlighted feature
-        const highlighted: any = {
+        const highlighted: {
+            feature: any;
+            originalColor: Cesium.Color;
+        } = {
             feature: undefined,
             originalColor: new Cesium.Color(),
         };
@@ -271,7 +277,7 @@ const handlePick = () => {
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 }
-function updateNameOverlay(pickedFeature:any, position:any) {
+function updateNameOverlay(pickedFeature: any, position: any) {
     if (!nameOverlay) return
     if (!Cesium.defined(pickedFeature)) {
         nameOverlay.style.display = "none";
