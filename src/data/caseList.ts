@@ -342,9 +342,21 @@ export var caseList = [
       {
         imgurl: getImagePath('polyline', 'polygon'),
         title: '面状',
-        description: '面状效果',
+        description: '面状图元及实体',
         path: '/example/polygon'
       },
+      // {
+      //   imgurl: getImagePath('polyline', 'polylinevolume'),
+      //   title: '动态管道',
+      //   description: '绘制动态管道方法',
+      //   path: '/example/polylineVolume'
+      // },
+      // {
+      //   imgurl: getImagePath('polyline', 'tail'),
+      //   title: '迁徙线',
+      //   description: '实现迁徙线效果',
+      //   path: '/example/polylineVolume'
+      // },
     ]
   },
   {
@@ -388,12 +400,6 @@ export var caseList = [
     type: 'radar',
     list: [
       {
-        imgurl: getImagePath('radar', 'jam'),
-        title: '干扰雷达',
-        description: '干扰雷达效果,根据地形及雷达参数计算通讯链路连通性',
-        path: '/example/jamRadar'
-      },
-      {
         imgurl: getImagePath('radar', 'scan'),
         title: '扫描雷达',
         description: '多种方法实现雷达扫描效果',
@@ -422,6 +428,12 @@ export var caseList = [
         title: '球体扫描雷达',
         description: '不同大小、颜色和速度的球体扫描雷达效果',
         path: '/example/ellipsoidRadar'
+      },
+            {
+        imgurl: getImagePath('radar', 'jam'),
+        title: '干扰雷达',
+        description: '干扰雷达效果,根据地形及雷达参数计算通讯链路连通性',
+        path: '/example/jamRadar'
       },
     ]
   },

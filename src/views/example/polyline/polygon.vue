@@ -20,7 +20,6 @@
 <script setup lang="ts">
 import { Location } from "@element-plus/icons-vue";
 import { ref } from 'vue';
-import { PolygonEditor } from '@/modules/control/rectangleEdit'
 import * as Cesium from "cesium";
 import 'cesium/Source/Widgets/widgets.css';
 import Map from '@/components/cesium/map.vue'
@@ -35,23 +34,45 @@ Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOi
 const polygonList = [
     {
         id: 'polygon001',
-        name: "红色半透明多边形",
-        positions: [112, 38, 114, 36, 113, 34, 112, 36, 112, 38],
-        material: new Cesium.ImageMaterialProperty({
-            image: 'public/textures/gugong.jpg',
-            repeat: new Cesium.Cartesian2(1, 1)
-        })
+        name: "蓝色多边形",
+        positions: [116.400327, 39.914952,
+            116.404667, 39.914992,
+            116.405091, 39.907520,
+            116.400276, 39.907725,
+            116.400691, 39.911293,
+            116.400327, 39.914952,],
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.CYAN.withAlpha(0.5)),
+        extrudedHeight: 0
     },
     {
         id: 'polygon002',
-        name: "蓝色多边形",
-        positions: [110, 38, 111, 38, 111, 37, 110, 37, 110, 38],
+        name: "红色带高度",
+        positions: [116.381472, 39.906648,
+            116.381179, 39.901755,
+            116.385007, 39.901839,
+            116.385042, 39.899653,
+            116.389326, 39.899327,
+            116.389480, 39.902064,
+            116.392945, 39.902143,
+            116.393025, 39.904181,
+            116.389035, 39.904418,
+            116.389133, 39.906274,
+            116.385165, 39.906578,
+            116.381472, 39.906648],
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.3)),
+        extrudedHeight: 200
+    },
+    {
+        id: 'polygon003',
+        name: "图片材质",
+        positions: [116.384877, 39.922420, 116.385409, 39.912552, 116.396083, 39.912551, 116.395624, 39.922487, 116.384877, 39.922420],
         material: new Cesium.ImageMaterialProperty({
             image: 'public/textures/gugong.jpg',
             repeat: new Cesium.Cartesian2(1, 1)
         })
     }
 ]
+
 
 const checkListChange = (value: { [key: string]: any; }, check: boolean) => {
     const entity = viewer?.entities?.getById(value.id);
@@ -77,7 +98,8 @@ const addPolygon = (data: any) => {
                 // height: 0,
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                 outline: true,
-                outlineColor: Cesium.Color.BLACK
+                outlineColor: Cesium.Color.BLACK,
+                extrudedHeight: data.extrudedHeight ?? 0,
             }
         });
     }
@@ -88,46 +110,17 @@ const location = (data: any) => {
         viewer.zoomTo(entity)
     }
 }
-const selectId = ref<string>()
-const control = ref<PolygonEditor>()
 const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     viewer = MapViewer;
     let handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
     handler.setInputAction(function (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
-        let ray = viewer.camera.getPickRay(event.position);
-        if (!ray) return
-        var pick = viewer.scene.pick(event.position);//拾取鼠标所在的entity
-        console.log('pick', pick)
-        if (Cesium.defined(pick?.id)) {
-            if (pick.id.id === selectId.value && selectId.value) {
-                selectId.value = '';
-                if (control.value) {
-                    control.value.stopEditing()
-                }
-                return
-            }
-            if (pick.id) {
-                let entity: Cesium.Entity = pick.id
-                let sid = pick.id.id
-                selectId.value = sid
-                control.value = new PolygonEditor(viewer, entity, (positions) => {
-                    console.log('positions', positions)
-                });
-            } else {
-                if (control.value) {
-                    control.value.stopEditing()
-                }
-            }
-        } else {
-            if (selectId.value) {
-                selectId.value = '';
-
-            }
-            if (control.value) {
-                control.value.stopEditing()
-            }
-        }
-    }, Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK);
+        var cartesian = viewer.camera.pickEllipsoid(event.position, viewer.scene.globe.ellipsoid);
+        if (!cartesian) return;
+        var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+        var longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+        var latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
+        console.log(longitudeString, latitudeString);
+    }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     polygonList.forEach(item => {
         addPolygon(item)
     })
