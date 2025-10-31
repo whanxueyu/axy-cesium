@@ -35,7 +35,7 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     nameOverlay.style.position = "absolute";
     nameOverlay.style.bottom = "0";
     nameOverlay.style.left = "0";
-    nameOverlay.style["pointer-events"] = "none";
+    nameOverlay.style.pointerEvents = "none";
     nameOverlay.style.padding = "4px";
     nameOverlay.style.backgroundColor = "black";
     load3DTileset()
@@ -209,7 +209,7 @@ const handlePick = () => {
         // Silhouettes are not supported. Instead, change the feature color.
 
         // Information about the currently highlighted feature
-        const highlighted = {
+        const highlighted: any = {
             feature: undefined,
             originalColor: new Cesium.Color(),
         };
@@ -271,7 +271,7 @@ const handlePick = () => {
         }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 }
-function updateNameOverlay(pickedFeature, position) {
+function updateNameOverlay(pickedFeature:any, position:any) {
     if (!nameOverlay) return
     if (!Cesium.defined(pickedFeature)) {
         nameOverlay.style.display = "none";
