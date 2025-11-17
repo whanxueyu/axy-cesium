@@ -47,6 +47,8 @@ const imageResources = {
     dynamicPolyline: 'dynamicPolyline.png',
     imagePolyline: 'imagePolyline.png',
     polygon: 'polygon.png',
+    polylinevolume: 'polylinevolume.png',
+    tailLine: 'tailLine.png',
   },
   model: {
     model: 'model.png',
@@ -54,6 +56,7 @@ const imageResources = {
     editModel: 'editModel.png',
     cityModel: 'cityModel.png',
     modelMove: 'modelMove.png',
+    modelPath:'modelPath.png',
   },
   radar: {
     scan: 'scanRadar.png',
@@ -345,18 +348,18 @@ export var caseList = [
         description: '面状图元及实体',
         path: '/example/polygon'
       },
-      // {
-      //   imgurl: getImagePath('polyline', 'polylinevolume'),
-      //   title: '动态管道',
-      //   description: '绘制动态管道方法',
-      //   path: '/example/polylineVolume'
-      // },
-      // {
-      //   imgurl: getImagePath('polyline', 'tail'),
-      //   title: '迁徙线',
-      //   description: '实现迁徙线效果',
-      //   path: '/example/polylineVolume'
-      // },
+      {
+        imgurl: getImagePath('polyline', 'polylinevolume'),
+        title: '动态管道',
+        description: '绘制动态管道方法',
+        path: '/example/polylineVolume'
+      },
+      {
+        imgurl: getImagePath('polyline', 'tailLine'),
+        title: '竖直尾迹',
+        description: '竖直向上的尾迹线',
+        path: '/example/tailLine'
+      },
     ]
   },
   {
@@ -386,6 +389,12 @@ export var caseList = [
         title: '模型编辑',
         description: '模型编辑工具，可沿着XYZ轴平移，旋转，缩放',
         path: '/example/editModel'
+      },
+      {
+        imgurl: getImagePath('model', 'modelPath'),
+        title: '模型路径',
+        description: '模型根据路线移动',
+        path: '/example/developing'
       },
       {
         imgurl: getImagePath('model', 'modelMove'),
