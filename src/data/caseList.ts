@@ -47,7 +47,7 @@ const imageResources = {
     dynamicPolyline: 'dynamicPolyline.png',
     imagePolyline: 'imagePolyline.png',
     polygon: 'polygon.png',
-    polylinevolume: 'polylinevolume.png',
+    polylineVolume: 'polylineVolume.png',
     tailLine: 'tailLine.png',
   },
   model: {
@@ -349,7 +349,7 @@ export var caseList = [
         path: '/example/polygon'
       },
       {
-        imgurl: getImagePath('polyline', 'polylinevolume'),
+        imgurl: getImagePath('polyline', 'polylineVolume'),
         title: '动态管道',
         description: '绘制动态管道方法',
         path: '/example/polylineVolume'

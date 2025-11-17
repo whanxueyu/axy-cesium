@@ -206,6 +206,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/example/polygon',
         name: 'polygon',
         component: () => import('@/views/example/polyline/polygon.vue')
+      },  
+      {
+        path: '/example/polylineVolume',
+        name: 'polylineVolume',
+        component: () => import('@/views/example/polyline/polylineVolume.vue')
+      },
+      {
+        path: '/example/tailLine',
+        name: 'tailLine',
+        component: () => import('@/views/example/polyline/tailLine.vue')
       },
       // model
       {
