@@ -213,6 +213,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/polyline/polylineVolume.vue')
       },
       {
+        path: '/example/verticaltail',
+        name: 'verticaltail',
+        component: () => import('@/views/example/polyline/verticaltail.vue')
+      },
+      {
         path: '/example/tailLine',
         name: 'tailLine',
         component: () => import('@/views/example/polyline/tailLine.vue')

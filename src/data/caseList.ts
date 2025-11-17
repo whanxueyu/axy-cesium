@@ -48,6 +48,7 @@ const imageResources = {
     imagePolyline: 'imagePolyline.png',
     polygon: 'polygon.png',
     polylineVolume: 'polylineVolume.png',
+    verticaltail: 'verticaltail.png',
     tailLine: 'tailLine.png',
   },
   model: {
@@ -344,8 +345,8 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('polyline', 'polygon'),
-        title: '面状',
-        description: '面状图元及实体',
+        title: '多边形面',
+        description: '多边形面面状实体各类材质',
         path: '/example/polygon'
       },
       {
@@ -355,9 +356,15 @@ export var caseList = [
         path: '/example/polylineVolume'
       },
       {
-        imgurl: getImagePath('polyline', 'tailLine'),
+        imgurl: getImagePath('polyline', 'verticaltail'),
         title: '竖直尾迹',
         description: '竖直向上的尾迹线',
+        path: '/example/verticaltail'
+      },
+      {
+        imgurl: getImagePath('polyline', 'tailLine'),
+        title: '迁徙线',
+        description: '迁徙线',
         path: '/example/tailLine'
       },
     ]
