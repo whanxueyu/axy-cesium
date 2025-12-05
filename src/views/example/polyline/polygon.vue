@@ -13,7 +13,12 @@
                 </div>
             </template>
         </el-tree>
+        <video id="trailer" style="width:0px;height: 0;" controls autoplay muted loop>
+            <source src="@/assets/oceans.mp4" type="video/mp4">
+            Your browser does not support the <code>video</code> element.
+        </video>
     </div>
+
     <Map @loaded="handleMapLoaded"></Map>
 </template>
 
@@ -59,7 +64,7 @@ const polygonList = [
             116.389133, 39.906274,
             116.385165, 39.906578,
             116.381472, 39.906648],
-        material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.3)),
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.RED.withAlpha(0.7)),
         extrudedHeight: 200
     },
     {
@@ -70,7 +75,26 @@ const polygonList = [
             image: 'public/textures/gugong.jpg',
             repeat: new Cesium.Cartesian2(1, 1)
         })
-    }
+    },
+    {
+        id: 'polygon004',
+        name: "模拟白膜",
+        positions: [116.411472, 39.906648,
+            116.411179, 39.901755,
+            116.415007, 39.901839,
+            116.415042, 39.899653,
+            116.419326, 39.899327,
+            116.419480, 39.902064,
+            116.422945, 39.902143,
+            116.423025, 39.904181,
+            116.419035, 39.904418,
+            116.419133, 39.906274,
+            116.415165, 39.906578,
+            116.411472, 39.906648],
+        material: new Cesium.ColorMaterialProperty(Cesium.Color.WHITE),
+        extrudedHeight: 200,
+        outlineColor: Cesium.Color.WHITE.withAlpha(0.5)
+    },
 ]
 
 
@@ -98,7 +122,7 @@ const addPolygon = (data: any) => {
                 // height: 0,
                 heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                 outline: true,
-                outlineColor: Cesium.Color.BLACK,
+                outlineColor: data.outlineColor ?? Cesium.Color.BLACK,
                 extrudedHeight: data.extrudedHeight ?? 0,
             }
         });
@@ -116,6 +140,7 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     handler.setInputAction(function (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) {
         var cartesian = viewer.camera.pickEllipsoid(event.position, viewer.scene.globe.ellipsoid);
         if (!cartesian) return;
+        // drawPlane(cartesian)
         var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
         var longitudeString = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
         var latitudeString = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
@@ -126,6 +151,23 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     })
     mapLoaded.value = true;
     reset()
+}
+const drawPlane = (center: Cesium.Cartesian3) => {
+    let cartographic = Cesium.Cartographic.fromCartesian(center);
+    let lng = Cesium.Math.toDegrees(cartographic.longitude); // 经度
+    let lat = Cesium.Math.toDegrees(cartographic.latitude); // 纬度
+    let alt = cartographic.height
+    const videoElement = document.getElementById("trailer");
+    viewer.entities.add({
+        position: Cesium.Cartesian3.fromDegrees(lng, lat, 540 + alt),
+        plane: {
+            plane: new Cesium.Plane(Cesium.Cartesian3.UNIT_Y, 0.0),
+            dimensions: new Cesium.Cartesian2(1920.0, 1080.0),
+            material: videoElement as any,
+            outline: true,
+            outlineColor: Cesium.Color.BLACK,
+        },
+    });
 }
 const reset = () => {
     viewer.camera.flyTo({
