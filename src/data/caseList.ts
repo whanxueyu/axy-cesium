@@ -54,7 +54,7 @@ const imageResources = {
   polygon: {
     polygon: 'polygon.png',
     areaMask: 'areaMask.png',
-    gradient: 'gradient.png'
+    gradientRegion: 'gradientRegion.png'
   },
   model: {
     model: 'model.png',
@@ -391,7 +391,7 @@ export var caseList = [
         path: '/example/areaMask'
       },
       {
-        imgurl: getImagePath('polygon', 'gradient'),
+        imgurl: getImagePath('polygon', 'gradientRegion'),
         title: '渐变色区域',
         description: '多边形面渐变色区域效果',
         path: '/example/gradientRegion'
