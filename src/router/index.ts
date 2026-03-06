@@ -201,12 +201,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/example/dynamicPolyline',
         name: 'dynamicPolyline',
         component: () => import('@/views/example/polyline/dynamicPolyline.vue')
-      },
-      {
-        path: '/example/polygon',
-        name: 'polygon',
-        component: () => import('@/views/example/polyline/polygon.vue')
-      },  
+      }, 
       {
         path: '/example/polylineVolume',
         name: 'polylineVolume',
@@ -221,6 +216,27 @@ const routes: Array<RouteRecordRaw> = [
         path: '/example/tailLine',
         name: 'tailLine',
         component: () => import('@/views/example/polyline/tailLine.vue')
+      },
+      {
+        path: '/example/glowLine',
+        name: 'glowLine',
+        component: () => import('@/views/example/polyline/glowLine.vue')
+      },
+      // polygon
+      {
+        path: '/example/polygon',
+        name: 'polygon',
+        component: () => import('@/views/example/polygon/polygon.vue')
+      },
+      {
+        path: '/example/areaMask',
+        name: 'areaMask',
+        component: () => import('@/views/example/polygon/areaMask.vue')
+      },
+      {
+        path: '/example/gradientRegion',
+        name: 'gradientRegion',
+        component: () => import('@/views/example/polygon/gradientRegion.vue')
       },
       // model
       {

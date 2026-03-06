@@ -46,10 +46,15 @@ const imageResources = {
     basicPolyline: 'basicPolyline.png',
     dynamicPolyline: 'dynamicPolyline.png',
     imagePolyline: 'imagePolyline.png',
-    polygon: 'polygon.png',
     polylineVolume: 'polylineVolume.png',
     verticaltail: 'verticaltail.png',
     tailLine: 'tailLine.png',
+    glowLine: 'glowLine.png',
+  },
+  polygon: {
+    polygon: 'polygon.png',
+    mask: 'mask.png',
+    gradient: 'gradient.png'
   },
   model: {
     model: 'model.png',
@@ -322,7 +327,7 @@ export var caseList = [
     ]
   },
   {
-    title: '基础图形',
+    title: '线状实体',
     type: 'polyline',
     list: [
       {
@@ -344,12 +349,6 @@ export var caseList = [
         path: '/example/dynamicPolyline'
       },
       {
-        imgurl: getImagePath('polyline', 'polygon'),
-        title: '多边形面',
-        description: '多边形面面状实体各类材质',
-        path: '/example/polygon'
-      },
-      {
         imgurl: getImagePath('polyline', 'polylineVolume'),
         title: '动态管道',
         description: '绘制动态管道方法',
@@ -364,8 +363,38 @@ export var caseList = [
       {
         imgurl: getImagePath('polyline', 'tailLine'),
         title: '迁徙线',
-        description: '迁徙线',
+        description: '发光迁徙线，带尾迹的效果',
         path: '/example/tailLine'
+      },
+      {
+        imgurl: getImagePath('polyline', 'glowLine'),
+        title: '边界发光线',
+        description: '使用primitive实现边界发光线效果',
+        path: '/example/glowLine'
+      },
+    ]
+  },
+  {
+    title: '面状实体',
+    type: 'polygon',
+    list: [
+      {
+        imgurl: getImagePath('polygon', 'polygon'),
+        title: '多边形面',
+        description: '多边形面面状实体各类材质',
+        path: '/example/polygon'
+      },
+      {
+        imgurl: getImagePath('polygon', 'mask'),
+        title: '反选遮罩',
+        description: '多边形面反选遮罩效果',
+        path: '/example/areaMask'
+      },
+      {
+        imgurl: getImagePath('polygon', 'gradient'),
+        title: '渐变色区域',
+        description: '多边形面渐变色区域效果',
+        path: '/example/gradientRegion'
       },
     ]
   },
