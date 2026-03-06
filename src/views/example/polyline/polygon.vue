@@ -120,7 +120,7 @@ const addPolygon = (data: any) => {
                 hierarchy: Cesium.Cartesian3.fromDegreesArray(data.positions),
                 material: data.material ?? Cesium.Color.RED.withAlpha(0.5),
                 // height: 0,
-                heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
+                heightReference: Cesium.HeightReference.CLAMP_TO_TERRAIN,
                 outline: true,
                 outlineColor: data.outlineColor ?? Cesium.Color.BLACK,
                 extrudedHeight: data.extrudedHeight ?? 0,
