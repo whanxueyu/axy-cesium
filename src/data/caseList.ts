@@ -53,7 +53,7 @@ const imageResources = {
   },
   polygon: {
     polygon: 'polygon.png',
-    mask: 'mask.png',
+    areaMask: 'areaMask.png',
     gradient: 'gradient.png'
   },
   model: {
@@ -385,7 +385,7 @@ export var caseList = [
         path: '/example/polygon'
       },
       {
-        imgurl: getImagePath('polygon', 'mask'),
+        imgurl: getImagePath('polygon', 'areaMask'),
         title: '反选遮罩',
         description: '多边形面反选遮罩效果',
         path: '/example/areaMask'
