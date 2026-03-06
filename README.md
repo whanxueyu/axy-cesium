@@ -4,6 +4,9 @@
 
 `axy-cesium` 是一个基于 Vue 3 和 Cesium 的 3D 可视化案例展示平台。该项目旨在提供一系列 Cesium 示例，帮助开发者学习和掌握 Cesium 的使用方法，并展示其在 GIS 开发中的强大功能。
 
+![ScreenShot_1](./public/display/ScreenShot_1.png)
+![ScreenShot_2](./public/display/ScreenShot_2.png)
+
 ## 功能特点
 
 - **丰富的示例**：涵盖了从基础的地图图层到复杂的 3D 模型加载，适合不同层次的开发者学习。
@@ -28,6 +31,19 @@ axy-cesium/
 ├── package.json              # 项目依赖和脚本
 └── README.md                 # 项目说明文档
 ```
+## 截图
+
+![ScreenShot_3](./public/display/ScreenShot_3.png)
+
+![ScreenShot_4](./public/display/ScreenShot_4.png)
+
+![ScreenShot_5](./public/display/ScreenShot_5.png)
+
+![ScreenShot_6](./public/display/ScreenShot_6.png)
+
+![ScreenShot_7](./public/display/ScreenShot_7.png)
+
+![ScreenShot_8](./public/display/ScreenShot_8.png)
 
 ## 安装与运行
 ### 前提条件
@@ -85,5 +101,5 @@ yarn preview
 
 邮箱: 1358042645@qq.com
 
-GitHub: [[axy-cesium](https://github.com/whanxueyu/axy-cesium)]
+GitHub: [axy-cesium](https://github.com/whanxueyu/axy-cesium)
 
