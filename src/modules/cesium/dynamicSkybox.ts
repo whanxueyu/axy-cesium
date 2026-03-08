@@ -85,7 +85,7 @@ export default class DynamicSkybox {
     constructor(options: { sources: skyboxSource; show?: boolean }) {
         this.sources = options.sources;
         this._sources = undefined;
-        this.show = Cesium.defaultValue(options.show, true);
+        this.show = options.show ?? true;
 
         this._command = new Cesium.DrawCommand({
             modelMatrix: Cesium.Matrix4.clone(Cesium.Matrix4.IDENTITY),

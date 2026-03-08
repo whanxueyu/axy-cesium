@@ -16,9 +16,9 @@ export class CustomPrimitive {
 
         this.outputTexture = options.outputTexture;
 
-        this.autoClear = Cesium.defaultValue(options.autoClear, false);
+        this.autoClear = options.autoClear ?? false;
         this.preExecute = options.preExecute;
-        this.matrix = Cesium.defaultValue(options.matrix, Cesium.Matrix4.IDENTITY);
+        this.matrix = options.matrix ?? Cesium.Matrix4.IDENTITY;
 
         this.show = true;
         this.commandToExecute = undefined;
