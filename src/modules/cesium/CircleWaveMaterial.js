@@ -10,13 +10,13 @@ import * as Cesium from 'cesium'
 export default class CircleWaveMaterialProperty {
   constructor(options) {
     this._definitionChanged = new Cesium.Event();
-    this.color = Cesium.defaultValue(options.color && new Cesium.Color.fromCssColorString(options.color), Cesium.Color.RED);
-    this.duration = Cesium.defaultValue(options.duration, 1000);
-    this.count = Cesium.defaultValue(options.count, 2);
+    this.color = options.color ? new Cesium.Color.fromCssColorString(options.color) : Cesium.Color.RED;
+    this.duration = options.duration ?? 1000;
+    this.count = options.count ?? 2;
     if (this.count <= 0) {
       this.count = 1;
     }
-    this.gradient = Cesium.defaultValue(options.gradient, 0.1);
+    this.gradient = options.gradient ?? 0.1;
     if (this.gradient > 1) {
       this.gradient = 1;
     }
