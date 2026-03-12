@@ -28,6 +28,7 @@ import * as Cesium from "cesium";
  * @param {Boolean} [options.clusterLabels=true] Whether or not to cluster the labels of an entity.
  * @param {Boolean} [options.clusterPoints=true] Whether or not to cluster the points of an entity.
  * @param {Boolean} [options.show=true] Determines if the entities in the cluster will be shown.
+ * @param {Number} [options.delay=800] Debounce delay for clustering updates.
  *
  * @alias PrimitiveCluster
  * @constructor
@@ -35,15 +36,15 @@ import * as Cesium from "cesium";
  * @demo {@link https://sandcastle.cesium.com/index.html?src=Clustering.html|Cesium Sandcastle Clustering Demo}
  */
 function PrimitiveCluster(options) {
-  options = Cesium.defaultValue(options, Cesium.defaultValue.EMPTY_OBJECT);
+  options = options ?? {};
 
-  this._enabled = Cesium.defaultValue(options.enabled, false);
-  this._pixelRange = Cesium.defaultValue(options.pixelRange, 80);
-  this._minimumClusterSize = Cesium.defaultValue(options.minimumClusterSize, 2);
-  this._clusterBillboards = Cesium.defaultValue(options.clusterBillboards, true);
-  this._clusterLabels = Cesium.defaultValue(options.clusterLabels, true);
-  this._clusterPoints = Cesium.defaultValue(options.clusterPoints, true);
-  this._delay = Cesium.defaultValue(options.delay, 800)
+  this._enabled = options.enabled ?? false;
+  this._pixelRange = options.pixelRange ?? 80;
+  this._minimumClusterSize = options.minimumClusterSize ?? 2;
+  this._clusterBillboards = options.clusterBillboards ?? true;
+  this._clusterLabels = options.clusterLabels ?? true;
+  this._clusterPoints = options.clusterPoints ?? true;
+  this._delay = options.delay ?? 800;
   this._labelCollection = undefined;
   this._billboardCollection = undefined;
   this._pointCollection = undefined;
@@ -75,15 +76,7 @@ function PrimitiveCluster(options) {
    * @type {Boolean}
    * @default true
    */
-  this.show = Cesium.defaultValue(options.show, true);
-}
-
-function getX(point) {
-  return point.coord.x;
-}
-
-function getY(point) {
-  return point.coord.y;
+  this.show = options.show ?? true;
 }
 
 function expandBoundingBox(bbox, pixelRange) {
@@ -198,16 +191,6 @@ function getScreenSpacePositions(
     ) {
       continue;
     }
-
-    // const canClusterLabels =
-    //   entityCluster._clusterLabels && Cesium.defined(item._labelCollection);
-    // const canClusterBillboards =
-    //   entityCluster._clusterBillboards && Cesium.defined(item.id._billboard);
-    // const canClusterPoints =
-    //   entityCluster._clusterPoints && Cesium.defined(item.id._point);
-    // if (canClusterLabels && (canClusterPoints || canClusterBillboards)) {
-    //   continue;
-    // }
 
     const coord = item.computeScreenSpacePosition(scene);
     if (!Cesium.defined(coord)) {
@@ -337,153 +320,167 @@ function createDeclutterCallback(entityCluster) {
     let collection;
     let collectionIndex;
 
-    const index = new KDBush(points, getX, getY, 64, Int32Array);
-    console.log(index)
-    if (currentHeight < previousHeight) {
-      length = clusters.length;
+    // Build KDBush index with proper API
+    if (points.length > 0) {
+      const index = new KDBush(points.length, 64, Float64Array);
+      for (let p = 0; p < points.length; ++p) {
+        const point = points[p];
+        if (point && point.coord && 
+            typeof point.coord.x === 'number' && 
+            typeof point.coord.y === 'number' &&
+            !isNaN(point.coord.x) && 
+            !isNaN(point.coord.y)) {
+          index.add(point.coord.x, point.coord.y);
+        }
+      }
+      index.finish();
+
+      if (currentHeight < previousHeight) {
+        length = clusters.length;
+        for (i = 0; i < length; ++i) {
+          const cluster = clusters[i];
+
+          if (!occluder.isPointVisible(cluster.position)) {
+            continue;
+          }
+
+          const coord = Cesium.Billboard._computeScreenSpacePosition(
+            Cesium.Matrix4.IDENTITY,
+            cluster.position,
+            Cesium.Cartesian3.ZERO,
+            Cesium.Cartesian2.ZERO,
+            scene
+          );
+          if (!Cesium.defined(coord)) {
+            continue;
+          }
+
+          const factor = 1.0 - currentHeight / previousHeight;
+          let width = (cluster.width = cluster.width * factor);
+          let height = (cluster.height = cluster.height * factor);
+
+          width = Math.max(width, cluster.minimumWidth);
+          height = Math.max(height, cluster.minimumHeight);
+
+          const minX = coord.x - width * 0.5;
+          const minY = coord.y - height * 0.5;
+          const maxX = coord.x + width;
+          const maxY = coord.y + height;
+
+          neighbors = index.range(minX, minY, maxX, maxY);
+          neighborLength = neighbors.length;
+          numPoints = 0;
+          ids = [];
+
+          for (j = 0; j < neighborLength; ++j) {
+            neighborIndex = neighbors[j];
+            neighborPoint = points[neighborIndex];
+            if (!neighborPoint.clustered) {
+              ++numPoints;
+
+              collection = neighborPoint.collection;
+              collectionIndex = neighborPoint.index;
+              ids.push(collection.get(collectionIndex).id);
+            }
+          }
+
+          if (numPoints >= minimumClusterSize) {
+            addCluster(cluster.position, numPoints, ids, entityCluster);
+            newClusters.push(cluster);
+
+            for (j = 0; j < neighborLength; ++j) {
+              points[neighbors[j]].clustered = true;
+            }
+          }
+        }
+      }
+
+      length = points.length;
       for (i = 0; i < length; ++i) {
-        const cluster = clusters[i];
-
-        if (!occluder.isPointVisible(cluster.position)) {
+        const point = points[i];
+        if (point.clustered) {
           continue;
         }
 
-        const coord = Cesium.Billboard._computeScreenSpacePosition(
-          Cesium.Matrix4.IDENTITY,
-          cluster.position,
-          Cesium.Cartesian3.ZERO,
-          Cesium.Cartesian2.ZERO,
-          scene
+        point.clustered = true;
+
+        collection = point.collection;
+        collectionIndex = point.index;
+
+        const item = collection.get(collectionIndex);
+        bbox = getBoundingBox(
+          item,
+          point.coord,
+          pixelRange,
+          entityCluster,
+          pointBoundinRectangleScratch
         );
-        if (!Cesium.defined(coord)) {
-          continue;
-        }
+        const totalBBox = Cesium.BoundingRectangle.clone(
+          bbox,
+          totalBoundingRectangleScratch
+        );
 
-        const factor = 1.0 - currentHeight / previousHeight;
-        let width = (cluster.width = cluster.width * factor);
-        let height = (cluster.height = cluster.height * factor);
-
-        width = Math.max(width, cluster.minimumWidth);
-        height = Math.max(height, cluster.minimumHeight);
-
-        const minX = coord.x - width * 0.5;
-        const minY = coord.y - height * 0.5;
-        const maxX = coord.x + width;
-        const maxY = coord.y + height;
-
-        neighbors = index.range(minX, minY, maxX, maxY);
+        neighbors = index.range(
+          bbox.x,
+          bbox.y,
+          bbox.x + bbox.width,
+          bbox.y + bbox.height
+        );
         neighborLength = neighbors.length;
-        numPoints = 0;
-        ids = [];
+
+        const clusterPosition = Cesium.Cartesian3.clone(item.position);
+        numPoints = 1;
+        ids = [item.id];
 
         for (j = 0; j < neighborLength; ++j) {
           neighborIndex = neighbors[j];
           neighborPoint = points[neighborIndex];
           if (!neighborPoint.clustered) {
+            const neighborItem = neighborPoint.collection.get(
+              neighborPoint.index
+            );
+            const neighborBBox = getBoundingBox(
+              neighborItem,
+              neighborPoint.coord,
+              pixelRange,
+              entityCluster,
+              neighborBoundingRectangleScratch
+            );
+
+            Cesium.Cartesian3.add(
+              neighborItem.position,
+              clusterPosition,
+              clusterPosition
+            );
+
+            Cesium.BoundingRectangle.union(totalBBox, neighborBBox, totalBBox);
             ++numPoints;
 
-            collection = neighborPoint.collection;
-            collectionIndex = neighborPoint.index;
-            ids.push(collection.get(collectionIndex).id);
+            ids.push(neighborItem.id);
           }
         }
 
         if (numPoints >= minimumClusterSize) {
-          addCluster(cluster.position, numPoints, ids, entityCluster);
-          newClusters.push(cluster);
+          const position = Cesium.Cartesian3.multiplyByScalar(
+            clusterPosition,
+            1.0 / numPoints,
+            clusterPosition
+          );
+          addCluster(position, numPoints, ids, entityCluster);
+          newClusters.push({
+            position: position,
+            width: totalBBox.width,
+            height: totalBBox.height,
+            minimumWidth: bbox.width,
+            minimumHeight: bbox.height,
+          });
 
           for (j = 0; j < neighborLength; ++j) {
             points[neighbors[j]].clustered = true;
           }
+        } else {
+          addNonClusteredItem(item, entityCluster);
         }
-      }
-    }
-
-    length = points.length;
-    for (i = 0; i < length; ++i) {
-      const point = points[i];
-      if (point.clustered) {
-        continue;
-      }
-
-      point.clustered = true;
-
-      collection = point.collection;
-      collectionIndex = point.index;
-
-      const item = collection.get(collectionIndex);
-      bbox = getBoundingBox(
-        item,
-        point.coord,
-        pixelRange,
-        entityCluster,
-        pointBoundinRectangleScratch
-      );
-      const totalBBox = Cesium.BoundingRectangle.clone(
-        bbox,
-        totalBoundingRectangleScratch
-      );
-
-      neighbors = index.range(
-        bbox.x,
-        bbox.y,
-        bbox.x + bbox.width,
-        bbox.y + bbox.height
-      );
-      neighborLength = neighbors.length;
-
-      const clusterPosition = Cesium.Cartesian3.clone(item.position);
-      numPoints = 1;
-      ids = [item.id];
-
-      for (j = 0; j < neighborLength; ++j) {
-        neighborIndex = neighbors[j];
-        neighborPoint = points[neighborIndex];
-        if (!neighborPoint.clustered) {
-          const neighborItem = neighborPoint.collection.get(
-            neighborPoint.index
-          );
-          const neighborBBox = getBoundingBox(
-            neighborItem,
-            neighborPoint.coord,
-            pixelRange,
-            entityCluster,
-            neighborBoundingRectangleScratch
-          );
-
-          Cesium.Cartesian3.add(
-            neighborItem.position,
-            clusterPosition,
-            clusterPosition
-          );
-
-          Cesium.BoundingRectangle.union(totalBBox, neighborBBox, totalBBox);
-          ++numPoints;
-
-          ids.push(neighborItem.id);
-        }
-      }
-
-      if (numPoints >= minimumClusterSize) {
-        const position = Cesium.Cartesian3.multiplyByScalar(
-          clusterPosition,
-          1.0 / numPoints,
-          clusterPosition
-        );
-        addCluster(position, numPoints, ids, entityCluster);
-        newClusters.push({
-          position: position,
-          width: totalBBox.width,
-          height: totalBBox.height,
-          minimumWidth: bbox.width,
-          minimumHeight: bbox.height,
-        });
-
-        for (j = 0; j < neighborLength; ++j) {
-          points[neighbors[j]].clustered = true;
-        }
-      } else {
-        addNonClusteredItem(item, entityCluster);
       }
     }
 
@@ -513,9 +510,9 @@ PrimitiveCluster.prototype._initialize = function (scene) {
   const cluster = createDeclutterCallback(this);
   this._cluster = cluster;
   var _t = null;
-  const _self = this;
-  // this._removeEventListener = scene.camera.changed.addEventListener(cluster);
-  this._removeEventListener = scene.camera.changed.addEventListener(function(amount) {
+  var _self = this;
+  
+  this._removeEventListener = scene.camera.changed.addEventListener(function (amount) {
     if (_t) {
       clearTimeout(_t);
       _t = null;
@@ -671,7 +668,7 @@ function createGetEntity(
 
     const unusedIndices = this[unusedIndicesProperty];
     if (unusedIndices.length > 0) {
-      index = unusedIndices.pop();
+      index = unusedIndices.shift();
       entityItem = collection.get(index);
     } else {
       entityItem = collection.add();

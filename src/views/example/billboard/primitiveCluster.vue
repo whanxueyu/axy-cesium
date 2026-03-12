@@ -176,7 +176,7 @@ const handleMapLoaded = (MapViewer) => {
     billboardsCollection = viewer.scene.primitives.add(
   new Cesium.BillboardCollection()
 );
-    alert("当前cesium版本 1.124 版本过高，该聚合方法不可用，经测试可在 1.105 版本可用");
+    // alert("当前cesium版本 1.124 版本过高，该聚合方法不可用，经测试可在 1.105 版本可用");
     mapLoaded.value = true;
     reset()
 }
