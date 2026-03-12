@@ -1,10 +1,11 @@
 <template>
     <div class="side-menu-section">
         <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
-            <div  class="menu-item"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >
-            {{ cat.title }}
+            <div  class="menu-item-text"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >
+            {{ cat.title }}<i>（{{ cat.list.length}}）</i>
             </div>
         </div>
+        <div class="totalCount">共<span>{{ totalCaseCount }}</span>个案例</div>
         <div class="github">
             <a href="https://github.com/whanxueyu/axy-cesium" target="_blank">
                 <img src="https://img.shields.io/github/stars/whanxueyu/axy-cesium?style=social" alt="GitHub stars">
@@ -20,7 +21,7 @@ import { caseList } from '@/data/caseList';
 
 const router = useRouter();
 const route = useRoute();
-
+const totalCaseCount = ref(0);
 const activeSection = ref<string | null>(null);
 
 const observer = ref<IntersectionObserver | null>(null);
@@ -54,6 +55,7 @@ onMounted(() => {
         if (element) {
             observer.value?.observe(element);
         }
+        totalCaseCount.value += cat.list.length;
     });
 
     // 初始化时根据路由设置 activeSection
@@ -79,7 +81,15 @@ onUnmounted(() => {
     position: absolute;
     bottom: 20px;
 }
-
+.totalCount{
+    margin-top: 10px;
+    span {
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0 10px;
+        color: #409EFF;
+    }
+}
 .logo {
     display: flex;
     align-items: center;
@@ -100,7 +110,7 @@ onUnmounted(() => {
 }
 
 .menu-item {
-    padding: 10px;
+    padding: 20px 10px;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
 

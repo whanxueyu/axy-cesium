@@ -12,18 +12,10 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup name='Layout'>
 import SideMenu from '@/components/SideMenu.vue';
 import Header from "./header.vue"
 
-export default defineComponent({
-  name: 'Layout',
-  components: {
-    SideMenu,
-    Header
-  }
-});
 </script>
 
 <style scoped>
