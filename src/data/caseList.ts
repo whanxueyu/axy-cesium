@@ -18,7 +18,8 @@ const imageResources = {
     baselayer: 'baselayer.png',
     editlayer: 'editlayer.png',
     areaMap: 'areaMap.png',
-    night: 'night.png'
+    night: 'night.png',
+    singleImg: 'singleImg.png'
   },
   skybox: {
     skybox: 'skybox.png',
@@ -40,7 +41,8 @@ const imageResources = {
     htmlBillboard: 'htmlBillboard.png',
     divBillboard: 'divBillboard.png',
     dragableBillboard: 'dragableBillboard.png',
-    css3DdivBillboard: 'css3DdivBillboard.png'
+    css3DdivBillboard: 'css3DdivBillboard.png',
+    divCluster: 'divCluster.png'
   },
   polyline: {
     basicPolyline: 'basicPolyline.png',
@@ -61,8 +63,8 @@ const imageResources = {
     tileset: 'tileset.png',
     editModel: 'editModel.png',
     cityModel: 'cityModel.png',
-    modelMove: 'modelMove.png',
-    modelPath:'modelPath.png',
+    pathTracking: 'pathTracking.png',
+    moveControl:'moveControl.png',
   },
   radar: {
     scan: 'scanRadar.png',
@@ -76,14 +78,27 @@ const imageResources = {
     postProcess: 'postProcess.png',
     heatmap: 'heatmap.png',
     terrain: 'terrain.png',
-    animation: 'animation.png'
+    weather: 'weather.png'
   },
   analysis: {
-    basic: 'basic.png'
+    position: 'position.png',
+    distance: 'distance.png',
+    height: 'height.png',
+    area: 'area.png',
+    volume: 'volume.png',
+    cutfill: 'cutfill.png',
+    profile: 'profile.png',
+    viewshed: 'viewshed.png',
+    slope: 'slope.png',
+    flood: 'flood.png'
   },
   camera: {
+    smoothFly: 'smoothFly.png',
     around: 'around.png',
-    rotation: 'rotation.png'
+    rotation: 'rotation.png',
+    orbit: 'orbit.png',
+    follow: 'follow.png',
+    limitView: 'limitView.png'
   },
   comprehensive: {
     measurement: 'measurement.png',
@@ -170,6 +185,12 @@ export var caseList = [
         title: '瓦片网格地图',
         description: '生成瓦片网格地图，并取消无关图标和widgets。',
         path: '/example/tileGrid'
+      },
+      {
+        imgurl: getImagePath('layers', 'singleImg'),
+        title: '单张图片作底图',
+        description: '加载单张图片作为地图底图',
+        path: '/example/singleImg'
       },
       {
         imgurl: getImagePath('layers', 'areaMap'),
@@ -268,6 +289,12 @@ export var caseList = [
         description: '标牌坠落、变大、透明等动画效果',
         path: '/example/animationBillboard'
       },
+       {
+        imgurl: getImagePath('billboard', 'gifBillboard'),
+        title: '动态标牌',
+        description: '使用gif动图实现动态标牌效果。（目前使用gifler库解析gif，但是效果不理想，无法加载超过1.6M的动图，且加载动图数量稍多就会卡顿，后续寻找更优解）',
+        path: '/example/gifBillboard'
+      },
       {
         imgurl: getImagePath('billboard', 'cluster'),
         title: 'entity标牌聚合效果',
@@ -293,12 +320,6 @@ export var caseList = [
         path: '/example/primitiveCluster'
       },
       {
-        imgurl: getImagePath('billboard', 'gifBillboard'),
-        title: '动态标牌',
-        description: '使用gif动图实现动态标牌效果。（目前使用gifler库解析gif，但是效果不理想，无法加载超过1.6M的动图，且加载动图数量稍多就会卡顿，后续寻找更优解）',
-        path: '/example/gifBillboard'
-      },
-      {
         imgurl: getImagePath('billboard', 'htmlBillboard'),
         title: 'html自定义标牌',
         description: '使用html作为标牌，有更高的自由度，可以实现自己的交互逻辑',
@@ -315,7 +336,12 @@ export var caseList = [
         title: '可拖动的标牌，结合div',
         description: '支持拖拽，可在地图上显示带连接线的信息弹窗',
         path: '/example/dragableBillboard'
-        // path: '/example/developing'
+      },
+      {
+        imgurl: getImagePath('billboard', 'divCluster'),
+        title: 'div聚合标牌',
+        description: '如果想要将div标牌也进行聚合的话可以参考这个实现',
+        path: '/example/divCluster'
       },
       {
         imgurl: getImagePath('billboard', 'css3DdivBillboard'),
@@ -427,16 +453,16 @@ export var caseList = [
         path: '/example/editModel'
       },
       {
-        imgurl: getImagePath('model', 'modelPath'),
+        imgurl: getImagePath('model', 'pathTracking'),
         title: '模型路径',
         description: '模型根据路线移动',
-        path: '/example/developing'
+        path: '/example/pathTracking'
       },
       {
-        imgurl: getImagePath('model', 'modelMove'),
+        imgurl: getImagePath('model', 'moveControl'),
         title: '模型移动',
         description: '鼠标控制模型移动方向',
-        path: '/example/developing'
+        path: '/example/moveControl'
       },
     ]
   },
@@ -487,7 +513,7 @@ export var caseList = [
     type: 'material',
     list: [
       {
-        imgurl: getImagePath('material', 'animation'),
+        imgurl: getImagePath('material', 'weather'),
         title: '天气效果',
         description: '雨雪雾动态天气模拟与切换',
         path: '/example/weatherEffects'
@@ -505,6 +531,12 @@ export var caseList = [
     type: 'camera',
     list: [
       {
+        imgurl: getImagePath('camera', 'smoothFly'),
+        title: '相机平滑飞入',
+        description: '监听瓦片加载事件，所有瓦片加载完成后再进行相机移动，实现相机丝滑飞入效果',
+        path: '/example/smoothFly'
+      },
+      {
         imgurl: getImagePath('camera', 'around'),
         title: '绕点飞行',
         description: '绕点飞行是三维场景中一种非常常见的的动画效果，需要围绕其中心点进行旋转浏览',
@@ -515,7 +547,25 @@ export var caseList = [
         title: '定点旋转',
         description: '定点旋转是指在目标点旋转看向四周进行浏览',
         path: '/example/pointRotation'
-      }
+      },
+      {
+        imgurl: getImagePath('camera', 'orbit'),
+        title: '轨道飞行',
+        description: '轨道飞行是指沿着预设的轨道进行飞行浏览',
+        path: '/example/orbit'
+      },
+      {
+        imgurl: getImagePath('camera', 'follow'),
+        title: '跟随飞行',
+        description: '跟随飞行是指沿着目标对象进行飞行浏览',
+        path: '/example/follow'
+      },
+      {
+        imgurl: getImagePath('camera', 'limitView'),
+        title: '限制相机范围',
+        description: '限制相机查看范围和角度，相机始终在目标点附近',
+        path: '/example/limitView'
+      },
     ]
   },
   {
@@ -523,10 +573,58 @@ export var caseList = [
     type: 'analysis',
     list: [
       {
-        imgurl: getImagePath('analysis', 'basic'),
-        title: '基础测量',
-        description: '点位测量、高度测量、距离测量、面积测量',
-        path: '/example/postProcessing'
+        imgurl: getImagePath('analysis', 'position'),
+        title: '坐标测量',
+        description: '多种模式坐标测量，拾取坐标',
+        path: '/example/position'
+      },
+      {
+        imgurl: getImagePath('analysis', 'distance'),
+        title: '距离测量',
+        description: '直线距离测量，贴地距离测量',
+        path: '/example/measurement'
+      },
+      {
+        imgurl: getImagePath('analysis', 'height'),
+        title: '高度差测量',
+        description: '测量两点之间高度差',
+        path: '/example/height'
+      },
+      {
+        imgurl: getImagePath('analysis', 'area'),
+        title: '面积测量',
+        description: '多边形面积测量，贴地面积测量',
+        path: '/example/area'
+      },
+      {
+        imgurl: getImagePath('analysis', 'cutfill'),
+        title: '填挖方分析',
+        description: '场地平整填挖方计算，土方量估算',
+        path: '/example/cutfill'
+      },
+      {
+        imgurl: getImagePath('analysis', 'profile'),
+        title: '剖面分析',
+        description: '地形剖面线分析，高程剖面',
+        path: '/example/profile'
+      },
+      {
+        imgurl: getImagePath('analysis', 'viewshed'),
+        title: '通视分析',
+        description: '两点之间通视性分析，可视域分析',
+        path: '/example/viewshed'
+      },
+      {
+        imgurl: getImagePath('analysis', 'slope'),
+        title: '坡度坡向分析',
+        description: '地形坡度坡向分析，坡度分级',
+        path: '/example/slope'
+      },
+      {
+        imgurl: getImagePath('analysis', 'flood'),
+        title: '淹没分析',
+        description: '洪水淹没模拟，水位上升下降',
+        path: '/example/flood'
       }
     ]
   },
@@ -538,7 +636,7 @@ export var caseList = [
         imgurl: getImagePath('comprehensive', 'dynamicData'),
         title: '场景日夜交替',
         description: '根据时间变化模拟日夜交替效果，光照天空变换',
-        path: '/example/developing'
+        path: '/example/dynamicData'
       }
     ]
   },
