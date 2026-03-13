@@ -104,6 +104,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'night',
         component: () => import('@/views/example/imageLayer/night.vue')
       },
+      {
+        path: '/example/singleImg',
+        name: 'singleImg',
+        component: () => import('@/views/example/imageLayer/singleImg.vue')
+      },
       // skybox
       {
         path: '/example/skybox',
@@ -259,6 +264,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'cityTileset',
         component: () => import('@/views/example/model/cityTileset.vue')
       },
+      {
+        path: '/example/pathTracking',
+        name: 'pathTracking',
+        component: () => import('@/views/example/model/pathTracking.vue')
+      },
+      {
+        path: '/example/moveControl',
+        name: 'moveControl',
+        component: () => import('@/views/example/model/moveControl.vue')
+      },
       // 雷达
       {
         path: '/example/jamRadar',
@@ -292,6 +307,11 @@ const routes: Array<RouteRecordRaw> = [
       },
       // camera
       {
+        path: '/example/smoothFly',
+        name: 'smoothFly',
+        component: () => import('@/views/example/camera/smoothFly.vue')
+      },
+      {
         path: '/example/pointAround',
         name: 'pointAround',
         component: () => import('@/views/example/camera/pointAround.vue')
@@ -318,6 +338,22 @@ const routes: Array<RouteRecordRaw> = [
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+});
+
+// Global before each guard for route navigation
+router.beforeEach((to, from, next) => {
+  // Check if the route exists or has a valid name
+  if (to.name === null || to.matched.length === 0) {
+    // Redirect to developing page but preserve the attempted path as a query parameter
+    next({ 
+      name: 'developing',
+      query: { 
+        attemptedPath: to.fullPath 
+      }
+    });
+  } else {
+    next();
+  }
 });
 
 export default router;
