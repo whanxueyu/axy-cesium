@@ -15,13 +15,11 @@ import * as Cesium from "cesium";
 import "cesium/Source/Widgets/widgets.css";
 const imgIndex = ref(0);
 const imgList = ref([
-  "/public/textures/earthbg.png",
-  "/public/textures/earthblue.png",
-  "/public/textures/xiaoba.jpg",
+  "./textures/earthbg.png",
+  "./textures/earthblue.png",
+  "./textures/xiaoba.jpg",
 ]);
 const viewer = ref();
-Cesium.Ion.defaultAccessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
 const changeImage = () => {
   if (viewer.value.imageryLayers.length > 0)
     viewer.value.imageryLayers.removeAll();
