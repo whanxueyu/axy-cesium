@@ -461,7 +461,7 @@ export var caseList = [
       {
         imgurl: getImagePath('model', 'moveControl'),
         title: '模型移动控制',
-        description: '鼠标控制模型移动方向',
+        description: '键盘控制模型移动方向，支持 WASD 键和方向键',
         path: '/example/moveControl'
       },
     ]
