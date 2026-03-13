@@ -454,13 +454,13 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('model', 'pathTracking'),
-        title: '模型路径',
-        description: '模型根据路线移动',
+        title: '模型沿线移动',
+        description: '模型根据设置的路径进行移动，支持循环播放，可设置路径点和路径参数',
         path: '/example/pathTracking'
       },
       {
         imgurl: getImagePath('model', 'moveControl'),
-        title: '模型移动',
+        title: '模型移动控制',
         description: '鼠标控制模型移动方向',
         path: '/example/moveControl'
       },
