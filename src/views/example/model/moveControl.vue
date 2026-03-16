@@ -137,7 +137,7 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
     const timeDiff = Cesium.JulianDate.secondsDifference(nextTime, currentTime);
 
     // 当未来的路径点只剩 1 秒时，添加下一个点
-    if (timeDiff <= 1) {
+    if (timeDiff <= 0.5) {
       const speed = 0.0001 * (multer.value === 0 ? 1 : multer.value);
       let newLongitude = lastLongitude;
       let newLatitude = lastLatitude;
@@ -179,7 +179,7 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
       // 0.5 秒后允许继续添加
       setTimeout(() => {
         hasPendingPoint = false;
-      }, 500);
+      }, 200);
     }
   });
 };
@@ -264,10 +264,10 @@ const handleDirection = (direction: string) => {
       break;
   }
 
-  // 计算下一秒的时间点
+  // 计算下一的时间点
   const futureTime = Cesium.JulianDate.addSeconds(
-    nextTime,
-    1,
+    viewer.clock.currentTime,
+    0.2,
     new Cesium.JulianDate()
   );
 
