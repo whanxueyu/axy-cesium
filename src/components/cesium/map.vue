@@ -64,6 +64,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showCompass: {
+    type: Boolean,
+    default: true,
+  },
+  loadTerrain: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emits = defineEmits(["loaded"]);
 const mapLoaded = ref(false);
@@ -81,10 +89,10 @@ const initCesium = () => {
     timeline: props.timeline, //底部的时间轴
     navigationHelpButton: false, //右上角的帮助按钮，
     fullscreenButton: false,
-    terrain: Cesium.Terrain.fromWorldTerrain({
+    terrain: props.loadTerrain ? Cesium.Terrain.fromWorldTerrain({
       requestWaterMask: true,
       requestVertexNormals: true,
-    }),
+    }) : undefined,
   });
   viewer.imageryLayers.removeAll();
   viewer.scene.screenSpaceCameraController.zoomEventTypes = [
@@ -100,7 +108,7 @@ const initCesium = () => {
   // viewer.scene.screenSpaceCameraController.enableTranslate = false;
   viewer.scene.screenSpaceCameraController.enableRotate = true; //拖拽旋转
   viewer.scene.screenSpaceCameraController.enableTilt = true; //右键拖拽倾斜
-  new Compass(viewer);
+  props.showCompass && new Compass(viewer);
   var helper = new Cesium.EventHelper();
   if (props.lazy) {
     helper.add(viewer.scene.globe.tileLoadProgressEvent, function (e) {
