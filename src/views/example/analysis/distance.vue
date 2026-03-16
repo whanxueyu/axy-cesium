@@ -129,8 +129,11 @@ const updateLineVisualization = () => {
       positions: positions,
       width: 4,
       material: new Cesium.PolylineGlowMaterialProperty({
-        color: Cesium.Color.CYAN,
-        glowPower: 0.2,
+        color: Cesium.Color.YELLOW,
+        glowPower: 0.3,
+      }),
+      depthFailMaterial: new Cesium.PolylineGlowMaterialProperty({
+        color: Cesium.Color.YELLOW.withAlpha(0.8),
       }),
       clampToGround: !straightLine.value,
     },
@@ -149,7 +152,7 @@ const addPointMarker = (position: Cesium.Cartesian3, index: number) => {
     },
     label: {
       text: `${index}`,
-      font: "12pt monospace",
+      font: "bold 14pt monospace",
       fillColor: Cesium.Color.WHITE,
       outlineColor: Cesium.Color.BLACK,
       outlineWidth: 2,
@@ -170,10 +173,10 @@ const addSegmentLabel = (
   const label = viewer.entities.add({
     position: position,
     label: {
-      text: `${distance.toFixed(2)}m`,
-      font: "10pt monospace",
-      fillColor: Cesium.Color.YELLOW,
-      outlineColor: Cesium.Color.WHITE,
+      text: `第 ${segmentIndex} 段: ${distance.toFixed(2)}m`,
+      font: "bold 14pt monospace",
+      fillColor: Cesium.Color.WHITE,
+      outlineColor: Cesium.Color.BLACK,
       outlineWidth: 1,
       style: Cesium.LabelStyle.FILL_AND_OUTLINE,
       verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
@@ -191,7 +194,7 @@ const processPickResult = (
   screenPosition: Cesium.Cartesian2
 ) => {
   if (!isDrawing) return;
-
+  console.log("Pick result:", cartesian, screenPosition);
   // 添加新的点
   positions.push(cartesian);
   const pointIndex = positions.length;
@@ -219,7 +222,7 @@ const processPickResult = (
       cartesian,
       new Cesium.Cartesian3()
     );
-    
+
     // 添加线段距离标签
     addSegmentLabel(midpoint, distance, segmentDistances.value.length);
 
@@ -231,10 +234,10 @@ const processPickResult = (
       position: cartesian,
       label: {
         text: `点${pointIndex}\n总距离：${totalDistance.value.toFixed(2)}m`,
-        font: "12pt monospace",
-        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-        fillColor: Cesium.Color.YELLOW,
+        font: "bold 14pt monospace",
+        fillColor: Cesium.Color.WHITE,
         outlineColor: Cesium.Color.BLACK,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
         outlineWidth: 2,
         verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
         pixelOffset: new Cesium.Cartesian2(0, -9),
@@ -278,41 +281,38 @@ const handleClickListener = () => {
   );
 
   // 右键结束绘制
-  handler.setInputAction(
-    (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
-      if (!isMeasuring.value || !isDrawing) return;
+  handler.setInputAction(() => {
+    if (!isMeasuring.value || !isDrawing) return;
 
-      isDrawing = false;
+    isDrawing = false;
 
-      // 移除临时标签
-      if (labelEntity) {
-        viewer.entities.remove(labelEntity);
-        labelEntity = null;
-      }
+    // 移除临时标签
+    if (labelEntity) {
+      viewer.entities.remove(labelEntity);
+      labelEntity = null;
+    }
 
-      // 显示最终结果标签（在最后一个点位置）
-      if (positions.length > 0) {
-        const lastPosition = positions[positions.length - 1];
-        labelEntity = viewer.entities.add({
-          position: lastPosition,
-          label: {
-            text: `总距离：${totalDistance.value.toFixed(2)}米\n段数：${
-              segmentDistances.value.length
-            }`,
-            font: "14pt monospace",
-            style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-            fillColor: Cesium.Color.YELLOW,
-            outlineColor: Cesium.Color.BLACK,
-            outlineWidth: 2,
-            verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-            pixelOffset: new Cesium.Cartesian2(0, -9),
-            disableDepthTestDistance: Number.MAX_VALUE,
-          },
-        });
-      }
-    },
-    Cesium.ScreenSpaceEventType.RIGHT_CLICK
-  );
+    // 显示最终结果标签（在最后一个点位置）
+    if (positions.length > 0) {
+      const lastPosition = positions[positions.length - 1];
+      labelEntity = viewer.entities.add({
+        position: lastPosition,
+        label: {
+          text: `总距离：${totalDistance.value.toFixed(2)}米\n段数：${
+            segmentDistances.value.length
+          }`,
+          font: "bold 14pt monospace",
+          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+          fillColor: Cesium.Color.WHITE,
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 2,
+          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+          pixelOffset: new Cesium.Cartesian2(0, -9),
+          disableDepthTestDistance: Number.MAX_VALUE,
+        },
+      });
+    }
+  }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 
   mouseHandler = handler;
 };
