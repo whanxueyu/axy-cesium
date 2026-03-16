@@ -575,7 +575,7 @@ export var caseList = [
       {
         imgurl: getImagePath('analysis', 'position'),
         title: '坐标测量',
-        description: '多种模式坐标测量，拾取坐标',
+        description: '多种模式坐标测量，拾取坐标位置，地形高程，建筑物高度',
         path: '/example/position'
       },
       {

@@ -325,7 +325,13 @@ const routes: Array<RouteRecordRaw> = [
         path: '/example/developing',
         name: 'developing',
         component: () => import('@/views/developing.vue')
-      }
+      },
+      // analys
+      {
+        path: '/example/position',
+        name: 'position',
+        component: () => import('@/views/example/analysis/position.vue')
+      },
     ]
   },
   {
@@ -351,6 +357,7 @@ router.beforeEach((to, from, next) => {
         attemptedPath: to.fullPath 
       }
     });
+    console.log('Route not found, redirecting to developing page',to, from);
   } else {
     next();
   }
