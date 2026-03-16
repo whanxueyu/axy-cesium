@@ -70,7 +70,7 @@ const props = defineProps({
   },
   loadTerrain: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 });
 const emits = defineEmits(["loaded"]);

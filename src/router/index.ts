@@ -332,6 +332,16 @@ const routes: Array<RouteRecordRaw> = [
         name: 'position',
         component: () => import('@/views/example/analysis/position.vue')
       },
+      {
+        path: '/example/distance',
+        name: 'distance',
+        component: () => import('@/views/example/analysis/distance.vue')
+      },
+      {
+        path: '/example/height',
+        name: 'height',
+        component: () => import('@/views/example/analysis/height.vue')
+      },
     ]
   },
   {

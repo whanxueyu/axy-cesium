@@ -4,10 +4,20 @@
       v-model="isMeasuring"
       inline-prompt
       size="large"
-      style="--el-switch-off-color: #664949"
+      style="--el-switch-off-color: #ff4949"
       active-text="开启测量位置"
       inactive-text="停止测量"
     />
+    <div>
+      <el-switch
+        v-model="straightLine"
+        inline-prompt
+        size="large"
+        style="--el-switch-off-color: #13ae66"
+        active-text="直线距离"
+        inactive-text="贴地距离"
+      />
+    </div>
     <div>
       <el-button type="danger" @click="handleClear">清除结果</el-button>
     </div>
@@ -21,6 +31,7 @@ import * as Cesium from "cesium";
 import Map from "@/components/cesium/map.vue";
 var viewer: Cesium.Viewer;
 const isMeasuring = ref(false);
+const straightLine = ref(false);
 const resultVisible = ref(false);
 const measureResult = ref({
   longitude: 0,

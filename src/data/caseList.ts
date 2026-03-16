@@ -582,7 +582,7 @@ export var caseList = [
         imgurl: getImagePath('analysis', 'distance'),
         title: '距离测量',
         description: '直线距离测量，贴地距离测量',
-        path: '/example/measurement'
+        path: '/example/distance'
       },
       {
         imgurl: getImagePath('analysis', 'height'),

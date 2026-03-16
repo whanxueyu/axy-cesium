@@ -4,7 +4,6 @@
       v-model="isMeasuring"
       inline-prompt
       size="large"
-      style="--el-switch-off-color: #664949"
       active-text="开启测量位置"
       inactive-text="停止测量"
     />
