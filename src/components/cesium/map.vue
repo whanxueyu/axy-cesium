@@ -6,7 +6,10 @@
     :map-type="props.mapType"
     v-show="showLayerSelect"
   ></base-layer>
-  <status-bar v-if="mapLoaded && viewer && showStatusBar" :viewer="viewer"></status-bar>
+  <status-bar
+    v-if="mapLoaded && viewer && showStatusBar"
+    :viewer="viewer"
+  ></status-bar>
 </template>
 
 <script setup lang="ts">
@@ -75,9 +78,10 @@ const props = defineProps({
 });
 const emits = defineEmits(["loaded"]);
 const mapLoaded = ref(false);
-const initCesium = () => {
+const initCesium = async () => {
   Cesium.Ion.defaultAccessToken =
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIyMjBkODk3NS0xZmE4LTQ5MzgtYTAxZC1mZTZhZTVmMTY3ZjQiLCJpZCI6MTcwNzE3LCJpYXQiOjE2OTY4MTY5OTN9.YivsBCkT8fHJNB5lFMFo2bh7860luv368ALHw-_gCD0";
+
   viewer = new Cesium.Viewer("cesiumContainer", {
     infoBox: false,
     selectionIndicator: false,
@@ -89,11 +93,21 @@ const initCesium = () => {
     timeline: props.timeline, //底部的时间轴
     navigationHelpButton: false, //右上角的帮助按钮，
     fullscreenButton: false,
-    terrain: props.loadTerrain ? Cesium.Terrain.fromWorldTerrain({
-      requestWaterMask: true,
-      requestVertexNormals: true,
-    }) : undefined,
   });
+
+  // 处理异步地形加载
+  if (props.loadTerrain) {
+    try {
+      const terrainProvider = await Cesium.createWorldTerrainAsync({
+        requestWaterMask: true,
+        requestVertexNormals: true,
+      });
+      viewer.terrainProvider = terrainProvider;
+    } catch (error) {
+      console.error("World terrain loading failed:", error);
+    }
+  }
+
   viewer.imageryLayers.removeAll();
   viewer.scene.screenSpaceCameraController.zoomEventTypes = [
     Cesium.CameraEventType.WHEEL,
@@ -136,7 +150,7 @@ const reset = () => {
       destination: Cesium.Cartesian3.fromDegrees(
         props.destination.longitude,
         props.destination.latitude,
-        props.destination.height
+        props.destination.height,
       ),
       orientation: {
         heading: Cesium.Math.toRadians(props.orientation.heading),
