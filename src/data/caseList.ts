@@ -65,6 +65,7 @@ const imageResources = {
     cityModel: 'cityModel.png',
     pathTracking: 'pathTracking.png',
     moveControl:'moveControl.png',
+    animation: 'animation.png',
   },
   radar: {
     scan: 'scanRadar.png',
@@ -464,6 +465,12 @@ export var caseList = [
         description: '键盘控制模型移动方向，支持 WASD 键和方向键',
         path: '/example/moveControl'
       },
+      // {
+      //   imgurl: getImagePath('model', 'animation'),
+      //   title: 'GLB模型动画',
+      //   description: '加载基础的各类glb单体模型，支持动画播放',
+      //   path: '/example/animation'
+      // },
     ]
   },
   {

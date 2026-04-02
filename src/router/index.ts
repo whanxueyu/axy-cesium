@@ -274,6 +274,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'moveControl',
         component: () => import('@/views/example/model/moveControl.vue')
       },
+      {
+        path: '/example/animation',
+        name: 'animation',
+        component: () => import('@/views/example/model/animation.vue')
+      },
       // 雷达
       {
         path: '/example/jamRadar',
