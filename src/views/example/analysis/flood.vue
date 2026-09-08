@@ -8,11 +8,13 @@
       active-text="开启绘制"
       inactive-text="停止绘制"
     />
+
     <div class="param-item">
       <span class="param-label">网格间距：</span>
       <el-input-number v-model="gridSpacing" :min="10" :max="100" :step="10" size="small" />
       <span class="param-unit">米</span>
     </div>
+
     <div class="param-item">
       <span class="param-label">水位高程：</span>
       <el-slider
@@ -24,51 +26,84 @@
         class="water-slider"
         @input="stopWaterAnim"
       />
-      <span class="param-unit">{{ waterLevel.toFixed(1) }} m</span>
+      <span class="param-unit water-value">{{ waterLevel.toFixed(1) }} m</span>
     </div>
+
+    <div class="button-row">
+      <el-button size="small" type="primary" :disabled="!gridReady" @click="playRise">
+        上涨模拟
+      </el-button>
+      <el-button size="small" :disabled="!gridReady" @click="lowerToBottom">
+        回落
+      </el-button>
+      <el-button size="small" :disabled="!waterAnimating" @click="stopWaterAnim">
+        暂停
+      </el-button>
+    </div>
+
     <div class="result-box" v-if="computing">
       <div class="result-item">
         <span class="value">采样中...</span>
       </div>
     </div>
+
     <div class="result-box" v-else-if="floodResult">
       <div class="result-item">
         <span class="label">水位：</span>
         <span class="value">{{ floodResult.waterLevel.toFixed(2) }} m</span>
       </div>
       <div class="result-item">
+        <span class="label">区域面积：</span>
+        <span class="value">{{ formatInteger(regionArea) }} m²</span>
+      </div>
+      <div class="result-item">
         <span class="label">淹没面积：</span>
-        <span class="value">{{ Math.round(floodResult.area).toLocaleString() }} m²</span>
+        <span class="value">{{ formatInteger(floodResult.area) }} m²</span>
       </div>
       <div class="result-item">
         <span class="label">淹没体积：</span>
-        <span class="value">{{ Math.round(floodResult.volume).toLocaleString() }} m³</span>
+        <span class="value">{{ formatInteger(floodResult.volume) }} m³</span>
+      </div>
+      <div class="result-item">
+        <span class="label">淹没比例：</span>
+        <span class="value">{{ formatPercent(floodResult.coverageRatio) }}</span>
+      </div>
+      <div class="result-item">
+        <span class="label">平均水深：</span>
+        <span class="value">{{ floodResult.averageDepth.toFixed(2) }} m</span>
       </div>
       <div class="result-item">
         <span class="label">最大水深：</span>
         <span class="value">{{ floodResult.maxDepth.toFixed(2) }} m</span>
       </div>
       <div class="result-item">
-        <span class="label">淹没网格：</span>
-        <span class="value">{{ floodResult.floodedCount }} 个</span>
+        <span class="label">有效网格：</span>
+        <span class="value">{{ floodResult.floodedCount }} / {{ floodResult.totalCount }} 个</span>
+      </div>
+      <div class="result-item">
+        <span class="label">实际间距：</span>
+        <span class="value">{{ actualSpacing.toFixed(0) }} m</span>
       </div>
     </div>
+
     <div class="result-box" v-else-if="hint">
       <div class="result-item">
         <span class="value">{{ hint }}</span>
       </div>
     </div>
+
     <div>
       <el-button type="danger" @click="handleClear">清除结果</el-button>
     </div>
   </div>
-  <Map @loaded="handleMapLoaded"></Map>
+
+  <CesiumMap @loaded="handleMapLoaded"></CesiumMap>
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, ref, watch } from "vue";
+import { computed, onUnmounted, ref, shallowRef, watch } from "vue";
 import * as Cesium from "cesium";
-import Map from "@/components/cesium/map.vue";
+import CesiumMap from "@/components/cesium/map.vue";
 import {
   computeFlood,
   pickPositionOnMap,
@@ -78,9 +113,19 @@ import {
   type LonLat,
   type PolygonGridResult,
 } from "@/modules/cesium/analysisUtils";
-import { DynamicWallMaterialProperty } from "@/modules/cesium/analysisWallMaterial";
+import { FloodAnalysisLayer } from "@/modules/cesium/floodAnalysisLayer";
 
-var viewer: Cesium.Viewer;
+let viewer: Cesium.Viewer | null = null;
+let analysisLayer: FloodAnalysisLayer | null = null;
+let mouseHandler: Cesium.ScreenSpaceEventHandler | null = null;
+let gridResult: PolygonGridResult | null = null;
+let polygonLngLats: LonLat[] = [];
+let positions: Cesium.Cartesian3[] = [];
+let isDrawing = false;
+let updateTimer: number | undefined;
+let waterAnimId: number | undefined;
+let sampleToken = 0;
+
 const isMeasuring = ref(false);
 const gridSpacing = ref(20);
 const waterLevel = ref(0);
@@ -89,284 +134,260 @@ const sliderMax = ref(100);
 const gridReady = ref(false);
 const computing = ref(false);
 const hint = ref("");
-const floodResult = ref<FloodResult | null>(null);
+const actualSpacing = ref(0);
+const waterAnimating = ref(false);
+const floodResult = shallowRef<FloodResult | null>(null);
 
-let gridResult: PolygonGridResult | null = null;
-let polygonLngLats: LonLat[] = [];
-let waterEntities: Cesium.Entity[] = [];
-let wallEntity: Cesium.Entity | null = null;
-let previewLineEntity: Cesium.Entity | null = null;
-let labelEntity: Cesium.Entity | null = null;
-let pointEntities: Cesium.Entity[] = [];
-let positions: Cesium.Cartesian3[] = [];
-let isDrawing = false;
-let mouseHandler: Cesium.ScreenSpaceEventHandler | null = null;
-let debounceTimer: number | undefined;
-let waterAnimId: number | undefined;
+const regionArea = computed(() => {
+  const result = floodResult.value;
+  const grid = gridResult;
+  return result && grid ? result.totalCount * grid.cellArea : 0;
+});
 
-/** 停止水位上涨动画 */
+const formatInteger = (value: number) => Math.round(value).toLocaleString();
+
+const formatPercent = (value: number) => `${(value * 100).toFixed(1)}%`;
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+const toLonLat = (position: Cesium.Cartesian3): LonLat => {
+  const carto = Cesium.Cartographic.fromCartesian(position);
+  return {
+    lng: Cesium.Math.toDegrees(carto.longitude),
+    lat: Cesium.Math.toDegrees(carto.latitude),
+  };
+};
+
+const getInitialTargetLevel = (grid: PolygonGridResult) => {
+  const span = Math.max(grid.maxHeight - grid.minHeight, 1);
+  return grid.minHeight + span * 0.85;
+};
+
+const syncSliderRange = (grid: PolygonGridResult) => {
+  const span = Math.max(grid.maxHeight - grid.minHeight, 1);
+  sliderMin.value = Number((grid.minHeight - Math.max(span * 0.05, 1)).toFixed(2));
+  sliderMax.value = Number((grid.maxHeight + Math.max(span * 0.15, 5)).toFixed(2));
+  actualSpacing.value = grid.spacing;
+};
+
+const resetWaterRange = () => {
+  waterLevel.value = 0;
+  sliderMin.value = 0;
+  sliderMax.value = 100;
+  actualSpacing.value = 0;
+};
+
 const stopWaterAnim = () => {
   if (waterAnimId !== undefined) {
     cancelAnimationFrame(waterAnimId);
     waterAnimId = undefined;
   }
+  waterAnimating.value = false;
 };
 
-/** 水位从当前值缓动上涨到目标值（easeOutCubic） */
 const animateWaterTo = (target: number, durationMs = 2500) => {
   stopWaterAnim();
+
   const start = waterLevel.value;
-  const t0 = performance.now();
+  const end = clamp(target, sliderMin.value, sliderMax.value);
+  if (Math.abs(start - end) < 0.01) {
+    waterLevel.value = end;
+    return;
+  }
+
+  waterAnimating.value = true;
+  const startTime = performance.now();
   const step = (now: number) => {
-    const t = Math.min(1, (now - t0) / durationMs);
-    const eased = 1 - Math.pow(1 - t, 3);
-    waterLevel.value = start + (target - start) * eased;
-    if (t < 1) {
+    const progress = Math.min(1, (now - startTime) / durationMs);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    waterLevel.value = start + (end - start) * eased;
+
+    if (progress < 1) {
       waterAnimId = requestAnimationFrame(step);
-    } else {
-      waterAnimId = undefined;
+      return;
     }
+
+    waterLevel.value = end;
+    waterAnimId = undefined;
+    waterAnimating.value = false;
   };
+
   waterAnimId = requestAnimationFrame(step);
 };
 
-const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
-  viewer = MapViewer;
-  // 让实体与真实地形正确遮挡
-  viewer.scene.globe.depthTestAgainstTerrain = true;
-  handleClickListener();
-  reset();
+const playRise = () => {
+  if (!gridResult) return;
+
+  const target = getInitialTargetLevel(gridResult);
+  if (waterLevel.value >= target - 0.1) {
+    waterLevel.value = sliderMin.value;
+  }
+  animateWaterTo(target);
 };
 
-const reset = () => {
-  viewer.camera.flyTo({
+const lowerToBottom = () => {
+  animateWaterTo(sliderMin.value, 1000);
+};
+
+const resetCamera = () => {
+  viewer?.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(103.82, 36.02, 3000),
     orientation: {
       heading: Cesium.Math.toRadians(0),
       pitch: Cesium.Math.toRadians(-40),
-      roll: 0.0,
+      roll: 0,
     },
     duration: 1,
   });
 };
 
-const handleClear = () => {
+const clearRuntimeState = () => {
+  sampleToken++;
   stopWaterAnim();
-  [previewLineEntity, wallEntity, labelEntity].forEach((entity) => {
-    if (entity) {
-      viewer.entities.remove(entity);
-    }
-  });
-  previewLineEntity = null;
-  wallEntity = null;
-  labelEntity = null;
-  waterEntities.forEach((entity) => {
-    viewer.entities.remove(entity);
-  });
-  waterEntities = [];
-  pointEntities.forEach((entity) => {
-    viewer.entities.remove(entity);
-  });
-  pointEntities = [];
+
+  if (updateTimer) {
+    clearTimeout(updateTimer);
+    updateTimer = undefined;
+  }
+
   positions = [];
   polygonLngLats = [];
   gridResult = null;
-  gridReady.value = false;
   isDrawing = false;
+  gridReady.value = false;
   computing.value = false;
   floodResult.value = null;
   hint.value = "";
-  // 重置水位与滑块范围，避免清除后残留旧数值
-  waterLevel.value = 0;
-  sliderMin.value = 0;
-  sliderMax.value = 100;
+  resetWaterRange();
 };
 
-const addPointMarker = (position: Cesium.Cartesian3, index: number) => {
-  const point = viewer.entities.add({
-    position: position,
-    point: {
-      pixelSize: 8,
-      color: Cesium.Color.RED,
-      outlineColor: Cesium.Color.WHITE,
-      outlineWidth: 2,
-      disableDepthTestDistance: Number.MAX_VALUE,
-    },
-    label: {
-      text: `${index}`,
-      font: "bold 14pt monospace",
-      fillColor: Cesium.Color.WHITE,
-      outlineColor: Cesium.Color.BLACK,
-      outlineWidth: 2,
-      style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-      verticalOrigin: Cesium.VerticalOrigin.TOP,
-      pixelOffset: new Cesium.Cartesian2(0, 10),
-      disableDepthTestDistance: Number.MAX_VALUE,
-    },
-  });
-  pointEntities.push(point);
+const handleClear = () => {
+  analysisLayer?.clear();
+  clearRuntimeState();
 };
 
-const updatePreviewLine = () => {
-  if (previewLineEntity) {
-    viewer.entities.remove(previewLineEntity);
-  }
-  if (positions.length < 2) return;
-  previewLineEntity = viewer.entities.add({
-    polyline: {
-      positions: [...positions],
-      width: 3,
-      material: new Cesium.PolylineGlowMaterialProperty({
-        color: Cesium.Color.YELLOW,
-        glowPower: 0.3,
-      }),
-      clampToGround: false,
-    },
-  });
-};
+const updateFloodResult = () => {
+  if (!gridResult || !analysisLayer) return;
 
-/** 沿绘制边界更新动态水墙（墙高 = 水位 - 边界地表高程） */
-const updateWall = () => {
-  if (!positions.length) return;
-
-  const groundHeights = positions.map((p) => Cesium.Cartographic.fromCartesian(p).height);
-  // 墙高随水位实时变化，用 CallbackProperty 每帧计算
-  // （地表高于水位的顶点处墙高为 0，max 不能小于 min，否则几何非法整体不渲染）
-  const maxHeights = new Cesium.CallbackProperty(
-    () => positions.map((p, i) => Math.max(waterLevel.value, groundHeights[i])),
-    false,
-  );
-
-  if (wallEntity) {
-    viewer.entities.remove(wallEntity);
-  }
-  wallEntity = viewer.entities.add({
-    wall: {
-      positions: [...positions],
-      minimumHeights: groundHeights,
-      maximumHeights: maxHeights,
-      material: new DynamicWallMaterialProperty({
-        color: Cesium.Color.fromCssColorString("#00c8ff").withAlpha(0.85),
-        duration: 2000,
-        trailImage: "/textures/flow-wall-1.png",
-        count: 10,
-        viewer: viewer,
-      }),
-    },
-  });
-};
-
-/** 重建水面（经典做法：贴地 polygon 拉伸到水位，低于水位处自然露出水面）
- *  extrudedHeight 用 CallbackProperty 每帧取水位，水位上涨动画时水面连续抬升 */
-const updateWaterSurface = () => {
-  waterEntities.forEach((entity) => {
-    viewer.entities.remove(entity);
-  });
-  waterEntities = [];
-
-  if (polygonLngLats.length < 3) return;
-  const entity = viewer.entities.add({
-    polygon: {
-      hierarchy: new Cesium.PolygonHierarchy(
-        polygonLngLats.map((p) => Cesium.Cartesian3.fromDegrees(p.lng, p.lat, 0)),
-      ),
-      perPositionHeight: false,
-      extrudedHeight: new Cesium.CallbackProperty(() => waterLevel.value, false),
-      material: Cesium.Color.fromCssColorString("#00c8ff").withAlpha(0.5),
-    },
-  });
-  waterEntities.push(entity);
-};
-
-/** 按当前水位即时重算 */
-const doUpdate = () => {
-  if (!gridResult) return;
   const result = computeFlood(gridResult, waterLevel.value);
   floodResult.value = result;
-  updateWaterSurface();
-  updateWall();
+  analysisLayer.renderFloodDepth(gridResult, result);
+  viewer?.scene.requestRender();
 };
 
-/** 右键结束绘制 → 采样网格并初始化淹没 */
+const scheduleFloodUpdate = () => {
+  if (!gridReady.value) return;
+  if (updateTimer) {
+    clearTimeout(updateTimer);
+  }
+  updateTimer = window.setTimeout(() => {
+    updateFloodResult();
+    updateTimer = undefined;
+  }, 120);
+};
+
+const applySampledGrid = async (grid: PolygonGridResult, token: number, animate: boolean) => {
+  if (!viewer || !analysisLayer || token !== sampleToken) return;
+
+  const validCount = grid.points.filter((point) => point.inside).length;
+  if (!validCount) {
+    hint.value = "区域内无有效网格，请增大绘制范围或调整间距";
+    floodResult.value = null;
+    gridReady.value = false;
+    return;
+  }
+
+  const sampledBoundary = await sampleTerrainHeights(viewer, polygonLngLats);
+  if (token !== sampleToken) return;
+
+  gridResult = grid;
+  syncSliderRange(grid);
+
+  if (sampledBoundary.length) {
+    positions = sampledBoundary.map((point) =>
+      Cesium.Cartesian3.fromDegrees(point.lng, point.lat, point.height),
+    );
+  }
+
+  analysisLayer.renderAnalysisArea(polygonLngLats, positions, grid);
+
+  waterLevel.value = animate
+    ? sliderMin.value
+    : clamp(waterLevel.value, sliderMin.value, sliderMax.value);
+  gridReady.value = true;
+  updateFloodResult();
+
+  if (animate) {
+    animateWaterTo(getInitialTargetLevel(grid));
+  }
+};
+
+const sampleCurrentPolygon = async (animate = false) => {
+  if (!viewer || polygonLngLats.length < 3) return;
+
+  const token = ++sampleToken;
+  stopWaterAnim();
+  computing.value = true;
+  hint.value = "";
+
+  try {
+    const grid = await samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value);
+    await applySampledGrid(grid, token, animate);
+  } catch (error) {
+    if (token !== sampleToken) return;
+    console.error("网格采样失败:", error);
+    hint.value = "网格采样失败，请重试";
+    floodResult.value = null;
+  } finally {
+    if (token === sampleToken) {
+      computing.value = false;
+    }
+  }
+};
+
+const startDrawing = () => {
+  analysisLayer?.clear();
+  clearRuntimeState();
+  isDrawing = true;
+};
+
 const finishDrawing = () => {
   if (!isMeasuring.value || !isDrawing) return;
-  isDrawing = false;
 
-  // 移除临时标签
-  if (labelEntity) {
-    viewer.entities.remove(labelEntity);
-    labelEntity = null;
-  }
+  isDrawing = false;
+  analysisLayer?.clearVertexLabel();
 
   if (positions.length < 3) {
     hint.value = "至少需要 3 个点才能构成面";
     return;
   }
 
-  polygonLngLats = positions.map((p) => {
-    const carto = Cesium.Cartographic.fromCartesian(p);
-    return {
-      lng: Cesium.Math.toDegrees(carto.longitude),
-      lat: Cesium.Math.toDegrees(carto.latitude),
-    };
-  });
-
-  hint.value = "";
-  computing.value = true;
-  samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value)
-    .then(async (g) => {
-      gridResult = g;
-      // 拾取点可能在椭球面上（地形未加载时），用真实地形高程重建边界顶点，
-      // 否则水墙/水面会埋入地下
-      const boundary = await sampleTerrainHeights(viewer, polygonLngLats);
-      if (boundary.length) {
-        positions = boundary.map((p) =>
-          Cesium.Cartesian3.fromDegrees(p.lng, p.lat, p.height),
-        );
-        rebuildBoundaryEntities();
-      }
-      sliderMin.value = g.minHeight - 1;
-      sliderMax.value = g.maxHeight + 5;
-      // 初始水位取区间 85% 处，从谷底缓动上涨，效果明显
-      waterLevel.value = g.minHeight;
-      gridReady.value = true;
-      doUpdate();
-      animateWaterTo(g.minHeight + (g.maxHeight - g.minHeight) * 0.85);
-    })
-    .catch((error) => {
-      console.error("网格采样失败:", error);
-      hint.value = "网格采样失败，请重试";
-    })
-    .finally(() => {
-      computing.value = false;
-    });
+  polygonLngLats = positions.map(toLonLat);
+  sampleCurrentPolygon(true);
 };
 
-/** 按校正后的边界顶点重建点标记与预览线 */
-const rebuildBoundaryEntities = () => {
-  pointEntities.forEach((entity) => {
-    viewer.entities.remove(entity);
+const handleMapLoaded = (mapViewer: Cesium.Viewer) => {
+  viewer = mapViewer;
+  viewer.scene.globe.depthTestAgainstTerrain = true;
+  analysisLayer = new FloodAnalysisLayer(viewer, {
+    getWaterLevel: () => waterLevel.value,
   });
-  pointEntities = [];
-  positions.forEach((p, i) => {
-    addPointMarker(p, i + 1);
-  });
-  updatePreviewLine();
+  bindMouseEvents();
+  resetCamera();
 };
 
-const handleClickListener = () => {
-  const handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+const bindMouseEvents = () => {
+  if (!viewer) return;
 
-  // 左键点击添加顶点
-  handler.setInputAction(
+  mouseHandler?.destroy();
+  mouseHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+  mouseHandler.setInputAction(
     (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
-      if (!isMeasuring.value) return;
+      if (!viewer || !analysisLayer || !isMeasuring.value) return;
 
       if (!isDrawing) {
-        isDrawing = true;
-        positions = [];
-        floodResult.value = null;
-        hint.value = "";
+        startDrawing();
       }
 
       const cartesian = pickPositionOnMap(viewer, event.position);
@@ -376,91 +397,42 @@ const handleClickListener = () => {
       }
 
       positions.push(cartesian);
-      addPointMarker(cartesian, positions.length);
-      updatePreviewLine();
-
-      // 最后一个点上显示顶点数
-      if (labelEntity) {
-        viewer.entities.remove(labelEntity);
-      }
-      labelEntity = viewer.entities.add({
-        position: cartesian,
-        label: {
-          text: `点${positions.length}`,
-          font: "bold 14pt monospace",
-          fillColor: Cesium.Color.WHITE,
-          outlineColor: Cesium.Color.BLACK,
-          style: Cesium.LabelStyle.FILL_AND_OUTLINE,
-          outlineWidth: 2,
-          verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
-          pixelOffset: new Cesium.Cartesian2(0, -9),
-          disableDepthTestDistance: Number.MAX_VALUE,
-        },
-      });
+      hint.value = "";
+      analysisLayer.drawDraft(positions);
     },
     Cesium.ScreenSpaceEventType.LEFT_CLICK,
   );
 
-  // 右键结束绘制
-  handler.setInputAction(() => {
+  mouseHandler.setInputAction(() => {
     finishDrawing();
   }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
-
-  mouseHandler = handler;
 };
 
-// 水位变化 → 防抖 150ms 重算
 watch(waterLevel, () => {
-  if (!gridReady.value) return;
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-  }
-  debounceTimer = window.setTimeout(() => {
-    doUpdate();
-  }, 150);
+  scheduleFloodUpdate();
 });
 
-// 网格间距变化 → 重新采样
 watch(gridSpacing, () => {
-  if (gridResult && !computing.value) {
-    if (!polygonLngLats.length) return;
-    computing.value = true;
-    samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value)
-      .then((g) => {
-        gridResult = g;
-        sliderMin.value = g.minHeight - 1;
-        sliderMax.value = g.maxHeight + 5;
-        waterLevel.value = g.minHeight + (g.maxHeight - g.minHeight) * 0.85;
-        doUpdate();
-      })
-      .catch((error) => {
-        console.error("网格采样失败:", error);
-      })
-      .finally(() => {
-        computing.value = false;
-      });
+  if (gridReady.value && !computing.value && polygonLngLats.length) {
+    sampleCurrentPolygon(false);
+  }
+});
+
+watch(isMeasuring, (enabled) => {
+  if (!enabled && isDrawing) {
+    isDrawing = false;
+    analysisLayer?.clearDraft();
+    positions = [];
   }
 });
 
 onUnmounted(() => {
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
-  }
-  stopWaterAnim();
-  if (mouseHandler) {
-    mouseHandler.destroy();
-  }
-  if (viewer) {
-    [previewLineEntity, wallEntity, labelEntity].forEach((entity) => {
-      if (entity) viewer.entities.remove(entity);
-    });
-    waterEntities.forEach((entity) => {
-      viewer.entities.remove(entity);
-    });
-    pointEntities.forEach((entity) => {
-      viewer.entities.remove(entity);
-    });
-  }
+  clearRuntimeState();
+  mouseHandler?.destroy();
+  mouseHandler = null;
+  analysisLayer?.destroy();
+  analysisLayer = null;
+  viewer = null;
 });
 </script>
 
@@ -479,7 +451,7 @@ onUnmounted(() => {
   &.box2 {
     left: 5px;
     top: 65px;
-    width: 300px;
+    width: 340px;
   }
 
   .param-item {
@@ -504,6 +476,21 @@ onUnmounted(() => {
       flex: 1;
       margin: 0 8px;
     }
+
+    .water-value {
+      width: 58px;
+      text-align: right;
+    }
+  }
+
+  .button-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+
+    .el-button {
+      margin-left: 0;
+    }
   }
 
   .result-box {
@@ -513,17 +500,21 @@ onUnmounted(() => {
     border-radius: 4px;
 
     .result-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
       margin: 5px 0;
       font-size: 14px;
 
       .label {
         color: #aaa;
-        margin-right: 5px;
+        white-space: nowrap;
       }
 
       .value {
         color: #00eeff;
         font-weight: bold;
+        text-align: right;
       }
     }
   }

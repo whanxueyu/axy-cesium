@@ -82,7 +82,21 @@ export interface FloodResult {
   area: number; // 淹没面积 m²
   volume: number; // 淹没体积 m³
   maxDepth: number; // 最大水深 m
+  averageDepth: number; // 平均水深 m
   floodedCount: number; // 淹没网格数
+  totalCount: number; // 区域内有效网格数
+  coverageRatio: number; // 淹没网格占比，0~1
+  cells: FloodCell[]; // 被淹没的网格明细
+}
+
+export interface FloodCell {
+  row: number;
+  col: number;
+  center: LonLat;
+  terrainHeight: number;
+  depth: number;
+  area: number;
+  volume: number;
 }
 
 // ==================== 常量 ====================
@@ -773,23 +787,45 @@ export function computeCutFill(grid: PolygonGridResult, baseHeight?: number): Cu
  * 淹没计算：地形高程低于水位的网格计入淹没
  */
 export function computeFlood(grid: PolygonGridResult, waterLevel: number): FloodResult {
+  const insidePoints = grid.points.filter((p) => p.inside);
   let area = 0;
   let volume = 0;
   let maxDepth = 0;
   let floodedCount = 0;
+  const cells: FloodCell[] = [];
 
-  grid.points.forEach((p) => {
-    if (!p.inside) return;
+  insidePoints.forEach((p) => {
     const depth = waterLevel - p.height;
     if (depth > 0) {
+      const cellArea = grid.cellArea;
+      const cellVolume = depth * cellArea;
       floodedCount++;
-      area += grid.cellArea;
-      volume += depth * grid.cellArea;
+      area += cellArea;
+      volume += cellVolume;
       if (depth > maxDepth) maxDepth = depth;
+      cells.push({
+        row: p.row,
+        col: p.col,
+        center: { lng: p.lng, lat: p.lat },
+        terrainHeight: p.height,
+        depth,
+        area: cellArea,
+        volume: cellVolume,
+      });
     }
   });
 
-  return { waterLevel, area, volume, maxDepth, floodedCount };
+  return {
+    waterLevel,
+    area,
+    volume,
+    maxDepth,
+    averageDepth: area > 0 ? volume / area : 0,
+    floodedCount,
+    totalCount: insidePoints.length,
+    coverageRatio: insidePoints.length ? floodedCount / insidePoints.length : 0,
+    cells,
+  };
 }
 
 /**
