@@ -5,10 +5,10 @@
     <!-- Hero Section -->
     <div class="hero-section">
       <div class="hero-content">
-        <h1 class="hero-title">3D Visualization Case Platform</h1>
-        <h2 class="hero-subtitle">Digital Twin · GIS Development · Learning Improvement</h2>
+        <h1 class="hero-title">3D可视化案例平台</h1>
+        <h2 class="hero-subtitle">数字孪生 · GIS开发 · 学习进阶</h2>
         <div class="hero-description">
-          Basic Cesium Demo · Advanced Learning · Comprehensive Case Presentation · Common Communication & Exchange
+          Cesium基础示例 · 进阶学习 · 综合案例展示 · 共同交流探讨
         </div>
       </div>
     </div>
@@ -31,8 +31,8 @@
 
     <!-- Innovation Section -->
     <div class="innovation-section">
-      <h2 class="section-title">Continuously Updated Features and Cases</h2>
-      <p class="section-subtitle">Years of technical accumulation, innovative products, forming technical advantages</p>
+      <h2 class="section-title">持续更新的功能与案例</h2>
+      <p class="section-subtitle">多年的技术积累，创新的产品，形成技术优势</p>
 
       <el-row :gutter="20" class="mt-8">
         <el-col :span="8" v-for="(service, index) in services" :key="index">
@@ -43,6 +43,31 @@
           </el-card>
         </el-col>
       </el-row>
+    </div>
+
+    <!-- Case Showcase Section -->
+    <div class="case-showcase-section">
+      <h2 class="section-title">精选功能示例</h2>
+      <p class="section-subtitle">从基础图层到复杂特效，丰富示例等你探索</p>
+
+      <el-row :gutter="20">
+        <el-col :xs="24" :sm="12" :md="6" v-for="caseItem in showcaseCases" :key="caseItem.title">
+          <el-card class="showcase-card" shadow="hover" @click="openCase(caseItem.path)">
+            <div class="showcase-image-wrapper">
+              <img :src="caseItem.imgurl" :alt="caseItem.title" class="showcase-image" loading="lazy">
+            </div>
+            <h3>{{ caseItem.title }}</h3>
+            <p>{{ caseItem.description }}</p>
+          </el-card>
+        </el-col>
+      </el-row>
+
+      <div class="showcase-more">
+        <el-button type="primary" round size="large" @click="goToCases">
+          查看更多案例
+          <el-icon class="el-icon--right"><ArrowRight /></el-icon>
+        </el-button>
+      </div>
     </div>
 
     <!-- Floating Action Buttons -->
@@ -66,8 +91,10 @@
 </template>
 
 <script setup lang="ts">
-import { InfoFilled, Comment, Monitor, Finished, MagicStick, ElementPlus } from '@element-plus/icons-vue'
+import { InfoFilled, Comment, Monitor, Finished, MagicStick, ElementPlus, ArrowRight } from '@element-plus/icons-vue'
 import Header from "./header.vue"
+import router from '@/router'
+import { caseList } from '@/data/caseList'
 interface Feature {
   icon: any;
   title: string;
@@ -80,46 +107,79 @@ interface Service {
   description: string;
 }
 
+interface ShowcaseCase {
+  imgurl: string;
+  title: string;
+  description: string;
+  path: string;
+}
+
 const features: Feature[] = [
   {
     icon: Monitor,
-    title: 'Easy to Read',
-    description: 'The function of the code is concise and easy to understand'
+    title: '通俗易懂',
+    description: '代码功能简洁明了，易于理解'
   },
   {
     icon: Finished,
-    title: 'Friendly Guidance',
-    description: 'From difficult to easy, step by step to guide the progress'
+    title: '友好指引',
+    description: '由难到易，循序渐进引导学习进度'
   },
   {
     icon: MagicStick,
-    title: 'Simple Popularization',
-    description: 'Using Vue3 based on element-plus framework'
+    title: '简单普及',
+    description: '基于 Vue3 + element-plus 框架开发'
   },
   {
     icon: ElementPlus,
-    title: 'Innovative Ideas',
-    description: 'Creative ideas and implementation methods'
+    title: '创新思维',
+    description: '富有创意的想法和实现方式'
   }
 ]
 
 const services: Service[] = [
   {
     image: 'case',
-    title: 'Lots of cases',
-    description: 'A large number of use cases, combined with practical application scenarios'
+    title: '案例丰富',
+    description: '大量使用案例，结合实际应用场景'
   },
   {
     image: 'understand',
-    title: 'In-depth understanding',
-    description: 'Step-by-step difficulty and easy-to-understand code'
+    title: '深入理解',
+    description: '难度循序渐进，代码通俗易懂'
   },
   {
     image: 'communicate',
-    title: 'Online Community',
-    description: 'On-line technology exchange group with like-minded friends together exchange'
+    title: '在线社区',
+    description: '线上技术交流群，与志同道合的朋友一起交流'
   }
 ]
+
+const getCaseItem = (type: string, title: string) => {
+  return caseList.find(c => c.type === type)?.list.find(i => i.title === title)
+}
+
+const showcaseCases: ShowcaseCase[] = [
+  getCaseItem('radar', '电光球体雷达'),
+  getCaseItem('polyline', '边界发光线'),
+  getCaseItem('model', '倾斜摄影模型加载'),
+  getCaseItem('model', '模型编辑'),
+  getCaseItem('billboard', 'entity标牌聚合效果'),
+  getCaseItem('camera', '相机平滑飞入'),
+  getCaseItem('skybox', '天空盒'),
+  getCaseItem('layers', '夜晚地图')
+].filter((item): item is ShowcaseCase => Boolean(item))
+
+const goToCases = () => {
+  router.push('/basicCase')
+}
+
+const openCase = (path: string) => {
+  if (path) {
+    const url = router.resolve({ path });
+    window.open(url.href);
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -261,6 +321,67 @@ const services: Service[] = [
   &.understand {
     background-image: url('@/assets/images/home/understand.png');
   }
+}
+
+.case-showcase-section {
+  max-width: 1200px;
+  margin: 100px auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.showcase-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  transition: transform 0.3s;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.showcase-card:hover {
+  transform: translateY(-10px);
+  border-color: #409EFF;
+}
+
+.showcase-image-wrapper {
+  width: 100%;
+  height: 140px;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.showcase-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.showcase-card:hover .showcase-image {
+  transform: scale(1.1);
+}
+
+.showcase-card h3 {
+  color: #409EFF;
+  margin-bottom: 0.5rem;
+}
+
+.showcase-card p {
+  font-size: 0.9rem;
+  color: #c0c4cc;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.showcase-more {
+  margin-top: 3rem;
 }
 
 .floating-buttons {

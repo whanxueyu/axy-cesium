@@ -6,12 +6,12 @@
                 <span class="text-xl font-bold">AXY-Cesium</span>
             </div>
             <el-menu mode="horizontal" class="nav-menu" :default-active="activeIndex" @select="handleSelect">
-                <el-menu-item index="1">Home</el-menu-item>
-                <el-menu-item index="2">Example</el-menu-item>
-                <el-menu-item index="3">Projects</el-menu-item>
-                <el-menu-item index="4">Documentation</el-menu-item>
-                <el-menu-item index="5">Download</el-menu-item>
-                <el-menu-item index="6">Support</el-menu-item>
+                <el-menu-item index="1">首页</el-menu-item>
+                <el-menu-item index="2">功能示例</el-menu-item>
+                <el-menu-item index="3">项目案例</el-menu-item>
+                <!-- <el-menu-item index="4">Documentation</el-menu-item> -->
+                <!-- <el-menu-item index="5">Download</el-menu-item> -->
+                <el-menu-item index="6">合作联系</el-menu-item>
             </el-menu>
         </div>
     </el-header>
@@ -39,6 +39,8 @@ const handleSelect = (key: string) => {
         router.push('/basicCase');
     } else if (key === '3') {
         router.push('/projects');
+    } else if (key === '6') {
+        router.push('/contact');
     }
     // else if (key === '4') {
     //   router.push('/documentation');
@@ -87,6 +89,7 @@ const handleSelect = (key: string) => {
 .nav-menu {
     background: transparent;
     border: none;
+    width: 460px;
 }
 
 :deep(.el-menu--horizontal .el-menu-item) {

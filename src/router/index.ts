@@ -5,6 +5,7 @@ import Home from '../views/Home.vue';
 import basicCase from '../views/basicCase.vue';
 import ComprehensiveCase from '../views/ComprehensiveCase.vue';
 import Projects from '../views/projects.vue';
+import Contact from '../views/contact.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -353,6 +354,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/projects',
     name: 'projects',
     component: Projects
+  },
+  {
+    path: '/contact',
+    name: 'contact',
+    component: Contact
   }
 ];
 
