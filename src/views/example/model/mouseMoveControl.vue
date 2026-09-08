@@ -211,8 +211,8 @@ const addModel = () => {
 };
 
 // 点击特效：在点击处显示扩散涟漪圆环和目标点标记
-const RIPPLE_DURATION = 1.5; // 涟漪动画时长：秒
-const RIPPLE_MAX_RADIUS = 40; // 涟漪最大半径：米
+const RIPPLE_DURATION = 0.5; // 涟漪动画时长：秒
+const RIPPLE_MAX_RADIUS = 20; // 涟漪最大半径：米
 const showClickEffect = (position: Cesium.Cartesian3) => {
   // 移除上一次的特效
   if (rippleEntity) {
