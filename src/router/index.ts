@@ -358,6 +358,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'area',
         component: () => import('@/views/example/analysis/area.vue')
       },
+      {
+        path: '/example/cutfill',
+        name: 'cutfill',
+        component: () => import('@/views/example/analysis/cutfill.vue')
+      },
     ]
   },
   {
