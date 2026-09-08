@@ -363,6 +363,26 @@ const routes: Array<RouteRecordRaw> = [
         name: 'cutfill',
         component: () => import('@/views/example/analysis/cutfill.vue')
       },
+      {
+        path: '/example/profile',
+        name: 'profile',
+        component: () => import('@/views/example/analysis/profile.vue')
+      },
+      {
+        path: '/example/viewshed',
+        name: 'viewshed',
+        component: () => import('@/views/example/analysis/viewshed.vue')
+      },
+      {
+        path: '/example/slope',
+        name: 'slope',
+        component: () => import('@/views/example/analysis/slope.vue')
+      },
+      {
+        path: '/example/flood',
+        name: 'flood',
+        component: () => import('@/views/example/analysis/flood.vue')
+      },
     ]
   },
   {

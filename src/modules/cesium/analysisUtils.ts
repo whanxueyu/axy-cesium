@@ -119,7 +119,15 @@ export function pickPositionOnMap(
   const ray = viewer.camera.getPickRay(windowPosition);
   if (!ray) return undefined;
 
-  return viewer.scene.globe.pick(ray, viewer.scene) ?? undefined;
+  const picked = viewer.scene.globe.pick(ray, viewer.scene);
+  if (!picked) return undefined;
+
+  // 瓦片未加载时 globe.pick 可能命中地球背面（高度为负数千公里），
+  // 这类点会导致实体被埋入地下或跨半球，直接丢弃
+  const carto = Cesium.Cartographic.fromCartesian(picked);
+  if (carto.height < -1000) return undefined;
+
+  return picked;
 }
 
 // ==================== 地形采样 ====================
