@@ -624,8 +624,8 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('analysis', 'viewshed'),
-        title: '通视分析',
-        description: '两点之间通视性分析，可视域分析',
+        title: '可视域分析',
+        description: '带视椎体和视线效果的可视域分析',
         path: '/example/viewshed'
       },
       {
