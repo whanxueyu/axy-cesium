@@ -276,6 +276,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/model/moveControl.vue')
       },
       {
+        path: '/example/mouseMoveControl',
+        name: 'mouseMoveControl',
+        component: () => import('@/views/example/model/mouseMoveControl.vue')
+      },
+      {
         path: '/example/animation',
         name: 'animation',
         component: () => import('@/views/example/model/animation.vue')

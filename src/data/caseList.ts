@@ -65,6 +65,7 @@ const imageResources = {
     cityModel: 'cityModel.png',
     pathTracking: 'pathTracking.png',
     moveControl:'moveControl.png',
+    mouseMoveControl:'mouseMoveControl.png',
     animation: 'animation.png',
   },
   radar: {
@@ -461,9 +462,15 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('model', 'moveControl'),
-        title: '模型移动控制',
-        description: '键盘控制模型移动方向，支持 WASD 键和方向键',
+        title: '键盘控制模型移动',
+        description: '键盘控制模型移动方向，支持 WASD 键和方向键，按一次方向模型持续朝该方向移动',
         path: '/example/moveControl'
+      },
+      {
+        imgurl: getImagePath('model', 'mouseMoveControl'),
+        title: '鼠标控制模型移动',
+        description: '点击地图任意位置，模型自动走向点击处，移动中可随时点击改道',
+        path: '/example/mouseMoveControl'
       },
       // {
       //   imgurl: getImagePath('model', 'animation'),
