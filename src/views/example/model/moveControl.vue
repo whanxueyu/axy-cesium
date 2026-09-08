@@ -7,7 +7,7 @@
     </div>
     <div class="menucell">
       <div>
-        <span>模型移动控制：</span>
+        <span>键盘控制模型移动：</span>
         <el-switch
           v-model="isAnimation"
           width="80"
@@ -39,7 +39,7 @@
           <el-button
             size="large"
             :class="{ active: activeDirection === 'up' }"
-            @mousedown="handleDirection('up')"
+            @mousedown.prevent="handleDirection('up')"
             @touchstart.prevent="handleDirection('up')"
           >
             <el-icon size="28" :color="currentDirection === 'up' ? '#40feff' : ''"><Arrow-Up /></el-icon>
@@ -49,7 +49,7 @@
           <el-button
             size="large"
             :class="{ active: activeDirection === 'left' }"
-            @mousedown="handleDirection('left')"
+            @mousedown.prevent="handleDirection('left')"
             @touchstart.prevent="handleDirection('left')"
           >
             <el-icon size="28" :color="currentDirection === 'left' ? '#40feff' : ''"><Arrow-Left /></el-icon>
@@ -57,7 +57,7 @@
           <el-button
             size="large"
             :class="{ active: activeDirection === 'down' }"
-            @mousedown="handleDirection('down')"
+            @mousedown.prevent="handleDirection('down')"
             @touchstart.prevent="handleDirection('down')"
           >
             <el-icon size="28" :color="currentDirection === 'down' ? '#40feff' : ''"><Arrow-Down /></el-icon>
@@ -65,14 +65,14 @@
           <el-button
             size="large"
             :class="{ active: activeDirection === 'right' }"
-            @mousedown="handleDirection('right')"
+            @mousedown.prevent="handleDirection('right')"
             @touchstart.prevent="handleDirection('right')"
           >
             <el-icon size="28" :color="currentDirection === 'right' ? '#40feff' : ''"><Arrow-Right /></el-icon>
           </el-button>
         </div>
       </div>
-      <div>操作说明：使用 W A S D 或 ↑ ↓ ← → 控制模型移动</div>
+      <div>操作说明：开启移动后模型自动前进，按 W A S D 或 ↑ ↓ ← → 键、或点击方向按钮，模型立即转向该方向持续移动</div>
     </div>
     <div v-if="!showPanel" class="hideicon" @click="handleShowPanel">
       <el-icon size="30">
@@ -96,30 +96,69 @@ import {
 } from "@element-plus/icons-vue";
 import Map from "@/components/cesium/map.vue";
 
-var viewer: Cesium.Viewer;
+let viewer: Cesium.Viewer;
 const showPanel = ref(true);
-const modelEntity = ref<Cesium.Entity | null>(null);
 const isAnimation = ref(false);
 const multer = ref(1);
-let keyboardHandler: any = null;
-let positionProperty: Cesium.SampledPositionProperty | null = null;
-let currentDirection = ref("up");
+// 当前移动方向，模型持续朝该方向移动
+const currentDirection = ref("up");
+// 按钮按下的高亮方向
 const activeDirection = ref("");
-let lastLongitude = 117.210698;
-let lastLatitude = 38.617627;
-let lastHeight = 0;
-let nextTime: Cesium.JulianDate | null = null;
-let hasPendingPoint = false;
+
+let modelEntity: Cesium.Entity | null = null;
+let positionProperty: Cesium.ConstantPositionProperty | null = null;
+let orientationProperty: Cesium.ConstantProperty | null = null;
+let removeTickListener: (() => void) | null = null;
+let keydownHandler: ((event: KeyboardEvent) => void) | null = null;
+
+// 模型当前位置（ECEF 笛卡尔坐标）
+let currentPosition = Cesium.Cartesian3.fromDegrees(117.210698, 38.617627, 0);
+// 上一帧时间，用于计算帧间隔 dt
+let lastTickTime: Cesium.JulianDate | null = null;
+
+// 移动速度：度/秒
+const SPEED = 0.0001;
+
+// 各方向对应的经纬度单位增量
+const DIRECTION_VECTORS: Record<string, { dLon: number; dLat: number }> = {
+  up: { dLon: 0, dLat: 1 },
+  down: { dLon: 0, dLat: -1 },
+  left: { dLon: -1, dLat: 0 },
+  right: { dLon: 1, dLat: 0 },
+};
+
+// 根据移动方向计算模型朝向。
+// Cesium 模型前方向为 +X，而 headingPitchRollQuaternion 中 heading 为 0 时
+// 模型面朝正东，因此需在移动方向方位角的基础上减 π/2，
+// 使模型面朝移动方向（与原 VelocityOrientationProperty 效果一致）。
+const getHeading = (dLon: number, dLat: number, latitude: number) =>
+  Math.atan2(dLon * Math.cos(latitude), dLat) - Cesium.Math.PI_OVER_TWO;
+
+const keyToDirection = (key: string): string | null => {
+  switch (key.toLowerCase()) {
+    case "w":
+    case "arrowup":
+      return "up";
+    case "s":
+    case "arrowdown":
+      return "down";
+    case "a":
+    case "arrowleft":
+      return "left";
+    case "d":
+    case "arrowright":
+      return "right";
+    default:
+      return null;
+  }
+};
 
 const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
   viewer = MapViewer;
-  viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+  viewer.clock.clockRange = Cesium.ClockRange.UNBOUNDED;
 
   const startTime = new Date().getTime();
   viewer.clock.startTime = Cesium.JulianDate.fromDate(new Date(startTime));
-  viewer.clock.stopTime = Cesium.JulianDate.fromDate(
-    new Date(startTime + 3600000)
-  );
   viewer.clock.currentTime = viewer.clock.startTime.clone();
   viewer.clock.shouldAnimate = false;
   viewer.clock.multiplier = 1;
@@ -128,95 +167,76 @@ const handleMapLoaded = (MapViewer: Cesium.Viewer) => {
   addModel();
   setupKeyboardListener();
 
-  // 监听时钟跳动，持续添加新坐标点
-  viewer.clock.onTick.addEventListener(() => {
-    if (!isAnimation.value || !positionProperty || !nextTime || hasPendingPoint)
+  // 每帧根据当前方向直接更新模型位置：
+  // 不再预生成未来路径点，按下方向键下一帧即转向，无延迟
+  removeTickListener = viewer.clock.onTick.addEventListener(() => {
+    const time = viewer.clock.currentTime;
+    const dt = lastTickTime
+      ? Cesium.JulianDate.secondsDifference(time, lastTickTime)
+      : 0;
+    lastTickTime = time.clone();
+
+    // 时钟恢复后的第一帧 dt 异常大，跳过该帧
+    if (
+      !isAnimation.value ||
+      !modelEntity ||
+      !positionProperty ||
+      !orientationProperty ||
+      dt <= 0
+    )
       return;
 
-    const currentTime = viewer.clock.currentTime;
-    const timeDiff = Cesium.JulianDate.secondsDifference(nextTime, currentTime);
+    // 页面卡顿/节流时 dt 可能很大，限制单帧步长防止瞬移
+    const stepDt = Math.min(dt, 0.5);
 
-    // 当未来的路径点只剩 1 秒时，添加下一个点
-    if (timeDiff <= 0.5) {
-      const speed = 0.0001 * (multer.value === 0 ? 1 : multer.value);
-      let newLongitude = lastLongitude;
-      let newLatitude = lastLatitude;
+    // 持续朝当前方向移动
+    const dir = DIRECTION_VECTORS[currentDirection.value];
+    const step = SPEED * multer.value * stepDt;
+    const carto = Cesium.Cartographic.fromCartesian(currentPosition);
+    currentPosition = Cesium.Cartesian3.fromRadians(
+      carto.longitude + Cesium.Math.toRadians(dir.dLon * step),
+      carto.latitude + Cesium.Math.toRadians(dir.dLat * step),
+      0
+    );
+    positionProperty.setValue(currentPosition);
 
-      // 根据当前方向计算新位置
-      switch (currentDirection.value) {
-        case "up":
-          newLatitude += speed;
-          break;
-        case "down":
-          newLatitude -= speed;
-          break;
-        case "left":
-          newLongitude -= speed;
-          break;
-        case "right":
-          newLongitude += speed;
-          break;
-      }
-
-      // 下一秒的时间点
-      const futureTime = Cesium.JulianDate.addSeconds(
-        nextTime,
-        1,
-        new Cesium.JulianDate()
-      );
-      const futurePos = Cesium.Cartesian3.fromDegrees(
-        newLongitude,
-        newLatitude,
-        lastHeight
-      );
-      positionProperty.addSample(futureTime, futurePos);
-
-      lastLongitude = newLongitude;
-      lastLatitude = newLatitude;
-      nextTime = futureTime;
-      hasPendingPoint = true;
-
-      // 0.5 秒后允许继续添加
-      setTimeout(() => {
-        hasPendingPoint = false;
-      }, 200);
-    }
+    // 朝向与移动方向一致
+    orientationProperty.setValue(
+      Cesium.Transforms.headingPitchRollQuaternion(
+        currentPosition,
+        new Cesium.HeadingPitchRoll(
+          getHeading(dir.dLon, dir.dLat, carto.latitude),
+          0,
+          0
+        )
+      )
+    );
   });
 };
 
 const addModel = () => {
-  if (modelEntity.value) {
-    viewer.entities.remove(modelEntity.value);
+  if (modelEntity) {
+    viewer.entities.remove(modelEntity);
   }
 
-  positionProperty = new Cesium.SampledPositionProperty();
+  // 重置模型位置与状态，初始朝北（up）移动
+  currentPosition = Cesium.Cartesian3.fromDegrees(117.210698, 38.617627, 0);
+  lastTickTime = null;
+  currentDirection.value = "up";
+  activeDirection.value = "";
 
-  // 初始化：添加当前时刻的起始点
-  const currentTime = viewer.clock.currentTime;
-  const initialPos = Cesium.Cartesian3.fromDegrees(
-    lastLongitude,
-    lastLatitude,
-    lastHeight
+  positionProperty = new Cesium.ConstantPositionProperty(currentPosition);
+  orientationProperty = new Cesium.ConstantProperty(
+    Cesium.Transforms.headingPitchRollQuaternion(
+      currentPosition,
+      // heading -π/2 对应面朝正北
+      new Cesium.HeadingPitchRoll(-Cesium.Math.PI_OVER_TWO, 0, 0)
+    )
   );
-  positionProperty.addSample(currentTime, initialPos);
 
-  // 预先添加未来 3 秒的点，保证模型不会消失
-  nextTime = currentTime.clone();
-  for (let i = 1; i <= 3; i++) {
-    nextTime = Cesium.JulianDate.addSeconds(
-      nextTime,
-      1,
-      new Cesium.JulianDate()
-    );
-    const lat = lastLatitude + i * 0.0001;
-    const pos = Cesium.Cartesian3.fromDegrees(lastLongitude, lat, lastHeight);
-    positionProperty.addSample(nextTime, pos);
-  }
-  lastLatitude = lastLatitude + 3 * 0.0001;
-
-  let model = viewer.entities.add({
+  const model = viewer.entities.add({
     position: positionProperty,
-    orientation: new Cesium.VelocityOrientationProperty(positionProperty),
+    orientation: orientationProperty,
     name: "Cesium_Man",
     model: {
       scale: 16,
@@ -230,146 +250,39 @@ const addModel = () => {
       silhouetteSize: 2.0,
     },
   });
-  modelEntity.value = model;
+  modelEntity = model;
 };
+
+// 切换移动方向：下一帧立即生效
 const handleDirection = (direction: string) => {
-  if (
-    !modelEntity.value ||
-    !isAnimation.value ||
-    !positionProperty ||
-    !nextTime
-  )
-    return;
-
-  const speed = 0.0001 * (multer.value === 0 ? 1 : multer.value);
-  let newLongitude = lastLongitude;
-  let newLatitude = lastLatitude;
-
-  switch (direction) {
-    case "up":
-      newLatitude += speed;
-      activeDirection.value = "up";
-      break;
-    case "down":
-      newLatitude -= speed;
-      activeDirection.value = "down";
-      break;
-    case "left":
-      newLongitude -= speed;
-      activeDirection.value = "left";
-      break;
-    case "right":
-      newLongitude += speed;
-      activeDirection.value = "right";
-      break;
-  }
-
-  // 计算下一的时间点
-  const futureTime = Cesium.JulianDate.addSeconds(
-    viewer.clock.currentTime,
-    0.2,
-    new Cesium.JulianDate()
-  );
-
-  // 添加下一秒的位置到路径中
-  const futurePos = Cesium.Cartesian3.fromDegrees(
-    newLongitude,
-    newLatitude,
-    lastHeight
-  );
-  positionProperty.addSample(futureTime, futurePos);
-
-  // 更新状态
-  lastLongitude = newLongitude;
-  lastLatitude = newLatitude;
-  nextTime = futureTime;
-  hasPendingPoint = true;
+  if (!isAnimation.value) return;
   currentDirection.value = direction;
+  activeDirection.value = direction;
   // 0.5 秒后恢复按钮状态
   setTimeout(() => {
-    activeDirection.value = "";
-    hasPendingPoint = false;
+    if (activeDirection.value === direction) {
+      activeDirection.value = "";
+    }
   }, 500);
 };
 
 const setupKeyboardListener = () => {
-  keyboardHandler = (event: KeyboardEvent) => {
-    if (
-      !modelEntity.value ||
-      !isAnimation.value ||
-      !positionProperty ||
-      !nextTime
-    )
-      return;
-
-    const speed = 0.0001 * (multer.value === 0 ? 1 : multer.value);
-    let newLongitude = lastLongitude;
-    let newLatitude = lastLatitude;
-    let direction = "";
-
-    switch (event.key.toLowerCase()) {
-      case "w":
-      case "arrowup":
-        newLatitude += speed;
-        direction = "up";
-        break;
-      case "s":
-      case "arrowdown":
-        newLatitude -= speed;
-        direction = "down";
-        break;
-      case "a":
-      case "arrowleft":
-        newLongitude -= speed;
-        direction = "left";
-        break;
-      case "d":
-      case "arrowright":
-        newLongitude += speed;
-        direction = "right";
-        break;
-      default:
-        return;
-    }
-
-    currentDirection.value = direction;
-    activeDirection.value = direction;
-
-    // 计算下一秒的时间点
-    const futureTime = Cesium.JulianDate.addSeconds(
-      nextTime,
-      1,
-      new Cesium.JulianDate()
-    );
-
-    // 添加下一秒的位置到路径中
-    const futurePos = Cesium.Cartesian3.fromDegrees(
-      newLongitude,
-      newLatitude,
-      lastHeight
-    );
-    positionProperty.addSample(futureTime, futurePos);
-
-    // 更新状态
-    lastLongitude = newLongitude;
-    lastLatitude = newLatitude;
-    nextTime = futureTime;
-    hasPendingPoint = true;
-
-    // 0.5 秒后恢复按钮状态
-    setTimeout(() => {
-      activeDirection.value = "";
-      hasPendingPoint = false;
-    }, 500);
+  keydownHandler = (event: KeyboardEvent) => {
+    const direction = keyToDirection(event.key);
+    if (!direction) return;
+    event.preventDefault(); // 阻止方向键滚动页面
+    if (event.repeat) return;
+    handleDirection(direction);
   };
-
-  document.addEventListener("keydown", keyboardHandler);
+  document.addEventListener("keydown", keydownHandler);
 };
 
 const handleAnimationChange = (val: boolean) => {
-  viewer.clock.shouldAnimate = val;
   isAnimation.value = val;
-  if (val && !modelEntity.value) {
+  viewer.clock.shouldAnimate = val;
+  if (!val) {
+    activeDirection.value = "";
+  } else if (!modelEntity) {
     addModel();
   }
 };
@@ -395,9 +308,8 @@ const reset = () => {
 };
 
 onUnmounted(() => {
-  if (keyboardHandler) {
-    document.removeEventListener("keydown", keyboardHandler);
-  }
+  if (removeTickListener) removeTickListener();
+  if (keydownHandler) document.removeEventListener("keydown", keydownHandler);
 });
 </script>
 
