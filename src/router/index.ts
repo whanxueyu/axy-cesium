@@ -353,6 +353,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'height',
         component: () => import('@/views/example/analysis/height.vue')
       },
+      {
+        path: '/example/area',
+        name: 'area',
+        component: () => import('@/views/example/analysis/area.vue')
+      },
     ]
   },
   {

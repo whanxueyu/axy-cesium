@@ -33,7 +33,7 @@ const props = defineProps({
   // 默认地图类型
   mapType: {
     type: String,
-    default: "tdt",
+    default: "gd",
   },
   destination: {
     type: Object,
