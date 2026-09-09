@@ -165,7 +165,7 @@ const updatePreviewLine = () => {
       positions: [...positions],
       width: 3,
       material: new Cesium.PolylineGlowMaterialProperty({
-        color: Cesium.Color.YELLOW,
+        color: Cesium.Color.BLUE,
         glowPower: 0.3,
       }),
       clampToGround: false,

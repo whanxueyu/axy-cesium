@@ -316,6 +316,27 @@ const routes: Array<RouteRecordRaw> = [
         name: 'ellipsoidRadar',
         component: () => import('@/views/example/radar/ellipsoidRadar.vue')
       },
+      // material
+      {
+        path: '/example/weatherRain',
+        name: 'weatherRain',
+        component: () => import('@/views/example/material/rain.vue')
+      },
+      {
+        path: '/example/weatherSnow',
+        name: 'weatherSnow',
+        component: () => import('@/views/developing.vue')
+      },
+      {
+        path: '/example/weatherFog',
+        name: 'weatherFog',
+        component: () => import('@/views/developing.vue')
+      },
+      {
+        path: '/example/weatherLightning',
+        name: 'weatherLightning',
+        component: () => import('@/views/developing.vue')
+      },
       // camera
       {
         path: '/example/smoothFly',
