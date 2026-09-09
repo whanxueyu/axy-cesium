@@ -80,7 +80,11 @@ const imageResources = {
     postProcess: 'postProcess.png',
     heatmap: 'heatmap.png',
     terrain: 'terrain.png',
-    weather: 'weather.png'
+    weather: 'weather.png',
+    rain: 'rain.png',
+    snow: 'snow.png',
+    fog: 'fog.png',
+    lightning: 'lightning.png'
   },
   analysis: {
     position: 'position.png',
@@ -527,10 +531,28 @@ export var caseList = [
     type: 'material',
     list: [
       {
-        imgurl: getImagePath('material', 'weather'),
-        title: '天气效果',
-        description: '雨雪雾动态天气模拟与切换',
-        path: '/example/weatherEffects'
+        imgurl: getImagePath('material', 'rain'),
+        title: '雨效果',
+        description: '基于重力与风向的三维雨场，支持雨量、雨速及远近层次调节',
+        path: '/example/weatherRain'
+      },
+      {
+        imgurl: getImagePath('material', 'snow'),
+        title: '雪效果',
+        description: '雪花飘落与寒冷氛围模拟',
+        path: '/example/weatherSnow'
+      },
+      {
+        imgurl: getImagePath('material', 'fog'),
+        title: '雾效果',
+        description: '近地雾、远景雾化与能见度模拟',
+        path: '/example/weatherFog'
+      },
+      {
+        imgurl: getImagePath('material', 'lightning'),
+        title: '闪电效果',
+        description: '闪电照明与雷暴天空模拟',
+        path: '/example/weatherLightning'
       },
       {
         imgurl: getImagePath('material', 'heatmap'),

@@ -325,7 +325,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/example/weatherSnow',
         name: 'weatherSnow',
-        component: () => import('@/views/developing.vue')
+        component: () => import('@/views/example/material/snow.vue')
       },
       {
         path: '/example/weatherFog',
