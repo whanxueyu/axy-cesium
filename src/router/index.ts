@@ -330,7 +330,7 @@ const routes: Array<RouteRecordRaw> = [
       {
         path: '/example/weatherFog',
         name: 'weatherFog',
-        component: () => import('@/views/developing.vue')
+        component: () => import('@/views/example/material/fog.vue')
       },
       {
         path: '/example/weatherLightning',

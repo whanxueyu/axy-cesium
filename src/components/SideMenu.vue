@@ -1,7 +1,7 @@
 <template>
     <div class="side-menu-section">
-        <div v-for="cat in caseList" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
-            <div  class="menu-item-text"  @click.prevent="handleMenuClick(cat.type)"  :class="{ active: activeSection === cat.type }" >
+        <div v-for="cat in caseList" @click.prevent="handleMenuClick(cat.type)" :class="['menu-item', { active: activeSection === cat.type }]" :key="cat.type">
+            <div  class="menu-item-text" :class="{ active: activeSection === cat.type }" >
             {{ cat.title }}<i>（{{ cat.list.length}}）</i>
             </div>
         </div>
@@ -75,6 +75,7 @@ onUnmounted(() => {
     color: #fff;
     height: calc(100vh - 60px);
     padding: 10px;
+    text-align: start;
 }
 
 .github {
