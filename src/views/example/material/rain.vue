@@ -6,8 +6,6 @@
       :orientation="cameraOrientation"
       :duration="1.2"
       :loadTerrain="false"
-      :showStatusBar="false"
-      :showCompass="false"
       @loaded="handleMapLoaded"
     ></Map>
     <canvas ref="rainCanvasRef" class="rain-canvas"></canvas>
