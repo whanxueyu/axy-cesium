@@ -533,19 +533,19 @@ export var caseList = [
       {
         imgurl: getImagePath('material', 'rain'),
         title: '雨效果',
-        description: '基于重力与风向的三维雨场，支持雨量、雨速及远近层次调节',
+        description: '基于后处理与风场扰动的雨幕效果，支持雨量、雨速、风向和远近层次调节',
         path: '/example/weatherRain'
       },
       {
         imgurl: getImagePath('material', 'snow'),
         title: '雪效果',
-        description: '雪花飘落与寒冷氛围模拟',
+        description: '局部深度感知降雪与地形积雪效果，支持风向、速度、覆盖范围和积雪增长调节',
         path: '/example/weatherSnow'
       },
       {
         imgurl: getImagePath('material', 'fog'),
         title: '雾效果',
-        description: '近地雾、远景雾化与能见度模拟',
+        description: '基于场景深度的近地雾和远景雾化效果，支持浓度、能见度和高度衰减控制',
         path: '/example/weatherFog'
       },
       {
