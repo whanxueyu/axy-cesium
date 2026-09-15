@@ -1,7 +1,10 @@
 import defaultImg from '@/assets/images/home/todo.png';
 
 type ImageImport = Record<string, { default: string }>;
-const exampleImages = import.meta.glob('@/assets/images/example/*.png', { eager: true }) as ImageImport;
+const exampleImages = {
+  ...import.meta.glob('@/assets/images/example/*.png', { eager: true }),
+  ...import.meta.glob('@/assets/images/example/*.jpg', { eager: true })
+} as ImageImport;
 
 const imageResources = {
   layers: {
@@ -121,7 +124,11 @@ type ImageName<T extends ImageCategory> = keyof typeof imageResources[T];
 const getImagePath = <T extends ImageCategory>(category: T, name: ImageName<T>): string => {
   const fileName = imageResources[category][name];
   if (fileName) {
-    let filePath = exampleImages[`/src/assets/images/example/${fileName}`];
+    const imageKey = `/src/assets/images/example/${fileName}`;
+    let filePath = exampleImages[imageKey];
+    if (!filePath && fileName.endsWith('.png')) {
+      filePath = exampleImages[imageKey.replace(/\.png$/, '.jpg')];
+    }
     if (filePath) {
       return filePath.default;
     } else {

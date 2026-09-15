@@ -32,7 +32,7 @@
           <el-icon size="18">
             <Cloudy />
           </el-icon>
-          <span>程序化雪</span>
+          <span>降雪积雪效果</span>
           <button class="icon-button reset-button" type="button" title="重置" @click="resetSnow">
             <el-icon size="17">
               <RefreshRight />
