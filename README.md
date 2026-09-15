@@ -64,7 +64,7 @@ npm run dev
 # 或者使用 Yarn
 yarn dev
 ```
-启动后，浏览器会自动打开 http://localhost:5137。
+启动后，浏览器会自动打开 http://localhost:5173。
 
 ### 构建生产版本
 ```bash
@@ -102,4 +102,3 @@ yarn preview
 邮箱: 1358042645@qq.com
 
 GitHub: [axy-cesium](https://github.com/whanxueyu/axy-cesium)
-

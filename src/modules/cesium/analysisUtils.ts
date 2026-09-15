@@ -42,6 +42,7 @@ export interface ProfileSample extends TerrainSample {
 export interface LineOfSightResult {
   visible: boolean;
   obstruction?: Cesium.Cartesian3; // 遮挡点
+  obstructionType?: "terrain" | "model";
 }
 
 export interface ViewshedResult {
@@ -498,6 +499,7 @@ export function isLineOfSightClear(
   to: Cesium.Cartesian3,
 ): LineOfSightResult {
   const distance = Cesium.Cartesian3.distance(from, to);
+  const endpointTolerance = Math.max(0.5, Math.min(3, distance * 0.00001));
 
   // 创建从 A 到 B 的射线
   const direction = Cesium.Cartesian3.normalize(
@@ -505,25 +507,29 @@ export function isLineOfSightClear(
     new Cesium.Cartesian3(),
   );
   const ray = new Cesium.Ray(from, direction);
+  const scene = viewer.scene as Cesium.Scene & {
+    pickFromRay?: (ray: Cesium.Ray) => unknown;
+    pickPositionFromRay?: (ray: Cesium.Ray) => Cesium.Cartesian3 | undefined;
+  };
 
   // 检测与地形的交点
   const intersection = viewer.scene.globe.pick(ray, viewer.scene);
   if (intersection) {
     const intersectionDistance = Cesium.Cartesian3.distance(from, intersection);
     // 交点距离小于 AB 距离，说明被地形遮挡
-    if (intersectionDistance < distance) {
-      return { visible: false, obstruction: intersection };
+    if (intersectionDistance > endpointTolerance && intersectionDistance < distance - endpointTolerance) {
+      return { visible: false, obstruction: intersection, obstructionType: "terrain" };
     }
   }
 
   // 检测与 3D Tiles 等模型的交点
-  const pickedObject = viewer.scene.pickFromRay(ray);
-  if (Cesium.defined(pickedObject) && pickedObject.id) {
-    const modelIntersection = viewer.scene.pickPositionFromRay(ray);
+  const pickedObject = scene.pickFromRay?.(ray);
+  if (Cesium.defined(pickedObject)) {
+    const modelIntersection = scene.pickPositionFromRay?.(ray);
     if (Cesium.defined(modelIntersection)) {
       const intersectionDistance = Cesium.Cartesian3.distance(from, modelIntersection);
-      if (intersectionDistance < distance) {
-        return { visible: false, obstruction: modelIntersection };
+      if (intersectionDistance > endpointTolerance && intersectionDistance < distance - endpointTolerance) {
+        return { visible: false, obstruction: modelIntersection, obstructionType: "model" };
       }
     }
   }

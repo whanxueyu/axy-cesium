@@ -400,6 +400,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/analysis/viewshed.vue')
       },
       {
+        path: '/example/lineOfSight',
+        name: 'lineOfSight',
+        component: () => import('@/views/example/analysis/lineOfSight.vue')
+      },
+      {
         path: '/example/slope',
         name: 'slope',
         component: () => import('@/views/example/analysis/slope.vue')
