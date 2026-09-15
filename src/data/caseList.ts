@@ -557,7 +557,7 @@ export var caseList = [
       {
         imgurl: getImagePath('material', 'heatmap'),
         title: '热力图效果',
-        description: '基于地理坐标的热力数据可视化',
+        description: '3D热力图效果，支持二三维切换、自定义颜色、半径大小、热力点和高度',
         path: '/example/heatmap'
       },
     ]

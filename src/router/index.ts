@@ -337,6 +337,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'weatherLightning',
         component: () => import('@/views/developing.vue')
       },
+      {
+        path: '/example/heatmap',
+        name: 'heatmap',
+        component: () => import('@/views/example/material/heatmap.vue')
+      },
       // camera
       {
         path: '/example/smoothFly',
