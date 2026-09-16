@@ -98,6 +98,7 @@ const imageResources = {
     cutfill: 'cutfill.png',
     profile: 'profile.png',
     viewshed: 'viewshed.png',
+    lineOfSight: 'lineOfSight.png',
     slope: 'slope.png',
     flood: 'flood.png'
   },
@@ -656,6 +657,12 @@ export var caseList = [
         title: '可视域分析',
         description: '带视椎体和视线效果的可视域分析',
         path: '/example/viewshed'
+      },
+      {
+        imgurl: getImagePath('analysis', 'lineOfSight'),
+        title: '通视分析',
+        description: '两点通视与 360° 通视分析',
+        path: '/example/lineOfSight'
       },
       {
         imgurl: getImagePath('analysis', 'slope'),

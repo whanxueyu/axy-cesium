@@ -116,7 +116,7 @@
 
     <div class="action-row bottom-actions">
       <el-button type="primary" size="small" :loading="computing" :disabled="!canAnalyze" @click="startAnalysis">
-        生成
+        计算
       </el-button>
       <el-button type="danger" size="small" @click="handleClear">清除</el-button>
     </div>
@@ -136,7 +136,7 @@
         <span class="value bad">{{ formatArea(analysisResult.hiddenArea) }}</span>
       </div>
       <div class="result-item">
-        <span class="label">可视占比：</span>
+        <span class="label">覆盖率：</span>
         <span class="value">{{ analysisResult.visibleRate.toFixed(1) }}%</span>
       </div>
       <div class="result-item">
@@ -159,8 +159,13 @@ import { computed, onUnmounted, ref, watch } from "vue";
 import * as Cesium from "cesium";
 import * as turf from "@turf/turf";
 import Map from "@/components/cesium/map.vue";
+import { ArticleViewshedRenderer } from "@/modules/cesium/viewshedRenderer";
 import {
-  pickPositionOnMap,
+  createArticleSensorFrame,
+  isDirectionInArticleSensor,
+  type ArticleSensorFrame,
+} from "@/modules/cesium/viewshedGeometry";
+import {
   sampleTerrainHeights,
   type TerrainSample,
 } from "@/modules/cesium/analysisUtils";
@@ -215,11 +220,11 @@ interface ViewshedStats {
 }
 
 const horizontalFov = ref(80);
-const verticalFov = ref(38);
+const verticalFov = ref(45);
 const radius = ref(1800);
-const heading = ref(55);
-const pitch = ref(-12);
-const observerHeight = ref(80);
+const heading = ref(45);
+const pitch = ref(0);
+const observerHeight = ref(2);
 const sampleDistanceStep = ref(50);
 const sampleAngleStep = ref(2);
 const resultOpacity = ref(45);
@@ -227,7 +232,7 @@ const showFrustum = ref(true);
 const showRays = ref(true);
 const pickMode = ref<PickMode>("observer");
 const computing = ref(false);
-const hint = ref("图上选点后生成视椎体可视域");
+const hint = ref("图上选点后预览视椎体，点击计算查看覆盖率");
 const analysisResult = ref<ViewshedStats | null>(null);
 const observerPosition = ref<Cesium.Cartesian3 | null>(null);
 const canAnalyze = computed(() => observerPosition.value !== null);
@@ -237,14 +242,12 @@ let mouseHandler: Cesium.ScreenSpaceEventHandler | null = null;
 let observerEntity: Cesium.Entity | null = null;
 let observerLabelEntity: Cesium.Entity | null = null;
 let heightLineEntity: Cesium.Entity | null = null;
-let frustumPrimitive: Cesium.Primitive | null = null;
-let viewshedPrimitive: Cesium.Primitive | null = null;
-let frustumEntities: Cesium.Entity[] = [];
-let rayEntities: Cesium.Entity[] = [];
-let lastCells: ViewshedCell[] = [];
-let lastRayRows: ViewshedRayRow[] = [];
+let viewshedRenderer: ArticleViewshedRenderer | null = null;
 let debounceTimer: number | undefined;
 let analysisToken = 0;
+let pickToken = 0;
+let previousGlobeShadowMode: Cesium.ShadowMode | undefined;
+let globeShadowModeCaptured = false;
 
 const VIEW_HEIGHT_OFFSET = 2;
 const HORIZON_EPSILON = Cesium.Math.toRadians(0.02);
@@ -253,6 +256,9 @@ const handleMapLoaded = (mapViewer: Cesium.Viewer) => {
   viewer = mapViewer;
   viewer.scene.globe.depthTestAgainstTerrain = true;
   viewer.scene.pickTranslucentDepth = true;
+  previousGlobeShadowMode = viewer.scene.globe.shadows;
+  globeShadowModeCaptured = true;
+  viewer.scene.globe.shadows = Cesium.ShadowMode.ENABLED;
   bindMapActions();
   resetCamera();
 };
@@ -271,8 +277,8 @@ const resetCamera = () => {
 };
 
 const startPickObserver = () => {
-  pickMode.value = pickMode.value === "observer" ? "none" : "observer";
-  hint.value = pickMode.value === "observer" ? "请在地图上选择相机位置" : "";
+  pickMode.value = "observer";
+  hint.value = "请在地图上选择相机位置";
 };
 
 const startPickDirection = () => {
@@ -281,8 +287,8 @@ const startPickDirection = () => {
     pickMode.value = "observer";
     return;
   }
-  pickMode.value = pickMode.value === "direction" ? "none" : "direction";
-  hint.value = pickMode.value === "direction" ? "请在地图上选择视线方向" : "";
+  pickMode.value = "direction";
+  hint.value = "请在地图上选择视线方向";
 };
 
 const locateObserver = () => {
@@ -302,21 +308,20 @@ const locateObserver = () => {
 
 const handleClear = () => {
   analysisToken++;
+  pickToken++;
   clearObserverEntities();
-  clearFrustumVisuals();
-  clearViewshedVisuals();
+  clearArticleViewshed();
   observerPosition.value = null;
-  lastCells = [];
-  lastRayRows = [];
   analysisResult.value = null;
   computing.value = false;
-  hint.value = "图上选点后生成视椎体可视域";
+  hint.value = "图上选点后预览视椎体，点击计算查看覆盖率";
   pickMode.value = "observer";
 };
 
 const bindMapActions = () => {
   if (!viewer) return;
 
+  mouseHandler?.destroy();
   mouseHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
   mouseHandler.setInputAction(
     (event: Cesium.ScreenSpaceEventHandler.PositionedEvent) => {
@@ -329,26 +334,114 @@ const bindMapActions = () => {
   }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
 };
 
-const handleMapClick = (position: Cesium.Cartesian2) => {
+const handleMapClick = async (position: Cesium.Cartesian2) => {
   if (!viewer || pickMode.value === "none") return;
 
-  const cartesian = pickPositionOnMap(viewer, position);
-  if (!cartesian) return;
+  const currentViewer = viewer;
+  const activePickMode = pickMode.value;
+  const currentPickToken = ++pickToken;
+  const picked = pickMapPosition(currentViewer, position);
+  if (!picked) {
+    hint.value = "未拾取到地形，请稍后重试";
+    return;
+  }
 
-  if (pickMode.value === "direction") {
-    heading.value = Math.round(getBearingFromObserver(cartesian));
+  if (activePickMode === "direction") {
+    heading.value = Math.round(getBearingFromObserver(picked.position));
     pickMode.value = "none";
     refreshScene();
     scheduleAnalysis();
     return;
   }
 
-  observerPosition.value = cartesian;
+  analysisToken++;
+  computing.value = false;
+  pickMode.value = "none";
+  observerPosition.value = picked.position;
   analysisResult.value = null;
-  hint.value = "";
+  hint.value = "观察点已选择，点击“计算”生成可视域结果";
   renderObserver();
   refreshScene();
-  startAnalysis();
+
+  if (!picked.fromEllipsoidFallback) return;
+
+  hint.value = "观察点已选择，正在校正地形高程...";
+  const corrected = await resolveTerrainPosition(currentViewer, picked.position);
+  if (!corrected || currentPickToken !== pickToken) return;
+
+  observerPosition.value = corrected;
+  hint.value = "观察点已选择，点击“计算”生成可视域结果";
+  renderObserver();
+  refreshScene();
+};
+
+interface PickedMapPosition {
+  position: Cesium.Cartesian3;
+  fromEllipsoidFallback: boolean;
+}
+
+const pickMapPosition = (
+  currentViewer: Cesium.Viewer,
+  windowPosition: Cesium.Cartesian2,
+): PickedMapPosition | undefined => {
+  const scene = currentViewer.scene;
+  const pickedObject = scene.pick(windowPosition);
+
+  if (
+    Cesium.defined(pickedObject) &&
+    pickedObject instanceof Cesium.Cesium3DTileFeature
+  ) {
+    const pickedModelPosition = scene.pickPosition(windowPosition);
+    if (pickedModelPosition) {
+      return { position: pickedModelPosition, fromEllipsoidFallback: false };
+    }
+  }
+
+  const ray = currentViewer.camera.getPickRay(windowPosition);
+  if (ray) {
+    const terrainPosition = scene.globe.pick(ray, scene);
+    if (terrainPosition) {
+      return { position: terrainPosition, fromEllipsoidFallback: false };
+    }
+  }
+
+  if (scene.pickPositionSupported) {
+    const pickedPosition = scene.pickPosition(windowPosition);
+    if (pickedPosition) {
+      return { position: pickedPosition, fromEllipsoidFallback: false };
+    }
+  }
+
+  const ellipsoidPosition = currentViewer.camera.pickEllipsoid(
+    windowPosition,
+    currentViewer.scene.globe.ellipsoid,
+  );
+  if (!ellipsoidPosition) return undefined;
+
+  return {
+    position: ellipsoidPosition,
+    fromEllipsoidFallback: true,
+  };
+};
+
+const resolveTerrainPosition = async (
+  currentViewer: Cesium.Viewer,
+  position: Cesium.Cartesian3,
+): Promise<Cesium.Cartesian3 | undefined> => {
+  const cartographic = Cesium.Cartographic.fromCartesian(position);
+  const lng = Cesium.Math.toDegrees(cartographic.longitude);
+  const lat = Cesium.Math.toDegrees(cartographic.latitude);
+  const loadedHeight = currentViewer.scene.globe.getHeight(cartographic);
+
+  if (loadedHeight !== undefined) {
+    return Cesium.Cartesian3.fromDegrees(lng, lat, loadedHeight);
+  }
+
+  const sampled = await sampleTerrainHeights(currentViewer, [{ lng, lat }]);
+  const height = sampled[0]?.height;
+  return height === undefined
+    ? position
+    : Cesium.Cartesian3.fromDegrees(lng, lat, height);
 };
 
 const startAnalysis = async () => {
@@ -363,9 +456,10 @@ const startAnalysis = async () => {
 
   const token = ++analysisToken;
   computing.value = true;
+  analysisResult.value = null;
   hint.value = "";
   renderObserver();
-  renderFrustum();
+  renderViewshedPreview();
 
   try {
     const rows = await buildViewshedRows(info);
@@ -373,19 +467,12 @@ const startAnalysis = async () => {
 
     const { cells, stats } = buildViewshedCells(rows);
     if (!cells.length) {
-      clearViewshedVisuals();
-      lastCells = [];
-      lastRayRows = rows;
       analysisResult.value = null;
       hint.value = "当前俯仰角和视场未落到地表";
       return;
     }
 
-    lastCells = cells;
-    lastRayRows = rows;
     analysisResult.value = stats;
-    renderViewshedCells();
-    renderViewshedRays();
   } catch (error) {
     console.error("视椎体可视域分析失败:", error);
     hint.value = "可视域分析失败，请重试";
@@ -398,24 +485,22 @@ const startAnalysis = async () => {
 
 const scheduleAnalysis = () => {
   if (!observerPosition.value) return;
+  analysisToken++;
   if (debounceTimer !== undefined) {
     window.clearTimeout(debounceTimer);
   }
   debounceTimer = window.setTimeout(() => {
     debounceTimer = undefined;
-    startAnalysis();
-  }, 250);
+    analysisResult.value = null;
+    renderObserver();
+    renderViewshedPreview();
+    hint.value = "参数已更新，点击“计算”刷新可视域结果";
+  }, 120);
 };
 
 const refreshScene = () => {
   renderObserver();
-  renderFrustum();
-  if (lastCells.length) {
-    renderViewshedCells();
-  }
-  if (lastRayRows.length) {
-    renderViewshedRays();
-  }
+  renderViewshedPreview();
 };
 
 const renderObserver = () => {
@@ -461,132 +546,27 @@ const renderObserver = () => {
   });
 };
 
-const renderFrustum = () => {
+const renderViewshedPreview = () => {
   if (!viewer) return;
-  clearFrustumVisuals();
-
-  if (!showFrustum.value) return;
   const info = getObserverInfo();
-  if (!info) return;
-
-  const corners = getFrustumCorners(info);
-  frustumPrimitive = createFrustumBody(info.eye, corners);
-  if (frustumPrimitive) {
-    viewer.scene.primitives.add(frustumPrimitive);
+  if (!info) {
+    clearArticleViewshed();
+    return;
   }
 
-  addFrustumPolyline([info.eye, corners[0]], Cesium.Color.WHITE.withAlpha(0.8), 2);
-  addFrustumPolyline([info.eye, corners[1]], Cesium.Color.WHITE.withAlpha(0.8), 2);
-  addFrustumPolyline([info.eye, corners[2]], Cesium.Color.WHITE.withAlpha(0.8), 2);
-  addFrustumPolyline([info.eye, corners[3]], Cesium.Color.WHITE.withAlpha(0.8), 2);
-
-  const leftAzimuth = heading.value - horizontalFov.value / 2;
-  const rightAzimuth = heading.value + horizontalFov.value / 2;
-  const bottomPitch = pitch.value - verticalFov.value / 2;
-  const topPitch = pitch.value + verticalFov.value / 2;
-  const shellColor = Cesium.Color.WHITE.withAlpha(0.72);
-  const centerColor = Cesium.Color.LIME.withAlpha(0.72);
-  const horizontalShells = [
-    bottomPitch,
-    pitch.value - verticalFov.value / 4,
-    pitch.value,
-    pitch.value + verticalFov.value / 4,
-    topPitch,
-  ];
-  const verticalShells = [
-    leftAzimuth,
-    heading.value - horizontalFov.value / 4,
-    heading.value,
-    heading.value + horizontalFov.value / 4,
-    rightAzimuth,
-  ];
-
-  horizontalShells.forEach((shellPitch) => {
-    addFrustumPolyline(
-      buildHorizontalArc(info, leftAzimuth, rightAzimuth, shellPitch),
-      shellPitch === pitch.value ? centerColor : shellColor,
-      shellPitch === pitch.value ? 2.5 : 2,
-    );
-  });
-
-  verticalShells.forEach((shellAzimuth) => {
-    addFrustumPolyline(
-      buildVerticalArc(info, shellAzimuth, bottomPitch, topPitch),
-      shellAzimuth === heading.value ? centerColor : shellColor,
-      shellAzimuth === heading.value ? 2.5 : 2,
-    );
-  });
-
-  const centerEnd = pointByAzimuthPitch(info, heading.value, pitch.value, radius.value);
-  addFrustumPolyline([info.eye, centerEnd], Cesium.Color.LIME.withAlpha(0.9), 3, true);
-};
-
-const renderViewshedCells = () => {
-  if (!viewer) return;
-  clearViewshedPrimitive();
-
-  if (!lastCells.length) return;
-  const instances = lastCells.map((cell) => {
-    const positions = cell.positions.map((point) =>
-      Cesium.Cartesian3.fromDegrees(point.lng, point.lat, point.height + VIEW_HEIGHT_OFFSET),
-    );
-    return new Cesium.GeometryInstance({
-      geometry: new Cesium.PolygonGeometry({
-        polygonHierarchy: new Cesium.PolygonHierarchy(positions),
-        perPositionHeight: true,
-        vertexFormat: Cesium.PerInstanceColorAppearance.VERTEX_FORMAT,
-      }),
-      attributes: {
-        color: Cesium.ColorGeometryInstanceAttribute.fromColor(getCellColor(cell.visible)),
-      },
-    });
-  });
-
-  viewshedPrimitive = new Cesium.Primitive({
-    geometryInstances: instances,
-    appearance: new Cesium.PerInstanceColorAppearance({
-      flat: true,
-      translucent: true,
-    }),
-    asynchronous: false,
-  });
-  viewer.scene.primitives.add(viewshedPrimitive);
-};
-
-const renderViewshedRays = () => {
-  if (!viewer) return;
-  clearRayEntities();
-
-  if (!showRays.value) return;
-  const info = getObserverInfo();
-  if (!info || !lastRayRows.length) return;
-
-  const stride = Math.max(1, Math.ceil(lastRayRows.length / 36));
-  lastRayRows.forEach((row, rowIndex) => {
-    if (rowIndex % stride !== 0 && rowIndex !== lastRayRows.length - 1) return;
-
-    const inConePoints = row.points.filter((point) => point.inVertical && point.distance > 0);
-    if (!inConePoints.length) return;
-
-    const visiblePoints = inConePoints.filter((point) => point.visible);
-    const lastVisible = visiblePoints[visiblePoints.length - 1];
-    const lastPoint = inConePoints[inConePoints.length - 1];
-
-    if (lastVisible) {
-      addRayPolyline(
-        [info.eye, samplePointToCartesian(lastVisible)],
-        Cesium.Color.LIME.withAlpha(0.85),
-        2,
-      );
-    }
-
-    if (!lastVisible || lastVisible.distance < lastPoint.distance) {
-      addRayPolyline(
-        [lastVisible ? samplePointToCartesian(lastVisible) : info.eye, samplePointToCartesian(lastPoint)],
-        Cesium.Color.RED.withAlpha(0.82),
-        2,
-      );
-    }
+  const viewPosition = getCurrentViewPosition(info);
+  const sensorFrame = getCurrentSensorFrame(info);
+  viewshedRenderer ??= new ArticleViewshedRenderer(viewer);
+  viewshedRenderer.update({
+    observer: info.eye,
+    viewPosition,
+    sensorFrame,
+    radius: radius.value,
+    horizontalFov: horizontalFov.value,
+    verticalFov: verticalFov.value,
+    showFrustum: showFrustum.value,
+    showLines: showRays.value,
+    sensorAlpha: resultOpacity.value / 100,
   });
 };
 
@@ -647,6 +627,7 @@ const buildViewshedRows = async (info: ObserverInfo): Promise<ViewshedRayRow[]> 
 
   sampled.forEach((sample, index) => {
     const descriptor = descriptors[index];
+    if (!descriptor) return;
     rows[descriptor.angleIndex].points[descriptor.distanceIndex] = {
       ...sample,
       angleIndex: descriptor.angleIndex,
@@ -660,8 +641,7 @@ const buildViewshedRows = async (info: ObserverInfo): Promise<ViewshedRayRow[]> 
     };
   });
 
-  const lowerPitch = Cesium.Math.toRadians(pitch.value - verticalFov.value / 2);
-  const upperPitch = Cesium.Math.toRadians(pitch.value + verticalFov.value / 2);
+  const sensorFrame = getCurrentSensorFrame(info);
 
   rows.forEach((row) => {
     let maxElevation = Number.NEGATIVE_INFINITY;
@@ -670,9 +650,27 @@ const buildViewshedRows = async (info: ObserverInfo): Promise<ViewshedRayRow[]> 
 
       const elevation = Math.atan2(point.height + VIEW_HEIGHT_OFFSET - info.eyeHeight, point.distance);
       point.elevation = Cesium.Math.toDegrees(elevation);
-      point.inVertical = elevation >= lowerPitch && elevation <= upperPitch;
-      point.visible = point.inVertical && elevation >= maxElevation - HORIZON_EPSILON;
-      maxElevation = Math.max(maxElevation, elevation);
+      const target = Cesium.Cartesian3.fromDegrees(
+        point.lng,
+        point.lat,
+        point.height + VIEW_HEIGHT_OFFSET,
+      );
+      const sightDirection = Cesium.Cartesian3.normalize(
+        Cesium.Cartesian3.subtract(target, info.eye, new Cesium.Cartesian3()),
+        new Cesium.Cartesian3(),
+      );
+
+      point.inVertical = isDirectionInArticleSensor(
+        sightDirection,
+        sensorFrame,
+        horizontalFov.value,
+        verticalFov.value,
+      );
+      point.visible =
+        point.inVertical && elevation >= maxElevation - HORIZON_EPSILON;
+      if (point.inVertical) {
+        maxElevation = Math.max(maxElevation, elevation);
+      }
     });
   });
 
@@ -819,107 +817,15 @@ const getBearingFromObserver = (target: Cesium.Cartesian3) => {
   return normalizeAngle(Cesium.Math.toDegrees(Math.atan2(east, north)));
 };
 
-const getFrustumCorners = (info: ObserverInfo) => {
-  const leftAzimuth = heading.value - horizontalFov.value / 2;
-  const rightAzimuth = heading.value + horizontalFov.value / 2;
-  const bottomPitch = pitch.value - verticalFov.value / 2;
-  const topPitch = pitch.value + verticalFov.value / 2;
+const getCurrentViewPosition = (info: ObserverInfo) =>
+  pointByAzimuthPitch(info, heading.value, pitch.value, radius.value);
 
-  return [
-    pointByAzimuthPitch(info, leftAzimuth, bottomPitch, radius.value),
-    pointByAzimuthPitch(info, rightAzimuth, bottomPitch, radius.value),
-    pointByAzimuthPitch(info, rightAzimuth, topPitch, radius.value),
-    pointByAzimuthPitch(info, leftAzimuth, topPitch, radius.value),
-  ];
-};
-
-const createFrustumBody = (eye: Cesium.Cartesian3, corners: Cesium.Cartesian3[]) => {
-  const positions = new Float64Array([
-    eye.x,
-    eye.y,
-    eye.z,
-    corners[0].x,
-    corners[0].y,
-    corners[0].z,
-    corners[1].x,
-    corners[1].y,
-    corners[1].z,
-    corners[2].x,
-    corners[2].y,
-    corners[2].z,
-    corners[3].x,
-    corners[3].y,
-    corners[3].z,
-  ]);
-
-  const attributes = new Cesium.GeometryAttributes();
-  attributes.position = new Cesium.GeometryAttribute({
-    componentDatatype: Cesium.ComponentDatatype.DOUBLE,
-    componentsPerAttribute: 3,
-    values: positions,
-  });
-
-  return new Cesium.Primitive({
-    geometryInstances: new Cesium.GeometryInstance({
-      geometry: new Cesium.Geometry({
-        attributes,
-        indices: new Uint16Array([0, 1, 2, 0, 2, 3, 0, 3, 4, 0, 4, 1, 1, 2, 3, 1, 3, 4]),
-        primitiveType: Cesium.PrimitiveType.TRIANGLES,
-        boundingSphere: Cesium.BoundingSphere.fromVertices(positions),
-      }),
-      attributes: {
-        color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.CYAN.withAlpha(0.14)),
-      },
-    }),
-    appearance: new Cesium.PerInstanceColorAppearance({
-      flat: true,
-      translucent: true,
-      closed: false,
-      renderState: {
-        depthTest: {
-          enabled: true,
-        },
-        depthMask: false,
-        blending: Cesium.BlendingState.ALPHA_BLEND,
-      },
-    }),
-    asynchronous: false,
-  });
-};
-
-const buildHorizontalArc = (
-  info: ObserverInfo,
-  startAzimuth: number,
-  endAzimuth: number,
-  elevation: number,
-) => {
-  const samples = 40;
-  const positions: Cesium.Cartesian3[] = [];
-
-  for (let index = 0; index <= samples; index++) {
-    const azimuth = startAzimuth + ((endAzimuth - startAzimuth) * index) / samples;
-    positions.push(pointByAzimuthPitch(info, azimuth, elevation, radius.value));
-  }
-
-  return positions;
-};
-
-const buildVerticalArc = (
-  info: ObserverInfo,
-  azimuth: number,
-  startElevation: number,
-  endElevation: number,
-) => {
-  const samples = 28;
-  const positions: Cesium.Cartesian3[] = [];
-
-  for (let index = 0; index <= samples; index++) {
-    const elevation = startElevation + ((endElevation - startElevation) * index) / samples;
-    positions.push(pointByAzimuthPitch(info, azimuth, elevation, radius.value));
-  }
-
-  return positions;
-};
+const getCurrentSensorFrame = (info: ObserverInfo): ArticleSensorFrame =>
+  createArticleSensorFrame(
+    info.eye,
+    getCurrentViewPosition(info),
+    info.frame.up,
+  );
 
 const pointByAzimuthPitch = (
   info: ObserverInfo,
@@ -954,51 +860,6 @@ const directionByAzimuthPitch = (
   );
 };
 
-const samplePointToCartesian = (point: TerrainSample) =>
-  Cesium.Cartesian3.fromDegrees(point.lng, point.lat, point.height + VIEW_HEIGHT_OFFSET);
-
-const addFrustumPolyline = (
-  positions: Cesium.Cartesian3[],
-  color: Cesium.Color,
-  width: number,
-  glow = false,
-) => {
-  if (!viewer || positions.length < 2) return;
-
-  const entity = viewer.entities.add({
-    polyline: {
-      positions,
-      width,
-      material: glow
-        ? new Cesium.PolylineGlowMaterialProperty({
-            color,
-            glowPower: 0.18,
-          })
-        : color,
-      clampToGround: false,
-    },
-  });
-  frustumEntities.push(entity);
-};
-
-const addRayPolyline = (
-  positions: Cesium.Cartesian3[],
-  color: Cesium.Color,
-  width: number,
-) => {
-  if (!viewer || positions.length < 2) return;
-
-  const entity = viewer.entities.add({
-    polyline: {
-      positions,
-      width,
-      material: color,
-      clampToGround: false,
-    },
-  });
-  rayEntities.push(entity);
-};
-
 const estimateCellArea = (
   leftAngle: number,
   rightAngle: number,
@@ -1007,13 +868,6 @@ const estimateCellArea = (
 ) => {
   const angle = Math.abs(Cesium.Math.toRadians(rightAngle - leftAngle));
   return (angle * (outerDistance * outerDistance - innerDistance * innerDistance)) / 2;
-};
-
-const getCellColor = (visible: boolean) => {
-  const alpha = resultOpacity.value / 100;
-  return visible
-    ? Cesium.Color.LIME.withAlpha(alpha)
-    : Cesium.Color.RED.withAlpha(Math.min(0.9, alpha + 0.1));
 };
 
 const clearObserverEntities = () => {
@@ -1026,33 +880,8 @@ const clearObserverEntities = () => {
   heightLineEntity = null;
 };
 
-const clearFrustumVisuals = () => {
-  if (!viewer) return;
-  if (frustumPrimitive) {
-    viewer.scene.primitives.remove(frustumPrimitive);
-    frustumPrimitive = null;
-  }
-  frustumEntities.forEach((entity) => viewer?.entities.remove(entity));
-  frustumEntities = [];
-};
-
-const clearViewshedPrimitive = () => {
-  if (!viewer) return;
-  if (viewshedPrimitive) {
-    viewer.scene.primitives.remove(viewshedPrimitive);
-    viewshedPrimitive = null;
-  }
-};
-
-const clearRayEntities = () => {
-  if (!viewer) return;
-  rayEntities.forEach((entity) => viewer?.entities.remove(entity));
-  rayEntities = [];
-};
-
-const clearViewshedVisuals = () => {
-  clearViewshedPrimitive();
-  clearRayEntities();
+const clearArticleViewshed = () => {
+  viewshedRenderer?.clear();
 };
 
 const normalizeAngle = (angle: number) => ((angle % 360) + 360) % 360;
@@ -1078,21 +907,20 @@ watch(
 );
 
 watch(showFrustum, () => {
-  renderFrustum();
+  renderViewshedPreview();
 });
 
 watch(showRays, () => {
-  renderViewshedRays();
+  renderViewshedPreview();
 });
 
 watch(resultOpacity, () => {
-  if (lastCells.length) {
-    renderViewshedCells();
-  }
+  renderViewshedPreview();
 });
 
 onUnmounted(() => {
   analysisToken++;
+  pickToken++;
   if (debounceTimer !== undefined) {
     window.clearTimeout(debounceTimer);
   }
@@ -1101,8 +929,14 @@ onUnmounted(() => {
     mouseHandler = null;
   }
   clearObserverEntities();
-  clearFrustumVisuals();
-  clearViewshedVisuals();
+  clearArticleViewshed();
+  viewshedRenderer?.destroy();
+  viewshedRenderer = null;
+  if (viewer && globeShadowModeCaptured && previousGlobeShadowMode !== undefined) {
+    viewer.scene.globe.shadows = previousGlobeShadowMode;
+  }
+  previousGlobeShadowMode = undefined;
+  globeShadowModeCaptured = false;
 });
 </script>
 
