@@ -206,7 +206,7 @@ const handleMapLoaded = (mapViewer: Cesium.Viewer) => {
   viewer.scene.globe.depthTestAgainstTerrain = true;
   viewer.scene.pickTranslucentDepth = true;
   bindMapEvents();
-  loadObliqueTileset();
+  // loadObliqueTileset();
 };
 
 const loadObliqueTileset = async () => {
