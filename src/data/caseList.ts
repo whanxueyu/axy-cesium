@@ -519,11 +519,10 @@ export var caseList = [
         path: '/example/mouseMoveControl'
       },
       {
-        imgurl: getImagePath('model', 'animation'),
+        imgurl: '/models/animation/Rampaging%20T-Rex.png',
         title: 'GLB内置动画播放',
-        description: '待完善：读取模型内置 animations，提供动画列表、播放暂停、倍速、循环和动画切换',
-        path: '/example/animation',
-        status: 'partial'
+        description: '读取 Rampaging T-Rex GLB 内置五段动画，支持动画切换、播放暂停、进度控制、倍速和循环播放',
+        path: '/example/animation'
       },
     ]
   },
