@@ -67,8 +67,8 @@ const imageResources = {
     editModel: 'editModel.png',
     cityModel: 'cityModel.png',
     pathTracking: 'pathTracking.png',
-    moveControl:'moveControl.png',
-    mouseMoveControl:'mouseMoveControl.png',
+    moveControl: 'moveControl.png',
+    mouseMoveControl: 'mouseMoveControl.png',
     animation: 'animation.png',
   },
   radar: {
@@ -87,13 +87,11 @@ const imageResources = {
     rain: 'rain.png',
     snow: 'snow.png',
     fog: 'fog.png',
+    cloud: 'cloud.png',
     lightning: 'lightning.png'
   },
   analysis: {
-    position: 'position.png',
-    distance: 'distance.png',
-    height: 'height.png',
-    area: 'area.png',
+    measure: 'measure.png',
     volume: 'volume.png',
     cutfill: 'cutfill.png',
     profile: 'profile.png',
@@ -142,6 +140,33 @@ const getImagePath = <T extends ImageCategory>(category: T, name: ImageName<T>):
 
 
 export var caseList = [
+  {
+    title: '综合案例',
+    type: 'comprehensive',
+    list: [
+      {
+        imgurl: getImagePath('comprehensive', 'measurement'),
+        title: '三维应急推演与通信保障',
+        description: '规划融合3D Tiles、车辆轨迹、动态天气、淹没、通视、通信链路和CSS3D信息面板',
+        path: '/example/emergencyScenario',
+        status: 'planned'
+      },
+      {
+        imgurl: getImagePath('comprehensive', 'cameraFlight'),
+        title: '轨迹巡检与相机编排',
+        description: '规划以时间轴组织模型轨迹、相机关键帧、跟随视角和巡检事件，形成可回放巡航流程',
+        path: '/example/cameraTimeline',
+        status: 'planned'
+      },
+      {
+        imgurl: getImagePath('comprehensive', 'dynamicData'),
+        title: '场景日夜交替',
+        description: '根据时间变化模拟日夜交替效果，光照天空变换',
+        path: '/example/dynamicData',
+        status: 'planned'
+      }
+    ]
+  },
   {
     title: '图层',
     type: 'layers',
@@ -260,25 +285,7 @@ export var caseList = [
         title: '设置背景图',
         description: '设置背景图',
         path: '/example/background'
-      },
-      // {
-      //   imgurl: getImagePath('skybox', 'dynamicSkybox'),
-      //   title: '动态天空盒',
-      //   description: '随时间变化的动态天空盒效果，模拟日夜转换',
-      //   path: '/example/dynamicSkybox'
-      // },
-      // {
-      //   imgurl: getImagePath('skybox', 'shaderSkybox'),
-      //   title: '着色器天空盒',
-      //   description: '使用自定义着色器实现的特殊天空效果',
-      //   path: '/example/shaderSkybox'
-      // },
-      // {
-      //   imgurl: getImagePath('skybox', 'weatherSkybox'),  // 复用现有图片或新建weatherSkybox.png
-      //   title: '天气天空盒',
-      //   description: '结合雨雪雾天气效果的复合天空盒',
-      //   path: '/example/weatherSkybox'
-      // }
+      }
     ]
   },
   {
@@ -303,7 +310,7 @@ export var caseList = [
         description: '标牌坠落、变大、透明等动画效果',
         path: '/example/animationBillboard'
       },
-       {
+      {
         imgurl: getImagePath('billboard', 'gifBillboard'),
         title: '动态标牌',
         description: '使用gif动图实现动态标牌效果。（目前使用gifler库解析gif，但是效果不理想，无法加载超过1.6M的动图，且加载动图数量稍多就会卡顿，后续寻找更优解）',
@@ -361,8 +368,14 @@ export var caseList = [
         imgurl: getImagePath('billboard', 'css3DdivBillboard'),
         title: 'css3Ddiv标牌',
         description: '使用css3D技术在cesium中加载有三维效果的div标牌',
-        // path: '/example/css3DdivBillboard'
-        path: '/example/developing'
+        path: '/example/css3DdivBillboard'
+      },
+      {
+        imgurl: getImagePath('billboard', 'primitiveCluster'),
+        title: '标牌性能实验室',
+        description: '规划对比 Entity、Primitive、HTML、CSS3D 标牌在大数据量下的FPS、聚合、遮挡、避让和LOD',
+        path: '/example/billboardBenchmark',
+        status: 'planned'
       },
     ]
   },
@@ -456,9 +469,23 @@ export var caseList = [
       },
       {
         imgurl: getImagePath('model', 'cityModel'),
-        title: '城市白膜',
-        description: '城市白膜加载，picker功能，自定义材质',
+        title: '3D Tiles城市构件检查',
+        description: '城市白膜加载、构件拾取、轮廓高亮与自定义着色，后续拓展属性面板和专题渲染',
         path: '/example/cityTileset'
+      },
+      {
+        imgurl: getImagePath('model', 'cityModel'),
+        title: '3D Tiles剖切与裁剪',
+        description: '规划基于裁剪面实现平面剖切、盒裁剪和高度裁剪，用于查看建筑内部与模型断面',
+        path: '/example/tilesetClipping',
+        status: 'planned'
+      },
+      {
+        imgurl: getImagePath('model', 'cityModel'),
+        title: '3D Tiles楼层爆炸',
+        description: '规划按楼层或构件分组展开，支持单体隐藏、透明化、属性查看、复位和相机定位',
+        path: '/example/tilesetExplosion',
+        status: 'planned'
       },
       {
         imgurl: getImagePath('model', 'editModel'),
@@ -473,6 +500,13 @@ export var caseList = [
         path: '/example/pathTracking'
       },
       {
+        imgurl: getImagePath('model', 'pathTracking'),
+        title: '轨迹编辑与相机跟随',
+        description: '规划路径点编辑、时间轴播放、倍速暂停、第一/第三人称跟随、相机关键帧和巡检回放',
+        path: '/example/trackPlayback',
+        status: 'planned'
+      },
+      {
         imgurl: getImagePath('model', 'moveControl'),
         title: '键盘控制模型移动',
         description: '键盘控制模型移动方向，支持 WASD 键和方向键，按一次方向模型持续朝该方向移动',
@@ -484,12 +518,13 @@ export var caseList = [
         description: '点击地图任意位置，模型自动走向点击处，移动中可随时点击改道',
         path: '/example/mouseMoveControl'
       },
-      // {
-      //   imgurl: getImagePath('model', 'animation'),
-      //   title: 'GLB模型动画',
-      //   description: '加载基础的各类glb单体模型，支持动画播放',
-      //   path: '/example/animation'
-      // },
+      {
+        imgurl: getImagePath('model', 'animation'),
+        title: 'GLB内置动画播放',
+        description: '待完善：读取模型内置 animations，提供动画列表、播放暂停、倍速、循环和动画切换',
+        path: '/example/animation',
+        status: 'partial'
+      },
     ]
   },
   {
@@ -526,11 +561,18 @@ export var caseList = [
         description: '不同大小、颜色和速度的球体扫描雷达效果',
         path: '/example/ellipsoidRadar'
       },
-            {
+      {
         imgurl: getImagePath('radar', 'jam'),
         title: '干扰雷达',
         description: '干扰雷达效果,根据地形及雷达参数计算通讯链路连通性',
         path: '/example/jamRadar'
+      },
+      {
+        imgurl: getImagePath('radar', 'jam'),
+        title: '多节点通信覆盖分析',
+        description: '规划多雷达/多终端链路连通图，叠加地形遮挡、通信半径、链路余量和移动目标变化',
+        path: '/example/radioCoverage',
+        status: 'planned'
       },
     ]
   },
@@ -563,10 +605,23 @@ export var caseList = [
         path: '/example/weatherLightning'
       },
       {
+        imgurl: getImagePath('material', 'cloud'),
+        title: '体积云效果',
+        description: '基于体积渲染的云层效果，支持云量、云速、云高度和云厚度调节',
+        path: '/example/weatherCloud'
+      },
+      {
         imgurl: getImagePath('material', 'heatmap'),
         title: '热力图效果',
         description: '3D热力图效果，支持二三维切换、自定义颜色、半径大小、热力点和高度',
         path: '/example/heatmap'
+      },
+      {
+        imgurl: getImagePath('material', 'weather'),
+        title: '天气与能见度联动',
+        description: '规划雨、雪、雾、体积云、闪电组合预设，并联动可视距离、光照和场景氛围',
+        path: '/example/weatherScenario',
+        status: 'planned'
       },
     ]
   },
@@ -595,20 +650,23 @@ export var caseList = [
       {
         imgurl: getImagePath('camera', 'orbit'),
         title: '轨道飞行',
-        description: '轨道飞行是指沿着预设的轨道进行飞行浏览',
-        path: '/example/orbit'
+        description: '规划沿预设轨道浏览，支持轨道编辑、速度控制、循环播放和视角插值',
+        path: '/example/orbit',
+        status: 'planned'
       },
       {
         imgurl: getImagePath('camera', 'follow'),
         title: '跟随飞行',
-        description: '跟随飞行是指沿着目标对象进行飞行浏览',
-        path: '/example/follow'
+        description: '规划绑定移动目标，支持第一人称、第三人称、侧后方跟随和跟随距离调节',
+        path: '/example/follow',
+        status: 'planned'
       },
       {
         imgurl: getImagePath('camera', 'limitView'),
         title: '限制相机范围',
-        description: '限制相机查看范围和角度，相机始终在目标点附近',
-        path: '/example/limitView'
+        description: '规划限制相机经纬度、高度、俯仰角和目标区域，适合园区/城市资产巡检场景',
+        path: '/example/limitView',
+        status: 'planned'
       },
     ]
   },
@@ -617,28 +675,10 @@ export var caseList = [
     type: 'analysis',
     list: [
       {
-        imgurl: getImagePath('analysis', 'position'),
-        title: '坐标测量',
-        description: '多种模式坐标测量，拾取坐标位置，地形高程，建筑物高度',
-        path: '/example/position'
-      },
-      {
-        imgurl: getImagePath('analysis', 'distance'),
-        title: '距离测量',
-        description: '直线距离测量，贴地距离测量',
-        path: '/example/distance'
-      },
-      {
-        imgurl: getImagePath('analysis', 'height'),
-        title: '高度差测量',
-        description: '测量两点之间高度差',
-        path: '/example/height'
-      },
-      {
-        imgurl: getImagePath('analysis', 'area'),
-        title: '面积测量',
-        description: '多边形面积测量，贴地面积测量',
-        path: '/example/area'
+        imgurl: getImagePath('analysis', 'measure'),
+        title: '综合测量',
+        description: '综合坐标、距离、面积和高度差测量，支持结果留存、右键结束和一键清空',
+        path: '/example/measure'
       },
       {
         imgurl: getImagePath('analysis', 'cutfill'),
@@ -675,19 +715,7 @@ export var caseList = [
         title: '淹没分析',
         description: '洪水淹没模拟，水位上升下降',
         path: '/example/flood'
-      }
-    ]
-  },
-  {
-    title: '综合案例',
-    type: 'comprehensive',
-    list: [
-      {
-        imgurl: getImagePath('comprehensive', 'dynamicData'),
-        title: '场景日夜交替',
-        description: '根据时间变化模拟日夜交替效果，光照天空变换',
-        path: '/example/dynamicData'
-      }
+      },
     ]
   },
 ]

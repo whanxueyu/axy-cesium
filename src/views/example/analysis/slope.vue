@@ -37,7 +37,7 @@
         <span class="value">{{ gridStats.maxSlope.toFixed(2) }}°</span>
       </div>
       <div class="result-item">
-        <span class="label">网格数：</span>
+        <span class="label">三角面数：</span>
         <span class="value">{{ gridStats.cellCount }} 个</span>
       </div>
     </div>
@@ -84,15 +84,15 @@ import * as Cesium from "cesium";
 import * as echarts from "echarts";
 import Map from "@/components/cesium/map.vue";
 import {
-  buildGridHeightMap,
-  buildGridPrimitive,
+  buildTerrainTriangleGroundPrimitive,
   computeSlopeAspect,
   pickPositionOnMap,
-  samplePolygonGrid,
+  sampleTerrainTriangleMesh,
   SLOPE_LEVELS,
   type LonLat,
-  type PolygonGridResult,
   type SlopeAspectCell,
+  type TerrainTriangleMesh,
+  type TerrainAnalysisPrimitive,
 } from "@/modules/cesium/analysisUtils";
 
 var viewer: Cesium.Viewer;
@@ -113,10 +113,10 @@ const chartRef = ref<HTMLDivElement>();
 const ASPECT_NAMES = ["北", "东北", "东", "东南", "南", "西南", "西", "西北"];
 
 let chart: echarts.ECharts | null = null;
-let gridResult: PolygonGridResult | null = null;
+let gridResult: TerrainTriangleMesh | null = null;
 let slopeCells: SlopeAspectCell[] = [];
 let polygonLngLats: LonLat[] = [];
-let gridPrimitive: Cesium.Primitive | null = null;
+let gridPrimitive: TerrainAnalysisPrimitive | null = null;
 let boundaryEntity: Cesium.Entity | null = null;
 let queryMarkerEntity: Cesium.Entity | null = null;
 let previewLineEntity: Cesium.Entity | null = null;
@@ -243,18 +243,10 @@ const renderGrid = () => {
   }
   if (!gridResult || !slopeCells.length) return;
 
-  const cellLevel: Record<string, number> = {};
-  slopeCells.forEach((c) => {
-    cellLevel[`${c.row},${c.col}`] = c.level;
-  });
-
-  const colorOf = (row: number, col: number): Cesium.Color => {
-    const level = cellLevel[`${row},${col}`];
-    if (level === undefined) return Cesium.Color.GRAY.withAlpha(0.2);
-    return Cesium.Color.fromCssColorString(SLOPE_LEVELS[level].color).withAlpha(0.7);
-  };
-
-  const primitive = buildGridPrimitive(gridResult, colorOf, 1.5);
+  const primitive = buildTerrainTriangleGroundPrimitive(
+    gridResult.triangles,
+    (triangle) => Cesium.Color.fromCssColorString(SLOPE_LEVELS[triangle.level].color).withAlpha(0.72),
+  );
   if (primitive) {
     viewer.scene.primitives.add(primitive);
     gridPrimitive = primitive;
@@ -347,10 +339,8 @@ const queryAt = (cartesian: Cesium.Cartesian3) => {
   if (queryMarkerEntity) {
     viewer.entities.remove(queryMarkerEntity);
   }
-  // 标记点落到该网格的地表高程上
-  const heightMap = gridResult ? buildGridHeightMap(gridResult) : null;
-  const sample = heightMap?.get(`${nearest.row},${nearest.col}`);
-  const markerHeight = (sample?.height ?? 0) + 1.5;
+  // 标记点落到最近三角面的地表高程上
+  const markerHeight = (nearest.center.height ?? 0) + 1.5;
   queryMarkerEntity = viewer.entities.add({
     position: Cesium.Cartesian3.fromDegrees(nearest.center.lng, nearest.center.lat, markerHeight),
     point: {
@@ -402,12 +392,12 @@ const finishDrawing = () => {
 
   hint.value = "";
   computing.value = true;
-  samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value)
+  sampleTerrainTriangleMesh(viewer, polygonLngLats, gridSpacing.value)
     .then((g) => {
       gridResult = g;
       slopeCells = computeSlopeAspect(g);
       if (!slopeCells.length) {
-        hint.value = "区域内无有效网格，请增大间距或重试";
+        hint.value = "区域内无有效三角面，请增大间距或重试";
         return;
       }
       const avg = slopeCells.reduce((a, c) => a + c.slope, 0) / slopeCells.length;
@@ -491,7 +481,7 @@ watch(gridSpacing, () => {
   if (gridResult && !computing.value) {
     if (!polygonLngLats.length) return;
     computing.value = true;
-    samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value)
+    sampleTerrainTriangleMesh(viewer, polygonLngLats, gridSpacing.value)
       .then((g) => {
         gridResult = g;
         slopeCells = computeSlopeAspect(g);

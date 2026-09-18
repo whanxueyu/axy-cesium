@@ -168,25 +168,27 @@ const updatePreviewLine = () => {
         color: Cesium.Color.BLUE,
         glowPower: 0.3,
       }),
-      clampToGround: false,
+      clampToGround: true,
+      arcType: Cesium.ArcType.GEODESIC,
     },
   });
 };
 
-/** 贴地剖面线（采样点抬升 1.5m 防重叠闪烁） */
+/** 使用地形采样路径绘制贴地剖面线 */
 const drawProfileLine = (samples: ProfileSample[]) => {
   if (profileEntity) {
     viewer.entities.remove(profileEntity);
   }
   profileEntity = viewer.entities.add({
     polyline: {
-      positions: samples.map((p) => Cesium.Cartesian3.fromDegrees(p.lng, p.lat, p.height + 1.5)),
+      positions: samples.map((p) => Cesium.Cartesian3.fromDegrees(p.lng, p.lat)),
       width: 4,
       material: new Cesium.PolylineGlowMaterialProperty({
         color: Cesium.Color.YELLOW,
         glowPower: 0.35,
       }),
-      clampToGround: false,
+      clampToGround: true,
+      arcType: Cesium.ArcType.GEODESIC,
     },
   });
 };

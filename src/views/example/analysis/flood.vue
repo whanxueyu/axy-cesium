@@ -77,7 +77,7 @@
         <span class="value">{{ floodResult.maxDepth.toFixed(2) }} m</span>
       </div>
       <div class="result-item">
-        <span class="label">有效网格：</span>
+        <span class="label">淹没三角面：</span>
         <span class="value">{{ floodResult.floodedCount }} / {{ floodResult.totalCount }} 个</span>
       </div>
       <div class="result-item">
@@ -107,18 +107,18 @@ import CesiumMap from "@/components/cesium/map.vue";
 import {
   computeFlood,
   pickPositionOnMap,
-  samplePolygonGrid,
+  sampleTerrainTriangleMesh,
   sampleTerrainHeights,
   type FloodResult,
   type LonLat,
-  type PolygonGridResult,
+  type TerrainTriangleMesh,
 } from "@/modules/cesium/analysisUtils";
 import { FloodAnalysisLayer } from "@/modules/cesium/floodAnalysisLayer";
 
 let viewer: Cesium.Viewer | null = null;
 let analysisLayer: FloodAnalysisLayer | null = null;
 let mouseHandler: Cesium.ScreenSpaceEventHandler | null = null;
-let gridResult: PolygonGridResult | null = null;
+let gridResult: TerrainTriangleMesh | null = null;
 let polygonLngLats: LonLat[] = [];
 let positions: Cesium.Cartesian3[] = [];
 let isDrawing = false;
@@ -141,7 +141,7 @@ const floodResult = shallowRef<FloodResult | null>(null);
 const regionArea = computed(() => {
   const result = floodResult.value;
   const grid = gridResult;
-  return result && grid ? result.totalCount * grid.cellArea : 0;
+  return result && grid ? (result.totalArea ?? grid.surfaceArea) : 0;
 });
 
 const formatInteger = (value: number) => Math.round(value).toLocaleString();
@@ -158,12 +158,12 @@ const toLonLat = (position: Cesium.Cartesian3): LonLat => {
   };
 };
 
-const getInitialTargetLevel = (grid: PolygonGridResult) => {
+const getInitialTargetLevel = (grid: TerrainTriangleMesh) => {
   const span = Math.max(grid.maxHeight - grid.minHeight, 1);
   return grid.minHeight + span * 0.85;
 };
 
-const syncSliderRange = (grid: PolygonGridResult) => {
+const syncSliderRange = (grid: TerrainTriangleMesh) => {
   const span = Math.max(grid.maxHeight - grid.minHeight, 1);
   sliderMin.value = Number((grid.minHeight - Math.max(span * 0.05, 1)).toFixed(2));
   sliderMax.value = Number((grid.maxHeight + Math.max(span * 0.15, 5)).toFixed(2));
@@ -286,12 +286,12 @@ const scheduleFloodUpdate = () => {
   }, 120);
 };
 
-const applySampledGrid = async (grid: PolygonGridResult, token: number, animate: boolean) => {
+const applySampledGrid = async (grid: TerrainTriangleMesh, token: number, animate: boolean) => {
   if (!viewer || !analysisLayer || token !== sampleToken) return;
 
-  const validCount = grid.points.filter((point) => point.inside).length;
+  const validCount = grid.triangles.length;
   if (!validCount) {
-    hint.value = "区域内无有效网格，请增大绘制范围或调整间距";
+    hint.value = "区域内无有效三角面，请增大绘制范围或调整间距";
     floodResult.value = null;
     gridReady.value = false;
     return;
@@ -331,7 +331,7 @@ const sampleCurrentPolygon = async (animate = false) => {
   hint.value = "";
 
   try {
-    const grid = await samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value);
+    const grid = await sampleTerrainTriangleMesh(viewer, polygonLngLats, gridSpacing.value);
     await applySampledGrid(grid, token, animate);
   } catch (error) {
     if (token !== sampleToken) return;

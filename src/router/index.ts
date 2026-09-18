@@ -365,24 +365,9 @@ const routes: Array<RouteRecordRaw> = [
       },
       // analys
       {
-        path: '/example/position',
-        name: 'position',
-        component: () => import('@/views/example/analysis/position.vue')
-      },
-      {
-        path: '/example/distance',
-        name: 'distance',
-        component: () => import('@/views/example/analysis/distance.vue')
-      },
-      {
-        path: '/example/height',
-        name: 'height',
-        component: () => import('@/views/example/analysis/height.vue')
-      },
-      {
-        path: '/example/area',
-        name: 'area',
-        component: () => import('@/views/example/analysis/area.vue')
+        path: '/example/measure',
+        name: 'measure',
+        component: () => import('@/views/example/analysis/measure.vue')
       },
       {
         path: '/example/cutfill',

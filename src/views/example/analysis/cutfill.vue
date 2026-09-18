@@ -71,14 +71,15 @@ import * as Cesium from "cesium";
 import * as echarts from "echarts";
 import Map from "@/components/cesium/map.vue";
 import {
-  buildGridPrimitive,
+  buildTerrainTriangleGroundPrimitive,
   computeCutFill,
   pickPositionOnMap,
-  samplePolygonGrid,
+  sampleTerrainTriangleMesh,
   type CutFillCell,
   type CutFillResult,
   type LonLat,
-  type PolygonGridResult,
+  type TerrainAnalysisPrimitive,
+  type TerrainTriangleMesh,
 } from "@/modules/cesium/analysisUtils";
 
 var viewer: Cesium.Viewer;
@@ -93,9 +94,9 @@ const regionArea = ref(0);
 const chartRef = ref<HTMLDivElement>();
 
 let chart: echarts.ECharts | null = null;
-let gridResult: PolygonGridResult | null = null; // 采样网格缓存
+let gridResult: TerrainTriangleMesh | null = null; // 采样三角网缓存
 let polygonLngLats: LonLat[] = []; // 已绘制区域（改间距重新采样用）
-let gridPrimitive: Cesium.Primitive | null = null;
+let gridPrimitive: TerrainAnalysisPrimitive | null = null;
 let boundaryEntity: Cesium.Entity | null = null;
 let previewLineEntity: Cesium.Entity | null = null;
 let labelEntity: Cesium.Entity | null = null;
@@ -219,23 +220,16 @@ const renderGrid = () => {
   }
   if (!gridResult || !result.value) return;
 
-  // 注意：不能用全局 Map，组件名 Map 会遮蔽全局构造函数
-  const cellMap: Record<string, CutFillCell> = {};
-  result.value.cells.forEach((c) => {
-    cellMap[`${c.row},${c.col}`] = c;
-  });
   const maxAbs = result.value.cells.reduce((m, c) => Math.max(m, Math.abs(c.dh)), 0.001);
 
-  const colorOf = (row: number, col: number): Cesium.Color => {
-    const cell = cellMap[`${row},${col}`];
-    if (!cell) return Cesium.Color.GRAY.withAlpha(0.2);
+  const colorOf = (cell: CutFillCell): Cesium.Color => {
     const t = Math.min(Math.abs(cell.dh) / maxAbs, 1);
     if (cell.dh > 0.5) return Cesium.Color.fromCssColorString("#ff4757").withAlpha(0.25 + 0.55 * t);
     if (cell.dh < -0.5) return Cesium.Color.fromCssColorString("#00d2ff").withAlpha(0.25 + 0.55 * t);
     return Cesium.Color.fromCssColorString("#9aa0a6").withAlpha(0.35);
   };
 
-  const primitive = buildGridPrimitive(gridResult, colorOf, 1.5);
+  const primitive = buildTerrainTriangleGroundPrimitive(result.value.cells, colorOf);
   if (primitive) {
     viewer.scene.primitives.add(primitive);
     gridPrimitive = primitive;
@@ -297,7 +291,7 @@ const computeFromGrid = () => {
   if (!gridResult) return;
   const base = baseMode.value === "manual" ? manualBase.value : undefined;
   result.value = computeCutFill(gridResult, base);
-  regionArea.value = result.value.cells.length * gridResult.cellArea;
+  regionArea.value = result.value.surfaceArea ?? gridResult.surfaceArea;
   renderGrid();
   renderChart();
 };
@@ -307,7 +301,7 @@ const resample = async () => {
   if (!polygonLngLats.length || !gridResult) return;
   computing.value = true;
   try {
-    gridResult = await samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value);
+    gridResult = await sampleTerrainTriangleMesh(viewer, polygonLngLats, gridSpacing.value);
     computeFromGrid();
   } catch (error) {
     console.error("网格采样失败:", error);
@@ -343,7 +337,7 @@ const finishDrawing = () => {
 
   hint.value = "";
   computing.value = true;
-  samplePolygonGrid(viewer, polygonLngLats, gridSpacing.value)
+  sampleTerrainTriangleMesh(viewer, polygonLngLats, gridSpacing.value)
     .then((g) => {
       gridResult = g;
       drawBoundary();

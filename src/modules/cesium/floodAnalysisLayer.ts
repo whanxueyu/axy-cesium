@@ -1,9 +1,9 @@
 import * as Cesium from "cesium";
 import {
-  buildGridPrimitive,
+  buildTerrainTriangleGroundPrimitive,
   type FloodResult,
   type LonLat,
-  type PolygonGridResult,
+  type TerrainTriangleMesh,
 } from "@/modules/cesium/analysisUtils";
 
 interface FloodAnalysisLayerOptions {
@@ -25,7 +25,7 @@ export class FloodAnalysisLayer {
   private waterVolumeEntity: Cesium.Entity | null = null;
   private labelEntity: Cesium.Entity | null = null;
   private pointEntities: Cesium.Entity[] = [];
-  private depthPrimitive: Cesium.Primitive | null = null;
+  private depthPrimitive: Cesium.GroundPrimitive | null = null;
 
   constructor(viewer: Cesium.Viewer, options: FloodAnalysisLayerOptions) {
     this.viewer = viewer;
@@ -76,7 +76,7 @@ export class FloodAnalysisLayer {
   renderAnalysisArea(
     polygonLngLats: LonLat[],
     boundaryPositions: Cesium.Cartesian3[],
-    grid: PolygonGridResult,
+    grid: TerrainTriangleMesh,
   ) {
     this.drawBoundary(boundaryPositions);
     this.drawWaterBody(polygonLngLats, grid.minHeight - Math.max(grid.spacing * 0.2, 2));
@@ -84,25 +84,17 @@ export class FloodAnalysisLayer {
     this.requestRender();
   }
 
-  renderFloodDepth(grid: PolygonGridResult | null, result: FloodResult | null) {
+  renderFloodDepth(grid: TerrainTriangleMesh | null, result: FloodResult | null) {
     this.removeDepthPrimitive();
     if (!grid || !result || result.floodedCount === 0 || result.maxDepth <= 0) {
       this.requestRender();
       return;
     }
 
-    const depthByCell = new Map<string, number>();
-    result.cells.forEach((cell) => {
-      depthByCell.set(`${cell.row},${cell.col}`, cell.depth);
-    });
-
-    const primitive = buildGridPrimitive(
-      grid,
-      (row, col) => {
-        const depth = depthByCell.get(`${row},${col}`);
-        if (!depth) return new Cesium.Color(0, 0, 0, 0);
-
-        const t = Math.min(depth / result.maxDepth, 1);
+    const primitive = buildTerrainTriangleGroundPrimitive(
+      result.cells,
+      (cell) => {
+        const t = Math.min(cell.depth / result.maxDepth, 1);
         const color = Cesium.Color.lerp(
           SHALLOW_FLOOD_COLOR,
           DEEP_FLOOD_COLOR,
@@ -112,7 +104,6 @@ export class FloodAnalysisLayer {
         color.alpha = 0.28 + 0.52 * t;
         return color;
       },
-      2,
     );
 
     if (primitive) {

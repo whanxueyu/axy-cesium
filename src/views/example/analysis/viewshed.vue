@@ -166,6 +166,7 @@ import {
   type ArticleSensorFrame,
 } from "@/modules/cesium/viewshedGeometry";
 import {
+  computeTerrainPolygonSurfaceArea,
   sampleTerrainHeights,
   type TerrainSample,
 } from "@/modules/cesium/analysisUtils";
@@ -713,7 +714,7 @@ const buildViewshedCells = (rows: ViewshedRayRow[]) => {
         distanceIndex === 1
           ? [innerLeft, outerLeft, outerRight]
           : [innerLeft, outerLeft, outerRight, innerRight];
-      const area = estimateCellArea(leftRow.angle, rightRow.angle, innerLeft.distance, outerLeft.distance);
+      const area = computeTerrainPolygonSurfaceArea(positions);
 
       cells.push({
         positions,
@@ -858,16 +859,6 @@ const directionByAzimuthPitch = (
     Cesium.Cartesian3.add(horizontalPart, verticalPart, new Cesium.Cartesian3()),
     new Cesium.Cartesian3(),
   );
-};
-
-const estimateCellArea = (
-  leftAngle: number,
-  rightAngle: number,
-  innerDistance: number,
-  outerDistance: number,
-) => {
-  const angle = Math.abs(Cesium.Math.toRadians(rightAngle - leftAngle));
-  return (angle * (outerDistance * outerDistance - innerDistance * innerDistance)) / 2;
 };
 
 const clearObserverEntities = () => {
