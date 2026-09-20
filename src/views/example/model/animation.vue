@@ -81,10 +81,10 @@
           <span>模型缩放</span>
           <el-input-number
             v-model="modelScale"
-            :min="1"
-            :max="10000000"
-            :step="1000"
-            :precision="0"
+            :min="0.01"
+            :max="1000000"
+            :step="1"
+            :precision="2"
             controls-position="right"
             size="small"
             :disabled="loading || !selectedModel"
@@ -262,8 +262,15 @@ interface AnimationModelDefinition {
   fileName: string;
   imageFileName: string;
   defaultScale: number;
-  defaultCameraHeight: number;
 }
+
+interface ModelFocusBounds {
+  centerOffset: Cesium.Cartesian3;
+  radius: number;
+  referenceScale: number;
+}
+
+const ASSET_ROOT_SCALE = 0.01;
 
 // 新增动画模型时，在这里补充对应的 GLB 和预览图即可。
 const MODEL_CATALOG: AnimationModelDefinition[] = [
@@ -272,47 +279,43 @@ const MODEL_CATALOG: AnimationModelDefinition[] = [
     name: "Breakdancer",
     fileName: "Breakdancer.glb",
     imageFileName: "Breakdancer.png",
-    defaultScale: 100000,
-    defaultCameraHeight: 1000,
+    defaultScale: 10,
   },
   {
     id: "curious-skeleton",
     name: "Curious Skeleton",
     fileName: "Curious skeleton.glb",
     imageFileName: "Curious skeleton.png",
-    defaultScale: 100000,
-    defaultCameraHeight: 1000,
+    defaultScale: 10,
   },
   {
     id: "dancing-troll",
     name: "Dancing Troll",
     fileName: "Dancing troll.glb",
     imageFileName: "Dancing troll.png",
-    defaultScale: 100000,
-    defaultCameraHeight: 1000,
+    defaultScale: 10,
   },
   {
     id: "playful-dog",
     name: "Playful Dog",
     fileName: "Playful dog.glb",
     imageFileName: "Playful dog.png",
-    defaultScale: 100000,
-    defaultCameraHeight: 1000,
+    defaultScale: 10,
   },
   {
     id: "rampaging-t-rex",
     name: "Rampaging T-Rex",
     fileName: "Rampaging T-Rex.glb",
     imageFileName: "Rampaging T-Rex.png",
-    defaultScale: 100000,
-    defaultCameraHeight: 1000,
+    defaultScale: 10,
   },
 ];
 
 const DEFAULT_MODEL_ID = "rampaging-t-rex";
 const MODEL_POSITION = {
-  longitude: 116.391257,
-  latitude: 39.907204,
+  // 天津蓟州盘山附近，避开敏感地标，也能保留山地环境作为模型背景。
+  longitude: 117.282351,
+  latitude: 40.097171,
   height: 0,
 };
 
@@ -337,7 +340,7 @@ const ANIMATION_LABELS: Record<string, string> = {
 const cameraDestination = {
   longitude: MODEL_POSITION.longitude,
   latitude: MODEL_POSITION.latitude,
-  height: 1000,
+  height: 1800,
 };
 
 const cameraOrientation = {
@@ -390,6 +393,7 @@ let animationStartTime: Cesium.JulianDate | null = null;
 let removeTickListener: (() => void) | null = null;
 let loadRequestId = 0;
 let suppressStopEvent = false;
+let modelFocusBounds: ModelFocusBounds | null = null;
 
 const togglePanel = () => {
   showPanel.value = !showPanel.value;
@@ -434,8 +438,8 @@ const loadModel = async () => {
     const loadedModel = await Cesium.Model.fromGltfAsync({
       url: getModelAssetUrl(modelDefinition.fileName),
       modelMatrix,
-      scale: modelScale.value,
-      minimumPixelSize: 64,
+      scale: modelScale.value * ASSET_ROOT_SCALE,
+      minimumPixelSize: 0,
       clampAnimations: true,
       shadows: Cesium.ShadowMode.ENABLED,
       silhouetteColor: Cesium.Color.fromCssColorString("#44e5ff"),
@@ -465,8 +469,32 @@ const loadModel = async () => {
       return;
     }
 
+    const modelTranslation = Cesium.Matrix4.getTranslation(
+      loadedModel.modelMatrix,
+      new Cesium.Cartesian3(),
+    );
+    const initialBounds = Cesium.BoundingSphere.clone(
+      loadedModel.boundingSphere,
+      new Cesium.BoundingSphere(),
+    );
+    modelFocusBounds = {
+      centerOffset: Cesium.Cartesian3.subtract(
+        initialBounds.center,
+        modelTranslation,
+        new Cesium.Cartesian3(),
+      ),
+      radius: initialBounds.radius,
+      referenceScale: modelScale.value,
+    };
+
+    // These assets contain the same 0.01 scale on the root node and on the
+    // skin's joint matrices. Reset the root once so skinned vertices are not
+    // scaled down a second time.
+    const rootNode = loadedModel.getNode("RootNode.0");
+    if (rootNode) {
+      rootNode.matrix = Cesium.Matrix4.IDENTITY;
+    }
     modelReady.value = true;
-    centerModelAtTarget();
 
     const idleIndex = animationDefinitions.value.findIndex(
       (animation) => animation.name === "idle",
@@ -503,8 +531,7 @@ const handleScaleChange = (value: number | undefined) => {
   modelScale.value = value;
   if (!model) return;
 
-  model.scale = value;
-  centerModelAtTarget();
+  model.scale = value * ASSET_ROOT_SCALE;
   focusModel();
   viewer?.scene.requestRender();
 };
@@ -574,62 +601,46 @@ const extractAnimationDefinitions = (gltf: any): AnimationDefinition[] => {
   });
 };
 
-const centerModelAtTarget = () => {
-  if (!model) return;
-
-  const targetCenter = Cesium.Cartesian3.fromDegrees(
-    MODEL_POSITION.longitude,
-    MODEL_POSITION.latitude,
-    MODEL_POSITION.height,
-  );
-  const modelCenter = model.boundingSphere.center;
-  const translationOffset = Cesium.Cartesian3.subtract(
-    targetCenter,
-    modelCenter,
-    new Cesium.Cartesian3(),
-  );
-  const currentTranslation = Cesium.Matrix4.getTranslation(
-    model.modelMatrix,
-    new Cesium.Cartesian3(),
-  );
-  const nextTranslation = Cesium.Cartesian3.add(
-    currentTranslation,
-    translationOffset,
-    new Cesium.Cartesian3(),
-  );
-  const nextModelMatrix = Cesium.Matrix4.clone(
-    model.modelMatrix,
-    new Cesium.Matrix4(),
-  );
-
-  Cesium.Matrix4.setTranslation(nextModelMatrix, nextTranslation, nextModelMatrix);
-  model.modelMatrix = nextModelMatrix;
-};
-
 const focusModel = () => {
-  if (!viewer || !model) return;
+  if (!viewer || !model || !modelFocusBounds) return;
 
-  const modelDefinition = selectedModel.value;
-  const scaleRatio = modelDefinition.defaultScale > 0
-    ? modelScale.value / modelDefinition.defaultScale
-    : 1;
-  const cameraHeight = Math.max(
-    120,
-    Math.min(modelDefinition.defaultCameraHeight * scaleRatio, 20000),
+  const scaleRatio = modelScale.value / modelFocusBounds.referenceScale;
+  const modelTranslation = Cesium.Matrix4.getTranslation(
+    model.modelMatrix,
+    new Cesium.Cartesian3(),
+  );
+  const centerOffset = Cesium.Cartesian3.multiplyByScalar(
+    modelFocusBounds.centerOffset,
+    scaleRatio / ASSET_ROOT_SCALE,
+    new Cesium.Cartesian3(),
+  );
+  const boundingSphere = new Cesium.BoundingSphere(
+    Cesium.Cartesian3.add(
+      modelTranslation,
+      centerOffset,
+      new Cesium.Cartesian3(),
+    ),
+    (modelFocusBounds.radius * scaleRatio) / ASSET_ROOT_SCALE,
   );
 
-  viewer.camera.flyTo({
-    destination: Cesium.Cartesian3.fromDegrees(
-      MODEL_POSITION.longitude,
-      MODEL_POSITION.latitude,
-      MODEL_POSITION.height + cameraHeight,
+  // Model.boundingSphere does not include animated skin deformation and is
+  // also cached before the root-node correction above. Keep the camera on a
+  // stable sphere derived from the original asset bounds instead.
+  const focusSphere = Cesium.BoundingSphere.clone(
+    boundingSphere,
+    new Cesium.BoundingSphere(),
+  );
+
+  viewer.camera.flyToBoundingSphere(focusSphere, {
+    offset: new Cesium.HeadingPitchRange(
+      Cesium.Math.toRadians(cameraOrientation.heading),
+      Cesium.Math.toRadians(cameraOrientation.pitch),
+      Math.max(focusSphere.radius * 2.8, 1),
     ),
-    orientation: {
-      heading: Cesium.Math.toRadians(cameraOrientation.heading),
-      pitch: Cesium.Math.toRadians(cameraOrientation.pitch),
-      roll: Cesium.Math.toRadians(cameraOrientation.roll),
-    },
     duration: 1.2,
+    complete: () => {
+      viewer?.scene.requestRender();
+    },
   });
 };
 
@@ -637,6 +648,7 @@ const clearModel = () => {
   if (!model) {
     activeAnimation = null;
     animationStartTime = null;
+    modelFocusBounds = null;
     return;
   }
 
@@ -649,6 +661,7 @@ const clearModel = () => {
   model = null;
   activeAnimation = null;
   animationStartTime = null;
+  modelFocusBounds = null;
 };
 
 const startAnimationAt = (seconds: number, shouldPlay: boolean) => {
