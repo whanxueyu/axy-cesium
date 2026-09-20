@@ -145,21 +145,21 @@ export var caseList = [
     type: 'comprehensive',
     list: [
       {
-        imgurl: getImagePath('comprehensive', 'measurement'),
+        imgurl: defaultImg,
         title: '三维应急推演与通信保障',
         description: '规划融合3D Tiles、车辆轨迹、动态天气、淹没、通视、通信链路和CSS3D信息面板',
         path: '/example/emergencyScenario',
         status: 'planned'
       },
       {
-        imgurl: getImagePath('comprehensive', 'cameraFlight'),
+        imgurl: defaultImg,
         title: '轨迹巡检与相机编排',
         description: '规划以时间轴组织模型轨迹、相机关键帧、跟随视角和巡检事件，形成可回放巡航流程',
         path: '/example/cameraTimeline',
         status: 'planned'
       },
       {
-        imgurl: getImagePath('comprehensive', 'dynamicData'),
+        imgurl: defaultImg,
         title: '场景日夜交替',
         description: '根据时间变化模拟日夜交替效果，光照天空变换',
         path: '/example/dynamicData',
@@ -359,7 +359,7 @@ export var caseList = [
         path: '/example/dragableBillboard'
       },
       {
-        imgurl: getImagePath('billboard', 'divCluster'),
+        imgurl: defaultImg,
         title: 'div聚合标牌',
         description: '如果想要将div标牌也进行聚合的话可以参考这个实现',
         path: '/example/divCluster'
@@ -371,7 +371,7 @@ export var caseList = [
         path: '/example/css3DdivBillboard'
       },
       {
-        imgurl: getImagePath('billboard', 'primitiveCluster'),
+        imgurl: defaultImg,
         title: '标牌性能实验室',
         description: '规划对比 Entity、Primitive、HTML、CSS3D 标牌在大数据量下的FPS、聚合、遮挡、避让和LOD',
         path: '/example/billboardBenchmark',
@@ -474,14 +474,13 @@ export var caseList = [
         path: '/example/cityTileset'
       },
       {
-        imgurl: getImagePath('model', 'cityModel'),
+        imgurl: getImagePath('model', 'tileset'),
         title: '3D Tiles剖切与裁剪',
         description: '规划基于裁剪面实现平面剖切、盒裁剪和高度裁剪，用于查看建筑内部与模型断面',
         path: '/example/tilesetClipping',
-        status: 'planned'
       },
       {
-        imgurl: getImagePath('model', 'cityModel'),
+        imgurl: defaultImg,
         title: '3D Tiles楼层爆炸',
         description: '规划按楼层或构件分组展开，支持单体隐藏、透明化、属性查看、复位和相机定位',
         path: '/example/tilesetExplosion',
@@ -500,7 +499,7 @@ export var caseList = [
         path: '/example/pathTracking'
       },
       {
-        imgurl: getImagePath('model', 'pathTracking'),
+        imgurl: defaultImg,
         title: '轨迹编辑与相机跟随',
         description: '规划路径点编辑、时间轴播放、倍速暂停、第一/第三人称跟随、相机关键帧和巡检回放',
         path: '/example/trackPlayback',
@@ -567,7 +566,7 @@ export var caseList = [
         path: '/example/jamRadar'
       },
       {
-        imgurl: getImagePath('radar', 'jam'),
+        imgurl: defaultImg,
         title: '多节点通信覆盖分析',
         description: '规划多雷达/多终端链路连通图，叠加地形遮挡、通信半径、链路余量和移动目标变化',
         path: '/example/radioCoverage',
@@ -598,13 +597,13 @@ export var caseList = [
         path: '/example/weatherFog'
       },
       {
-        imgurl: getImagePath('material', 'lightning'),
+        imgurl: defaultImg,
         title: '闪电效果',
         description: '闪电照明与雷暴天空模拟',
         path: '/example/weatherLightning'
       },
       {
-        imgurl: getImagePath('material', 'cloud'),
+        imgurl: defaultImg,
         title: '体积云效果',
         description: '基于体积渲染的云层效果，支持云量、云速、云高度和云厚度调节',
         path: '/example/weatherCloud'
@@ -616,7 +615,7 @@ export var caseList = [
         path: '/example/heatmap'
       },
       {
-        imgurl: getImagePath('material', 'weather'),
+        imgurl: defaultImg,
         title: '天气与能见度联动',
         description: '规划雨、雪、雾、体积云、闪电组合预设，并联动可视距离、光照和场景氛围',
         path: '/example/weatherScenario',
@@ -647,21 +646,21 @@ export var caseList = [
         path: '/example/pointRotation'
       },
       {
-        imgurl: getImagePath('camera', 'orbit'),
+        imgurl: defaultImg,
         title: '轨道飞行',
         description: '规划沿预设轨道浏览，支持轨道编辑、速度控制、循环播放和视角插值',
         path: '/example/orbit',
         status: 'planned'
       },
       {
-        imgurl: getImagePath('camera', 'follow'),
+        imgurl: defaultImg,
         title: '跟随飞行',
         description: '规划绑定移动目标，支持第一人称、第三人称、侧后方跟随和跟随距离调节',
         path: '/example/follow',
         status: 'planned'
       },
       {
-        imgurl: getImagePath('camera', 'limitView'),
+        imgurl: defaultImg,
         title: '限制相机范围',
         description: '规划限制相机经纬度、高度、俯仰角和目标区域，适合园区/城市资产巡检场景',
         path: '/example/limitView',

@@ -256,6 +256,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/model/tileset.vue')
       },
       {
+        path: '/example/tilesetClipping',
+        name: 'tilesetClipping',
+        component: () => import('@/views/example/model/tilesetClipping.vue')
+      },
+      {
         path: '/example/editModel',
         name: 'editModel',
         component: () => import('@/views/example/model/editModel.vue')
