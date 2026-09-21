@@ -66,6 +66,10 @@ const imageResources = {
     tileset: 'tileset.png',
     editModel: 'editModel.png',
     cityModel: 'cityModel.png',
+    cityTileset: 'cityTileset.png',
+    tilesetExplosion: 'tilesetExplosion.png',
+    tilesetClipping: 'tilesetClipping.png',
+    trackPlayback: 'trackPlayback.png',
     pathTracking: 'pathTracking.png',
     moveControl: 'moveControl.png',
     mouseMoveControl: 'mouseMoveControl.png',
@@ -468,23 +472,22 @@ export var caseList = [
         path: '/example/tileset'
       },
       {
-        imgurl: getImagePath('model', 'cityModel'),
+        imgurl: getImagePath('model', 'cityTileset'),
         title: '3D Tiles城市构件检查',
-        description: '城市白膜加载、构件拾取、轮廓高亮与自定义着色，后续拓展属性面板和专题渲染',
+        description: '城市白膜加载、构件拾取、属性面板、轮廓高亮与按属性专题着色',
         path: '/example/cityTileset'
       },
       {
-        imgurl: getImagePath('model', 'tileset'),
+        imgurl: getImagePath('model', 'tilesetClipping'),
         title: '3D Tiles剖切与裁剪',
-        description: '规划基于裁剪面实现平面剖切、盒裁剪和高度裁剪，用于查看建筑内部与模型断面',
+        description: '基于裁剪面实现平面剖切、盒裁剪和高度裁剪，支持剖切面拖拽与复位',
         path: '/example/tilesetClipping',
       },
       {
-        imgurl: defaultImg,
-        title: '3D Tiles楼层爆炸',
-        description: '规划按楼层或构件分组展开，支持单体隐藏、透明化、属性查看、复位和相机定位',
+        imgurl: getImagePath('model', 'tilesetExplosion'),
+        title: '3D Tiles构件单体化',
+        description: '拾取构件后单体化查看，支持属性查看、定位、透明度、近距离保持和显示全部',
         path: '/example/tilesetExplosion',
-        status: 'planned'
       },
       {
         imgurl: getImagePath('model', 'editModel'),
@@ -499,11 +502,10 @@ export var caseList = [
         path: '/example/pathTracking'
       },
       {
-        imgurl: defaultImg,
+        imgurl: getImagePath('model', 'trackPlayback'),
         title: '轨迹编辑与相机跟随',
-        description: '规划路径点编辑、时间轴播放、倍速暂停、第一/第三人称跟随、相机关键帧和巡检回放',
+        description: '支持路径点编辑、时间轴播放、倍速暂停、第一/第三人称跟随和相机关键帧巡航',
         path: '/example/trackPlayback',
-        status: 'planned'
       },
       {
         imgurl: getImagePath('model', 'moveControl'),
