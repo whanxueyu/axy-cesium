@@ -271,9 +271,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/example/model/cityTileset.vue')
       },
       {
+        path: '/example/tilesetExplosion',
+        name: 'tilesetExplosion',
+        component: () => import('@/views/example/model/tilesetExplosion.vue')
+      },
+      {
         path: '/example/pathTracking',
         name: 'pathTracking',
         component: () => import('@/views/example/model/pathTracking.vue')
+      },
+      {
+        path: '/example/trackPlayback',
+        name: 'trackPlayback',
+        component: () => import('@/views/example/model/trackPlayback.vue')
       },
       {
         path: '/example/moveControl',
